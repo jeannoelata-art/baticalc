@@ -119,8 +119,8 @@ footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;font-size:12px;color:
 <script>
 (function () {
   // === À COMPLÉTER AVANT DE PUBLIER : votre nom et votre e-mail ===
-  var EDITEUR = "ATA A DJOOH MERVEIL JEAN-NOEL";
-  var CONTACT = "jeannoelata@gmail.com";
+  var EDITEUR = "À COMPLÉTER : votre nom";
+  var CONTACT = "À COMPLÉTER : votre e-mail";
   // ==================================================================
   var SAC = 50, KEY = "baticalc_v2";
   var MORT = { "10": 0.018, "15": 0.025, "20": 0.033 };
@@ -187,6 +187,7 @@ footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;font-size:12px;color:
     return sel(r, "dos", label, DOS.map(function (d) { return [d, d + " kg/m³"]; }), cur);
   }
   function cur(r) { return POSTES[r][$("sel-" + r).selectedIndex]; }
+
   function fillDef(r) {
     var p = cur(r), dos = parseFloat($(r + "-dos").value);
     var d = p.t === "b" ? { sa: 0.4, gr: 0.8, ea: 175 } : { sa: 1, ea: 200 };
@@ -258,7 +259,7 @@ footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;font-size:12px;color:
       if (!(a[0] > 0 && a[1] > 0 && a[2] > 0 && a[3] > 0)) { return bad(r, "Remplissez toutes les cases avec des nombres supérieurs à 0."); }
       V = a[0] * a[1] * a[2] * a[3] * (1 + P / 100);
       e = { nom: p.nom + " " + dos + " kg/m³ (" + fmt(V, 2) + " m³ avec perte)", kg: V * dos, sable: V * rd(r, "sa", 0.4), gravier: V * rd(r, "gr", 0.8), eau: V * rd(r, "ea", 175), parp: {} };
-      } else if (p.t === "m") {
+    } else if (p.t === "m") {
       var L = num(r + "-L"), H = num(r + "-H"), O = n0(r + "-O");
       var ep = $(r + "-ep").value, ty = $(r + "-ty").value;
       if (!(L > 0) || !(H > 0)) { return bad(r, "Entrez la longueur et la hauteur du mur (nombres supérieurs à 0)."); }
@@ -338,7 +339,94 @@ footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;font-size:12px;color:
     recap.forEach(function (x) { h += "<tr><td>" + x[0] + '</td><td class="n">' + money(x[1]) + "</td></tr>"; });
     if (mo > 0) { h += "<tr><td>Main d'œuvre</td><td class=\"n\">" + money(mo) + "</td></tr>"; }
     h += '<tr class="tot"><td>TOTAL ESTIMATIF</td><td class="n">' + money(tot + mo) + "</td></tr></table>";
+
     var T = { kg: 0, sable: 0, gravier: 0, eau: 0, parp: {} };
     entries.forEach(function (e) {
       T.kg += e.kg; T.sable += e.sable; T.gravier += e.gravier; T.eau += e.eau;
       Object.keys(e.parp).forEach(function (k) { T.parp[k] = (T.parp[k] || 0) + e.parp[k]; });
+    });
+    h += '<h3>Liste des matériaux à acheter</h3><table class="dv">';
+    Object.keys(T.parp).forEach(function (k) { h += "<tr><td>" + Cap(plab(k)) + '</td><td class="n">' + fmt(T.parp[k], 0) + "</td></tr>"; });
+    h += '<tr><td>Ciment (sacs de 50 kg)</td><td class="n">' + fmt(sacs(T.kg), 0) + "</td></tr>" +
+      '<tr><td>Sable</td><td class="n">' + fmt(T.sable, 2) + " m³</td></tr>";
+    if (T.gravier > 0) { h += '<tr><td>Gravier</td><td class="n">' + fmt(T.gravier, 2) + " m³</td></tr>"; }
+    h += '<tr><td>Eau (environ)</td><td class="n">' + fmt(T.eau, 0) + " litres</td></tr></table>";
+    $("dv-body").innerHTML = h;
+  }
+
+  function go(tab) {
+    var ps = document.querySelectorAll(".panel"), bs = document.querySelectorAll("#tabs button"), i;
+    for (i = 0; i < ps.length; i++) { ps[i].classList.remove("on"); }
+    for (i = 0; i < bs.length; i++) { bs[i].classList.toggle("on", bs[i].getAttribute("data-tab") === tab); }
+    $(tab).classList.add("on");
+    if (tab === "devis") { renderDevis(); }
+    window.scrollTo(0, 0);
+  }
+
+  var AIDE = {
+    fond: "Choisissez un poste, entrez les dimensions en mètres, puis calculez.",
+    elev: "Choisissez un poste, entrez les dimensions en mètres, puis calculez.",
+    enduit: "Entrez la surface à crépir et l'épaisseur de l'enduit."
+  };
+  var html = "";
+  ORD.forEach(function (r) {
+    html += '<section class="panel' + (r === "fond" ? " on" : "") + '" id="' + r + '"><h2>' + RUB[r] + '</h2><p class="aide">' + AIDE[r] +
+      '</p><label for="sel-' + r + '">Poste</label><select id="sel-' + r + '"></select><div id="form-' + r + '"></div>' +
+      '<button type="button" class="btn" id="go-' + r + '">Calculer</button><div class="res" id="res-' + r + '"></div>' +
+      '<button type="button" class="btn bleu" id="add-' + r + '" disabled>Ajouter au devis</button>' +
+      '<div class="pro">L\'acier (armatures) est disponible dans la <b>version Pro</b>.</div></section>';
+  });
+  $("devis").insertAdjacentHTML("beforebegin", html);
+
+  var ph = "";
+  PRIX.forEach(function (x) {
+    ph += '<div><label for="' + x[0] + '">' + x[1] + '</label><input id="' + x[0] + '" type="text" inputmode="decimal" value="' + x[2] + '"></div>';
+  });
+  $("prix").innerHTML = ph;
+
+  ORD.forEach(function (r) {
+    var s = $("sel-" + r), o = "";
+    POSTES[r].forEach(function (p, i) { o += '<option value="' + i + '">' + esc(p.nom) + "</option>"; });
+    s.innerHTML = o;
+    s.addEventListener("change", function () { buildForm(r); });
+    buildForm(r);
+    $("go-" + r).addEventListener("click", function () { calc(r); });
+    $("add-" + r).addEventListener("click", function () {
+      if (!pend[r]) { return; }
+      entries.push(pend[r]);
+      pend[r] = null;
+      $("add-" + r).disabled = true;
+      $("res-" + r).innerHTML += "<p><b>Ajouté au devis.</b> Ouvrez « Mon devis » pour voir le total.</p>";
+      save();
+      renderDevis();
+    });
+  });
+
+  var bs = document.querySelectorAll("#tabs button");
+  for (var i = 0; i < bs.length; i++) {
+    bs[i].addEventListener("click", function (ev) { go(ev.currentTarget.getAttribute("data-tab")); });
+  }
+  PRIX.map(function (x) { return x[0]; }).concat(["p-client"]).forEach(function (id) {
+    $(id).addEventListener("input", function () { renderDevis(); save(); });
+  });
+  $("dv-body").addEventListener("click", function (ev) {
+    var d = ev.target.getAttribute ? ev.target.getAttribute("data-del") : null;
+    if (d !== null && d !== undefined) { entries.splice(parseInt(d, 10), 1); save(); renderDevis(); }
+  });
+  $("dv-print").addEventListener("click", function () { renderDevis(); window.print(); });
+  $("dv-clear").addEventListener("click", function () {
+    if (window.confirm("Vider tout le devis ?")) { entries = []; save(); renderDevis(); }
+  });
+  var nn = document.querySelectorAll(".lg-nom"), mm = document.querySelectorAll(".lg-mail"), q;
+  for (q = 0; q < nn.length; q++) { nn[q].textContent = EDITEUR; }
+  for (q = 0; q < mm.length; q++) { mm[q].textContent = CONTACT; }
+  var gl = document.querySelectorAll("[data-go]");
+  for (q = 0; q < gl.length; q++) {
+    gl[q].addEventListener("click", function (ev) { ev.preventDefault(); go(ev.currentTarget.getAttribute("data-go")); });
+  }
+  load();
+  renderDevis();
+})();
+</script>
+</body>
+</html>
