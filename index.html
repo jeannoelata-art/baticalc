@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BatiCalc - Devis estimatif du bâtiment</title>
+<meta name="description" content="Application gratuite pour calculer les matériaux et le devis estimatif d'un ouvrage : fondation, élévation, enduit.">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f2f5f9;color:#1b2a3a;font-size:16px}
+header{background:#1f4e79;color:#fff;padding:14px;text-align:center}
+header h1{margin:0;font-size:26px}
+header p{margin:4px 0 0;font-size:14px;opacity:.9}
+nav{display:flex;gap:6px;overflow-x:auto;padding:10px;background:#fff;position:sticky;top:0;border-bottom:1px solid #d5dde6;z-index:5}
+nav button{flex:0 0 auto;padding:10px 14px;border:1px solid #1f4e79;background:#fff;color:#1f4e79;border-radius:20px;font-size:15px;font-weight:bold}
+nav button.on{background:#1f4e79;color:#fff}
+main{max-width:640px;margin:0 auto;padding:12px}
+.panel{display:none;background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.panel.on{display:block}
+h2{margin:0 0 4px;font-size:20px;color:#1f4e79}
+h3{margin:18px 0 0;font-size:17px;color:#1f4e79}
+.aide{margin:0 0 10px;font-size:14px;color:#566678}
+label{display:block;margin:10px 0 4px;font-weight:bold;font-size:15px}
+input,select{width:100%;padding:12px;font-size:17px;border:1px solid #b8c4d0;border-radius:8px;background:#fff;color:#1b2a3a}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.btn{display:block;width:100%;margin-top:14px;padding:14px;font-size:17px;font-weight:bold;border:0;border-radius:10px;color:#fff;background:#1f7a3d}
+.btn.bleu{background:#1f4e79}
+.btn.rouge{background:#b3261e}
+.btn:disabled{opacity:.45}
+.res{margin-top:14px;padding:12px;background:#eaf6ea;border:1px solid #9fcfa8;border-radius:10px;display:none}
+.res.err{background:#fdecea;border-color:#e3a19b}
+.res.show{display:block}
+.res table{width:100%;border-collapse:collapse}
+.res td{padding:5px 0;border-bottom:1px solid #cfe5d3}
+.res td:last-child{text-align:right;font-weight:bold}
+table.dv{width:100%;border-collapse:collapse;margin-top:8px;font-size:15px}
+table.dv th,table.dv td{border:1px solid #c9d3dd;padding:7px;text-align:left;vertical-align:top}
+table.dv th{background:#dce9f5}
+table.dv .n{text-align:right;white-space:nowrap}
+table.dv tr.tot td{font-weight:bold;background:#f0f6fc}
+small{color:#566678}
+.sup{padding:4px 9px;font-size:14px;border:1px solid #b3261e;color:#b3261e;background:#fff;border-radius:6px}
+.note{margin-top:14px;font-size:13px;color:#566678}
+.info{background:#eaf1fa;border:1px solid #9db9d8;border-radius:10px;padding:10px;margin-top:10px;font-size:14px}
+.pro{background:#fff8e6;border:1px solid #e6c36a;border-radius:10px;padding:10px;margin-top:14px;font-size:14px}
+footer a{color:#1f4e79;font-weight:bold}
+ul{padding-left:20px;line-height:1.7}
+#legal p,#legal li{font-size:15px;line-height:1.6}
+footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;font-size:12px;color:#566678;text-align:center}
+@media print{nav,.noprint,footer,header p{display:none !important}.panel{display:none !important}#devis{display:block !important;box-shadow:none}body{background:#fff}}
+</style>
+</head>
+<body>
+<header><h1>BatiCalc</h1><p>Devis estimatif du bâtiment</p></header>
+<nav id="tabs">
+ <button type="button" data-tab="fond" class="on">Fondation</button>
+ <button type="button" data-tab="elev">Élévation</button>
+ <button type="button" data-tab="enduit">Enduit</button>
+ <button type="button" data-tab="devis">Mon devis</button>
+ <button type="button" data-tab="pro">Version Pro</button>
+ <button type="button" data-tab="legal">Légal</button>
+</nav>
+<main>
+<section class="panel" id="devis">
+ <h2>Devis estimatif de l'ouvrage</h2>
+ <p class="aide noprint">Entrez vos prix (les valeurs sont des exemples à modifier). Le devis se met à jour tout seul.</p>
+ <label for="p-client">Nom du client ou du chantier</label>
+ <input id="p-client" type="text" placeholder="ex : Maison M. Dupont">
+ <div class="noprint"><h3>Mes prix (FCFA)</h3><div class="grid" id="prix"></div></div>
+ <div id="dv-date" class="aide" style="margin-top:12px"></div>
+ <div id="dv-body"></div>
+ <button type="button" class="btn bleu noprint" id="dv-print">Imprimer ou enregistrer en PDF</button>
+ <button type="button" class="btn rouge noprint" id="dv-clear">Vider le devis</button>
+ <p class="note">Estimation indicative. Les quantités réelles varient selon les matériaux et les méthodes de travail. Faites vérifier ce devis par un professionnel avant tout achat.</p>
+</section>
+<section class="panel" id="pro">
+ <h2>Version Pro (bientôt disponible)</h2>
+ <p class="aide">Pour les entreprises et les professionnels du bâtiment.</p>
+ <ul>
+  <li><b>Acier</b> : barres, cadres, fil de fer, en kilos</li>
+  <li><b>Carrelage</b> : carreaux, colle, joints</li>
+  <li><b>Peinture</b> : litres, nombre de couches</li>
+  <li>Plusieurs chantiers et clients sauvegardés</li>
+  <li>Devis PDF professionnel : logo, TVA, marge, remise</li>
+  <li>Main d'œuvre détaillée par poste</li>
+  <li>Liste d'achats à envoyer au fournisseur</li>
+  <li>Export Excel</li>
+  <li>Prix par ville</li>
+ </ul>
+</section>
+<section class="panel" id="legal">
+ <h2>Informations légales</h2>
+ <p class="aide">Dernière mise à jour : octobre 2026</p>
+
+ <h3>Mentions légales</h3>
+ <p>Éditeur du site : <b class="lg-nom"></b>, Cameroun.<br>Contact : <b class="lg-mail"></b><br>Hébergeur : Vercel Inc. (États-Unis).<br>BatiCalc est un outil de calcul de matériaux et de devis estimatif pour le bâtiment.</p>
+
+ <h3>Conditions d'utilisation</h3>
+ <ul>
+  <li><b>Estimations indicatives.</b> Les quantités et les montants affichés sont des estimations basées sur des valeurs courantes. Ils n'ont aucune valeur contractuelle et ne remplacent pas un devis établi par un professionnel.</li>
+  <li><b>Pas une étude technique.</b> BatiCalc ne réalise ni calcul de structure, ni dimensionnement, ni étude de sol. Faites valider tout ouvrage par un ingénieur ou un technicien qualifié avant de construire ou d'acheter.</li>
+  <li><b>Responsabilité.</b> L'utilisateur reste responsable de l'usage des résultats. Dans la limite permise par la loi, l'éditeur ne peut être tenu responsable des pertes, erreurs d'achat ou dommages liés à l'utilisation de l'outil.</li>
+  <li><b>Disponibilité.</b> Le service est fourni tel quel, sans garantie d'accès continu. Il peut être modifié ou interrompu à tout moment.</li>
+  <li><b>Propriété intellectuelle.</b> Le nom BatiCalc, le code, les textes et la présentation du site appartiennent à l'éditeur. Toute copie ou réutilisation sans autorisation écrite est interdite.</li>
+  <li><b>Droit applicable.</b> Les présentes conditions sont soumises au droit camerounais. L'éditeur peut les modifier ; la date de mise à jour figure en haut de cette page.</li>
+ </ul>
+
+ <h3>Politique de confidentialité</h3>
+ <ul>
+  <li><b>Aucune collecte.</b> Cette version ne demande ni compte, ni e-mail, ni numéro de téléphone, et ne contient ni publicité ni outil de suivi.</li>
+  <li><b>Vos données restent chez vous.</b> Les prix, les calculs et le nom du client ou du chantier sont enregistrés uniquement dans le navigateur de votre appareil. Ils ne sont jamais envoyés à l'éditeur. Vous pouvez les effacer avec le bouton « Vider le devis » ou en supprimant les données du site dans votre navigateur.</li>
+  <li><b>Hébergement.</b> L'hébergeur peut enregistrer des journaux techniques standards (par exemple l'adresse IP) pour assurer la sécurité et le fonctionnement du site.</li>
+  <li><b>Évolutions.</b> Si des fonctions utilisant des données personnelles sont ajoutées (comptes, paiements), cette politique sera mise à jour et votre consentement sera demandé, conformément à la loi camerounaise n° 2024/017 sur la protection des données personnelles.</li>
+  <li><b>Vos droits.</b> Pour toute question ou demande concernant vos données : <span class="lg-mail"></span>.</li>
+ </ul>
+</section>
+</main>
+<footer>BatiCalc - Estimations indicatives, à vérifier avec un professionnel.<br><a href="#" data-go="legal">Mentions légales</a> · <a href="#" data-go="legal">Confidentialité</a> · <a href="#" data-go="legal">Conditions d'utilisation</a></footer>
+<script>
+(function () {
+  // === À COMPLÉTER AVANT DE PUBLIER : votre nom et votre e-mail ===
+  var EDITEUR = "ATA A DJOOH MERVEIL JEAN-NOEL";
+  var CONTACT = "jeannoelata@gmail.com";
+  // ==================================================================
+  var SAC = 50, KEY = "baticalc_v2";
+  var MORT = { "10": 0.018, "15": 0.025, "20": 0.033 };
+  var RUB = { fond: "Fondation", elev: "Élévation", enduit: "Enduit (crépissage)" };
+  var ORD = ["fond", "elev", "enduit"];
+  var DOS = [150, 200, 250, 300, 350, 400, 450];
+  var entries = [], pend = {};
+
+  function B(nom, dos, l, v) { return { nom: nom, t: "b", dos: dos, l: l, v: v }; }
+  var L4 = ["Nombre", "Longueur totale (m)", "Largeur (m)", "Hauteur (m)"];
+  var POSTES = {
+    fond: [
+      B("Béton de propreté", 200, ["Nombre", "Longueur (m)", "Largeur (m)", "Épaisseur (m)"], [1, "", "", 0.05]),
+      B("Semelles", 350, ["Nombre de semelles", "Longueur (m)", "Largeur (m)", "Hauteur (m)"], ["", "", "", 0.3]),
+      B("Amorces de poteaux", 350, ["Nombre de poteaux", "Côté a (m)", "Côté b (m)", "Hauteur (m)"], ["", 0.15, 0.15, ""]),
+      { nom: "Mur de soubassement", t: "m", dos: 300 },
+      B("Chaînage bas", 350, L4, [1, "", 0.15, 0.2])
+    ],
+    elev: [
+      { nom: "Murs en parpaings", t: "m", dos: 300 },
+      B("Poteaux", 350, ["Nombre de poteaux", "Côté a (m)", "Côté b (m)", "Hauteur (m)"], ["", 0.15, 0.15, 3]),
+      B("Poutres", 350, L4, [1, "", 0.15, 0.3]),
+      B("Linteaux", 350, ["Nombre de linteaux", "Longueur (m)", "Largeur (m)", "Hauteur (m)"], ["", 1.2, 0.15, 0.2]),
+      B("Chaînage haut", 350, L4, [1, "", 0.15, 0.2])
+    ],
+    enduit: [{ nom: "Crépissage (enduit)", t: "e", dos: 350 }]
+  };
+  var PRIX = [
+    ["p-ciment", "Sac de ciment 50 kg", 6000], ["p-sable", "Sable (m³)", 12000],
+    ["p-gravier", "Gravier (m³)", 20000], ["p-mo", "Main d'œuvre (total)", 0],
+    ["p-10c", "Parpaing 10 creux", 350], ["p-10p", "Parpaing 10 plein", 450],
+    ["p-15c", "Parpaing 15 creux", 400], ["p-15p", "Parpaing 15 plein", 500],
+    ["p-20c", "Parpaing 20 creux", 500], ["p-20p", "Parpaing 20 plein", 600]
+  ];
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function num(id) {
+    var n = parseFloat(String($(id).value).replace(/\s/g, "").replace(",", "."));
+    return isNaN(n) ? NaN : n;
+  }
+  function n0(id) { var n = num(id); return isNaN(n) ? 0 : n; }
+  function fmt(n, d) { return n.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function sacs(kg) { return Math.ceil(Math.round((kg / SAC) * 100) / 100); }
+  function money(n) { return fmt(Math.round(n), 0) + " FCFA"; }
+  function plab(k) { return "parpaing " + k.slice(0, -1) + " cm " + (k.slice(-1) === "c" ? "creux" : "plein"); }
+
+  function inp(r, id, label, val) {
+    return '<label for="' + r + "-" + id + '">' + esc(label) + '</label><input id="' + r + "-" + id +
+      '" type="text" inputmode="decimal" value="' + esc(String(val).replace(".", ",")) + '">';
+  }
+  function sel(r, id, label, opts, cur) {
+    var h = '<label for="' + r + "-" + id + '">' + esc(label) + '</label><select id="' + r + "-" + id + '">';
+    opts.forEach(function (o) {
+      h += '<option value="' + o[0] + '"' + (String(o[0]) === String(cur) ? " selected" : "") + ">" + esc(o[1]) + "</option>";
+    });
+    return h + "</select>";
+  }
+  function dosSel(r, label, cur) {
+    return sel(r, "dos", label, DOS.map(function (d) { return [d, d + " kg/m³"]; }), cur);
+  }
+  function cur(r) { return POSTES[r][$("sel-" + r).selectedIndex]; }
+  function fillDef(r) {
+    var p = cur(r), dos = parseFloat($(r + "-dos").value);
+    var d = p.t === "b" ? { sa: 0.4, gr: 0.8, ea: 175 } : { sa: 1, ea: 200 };
+    Object.keys(d).forEach(function (k) { $(r + "-" + k).value = String(d[k]).replace(".", ","); });
+    $(r + "-info").textContent = "Pour 1 m³ à " + dos + " kg/m³ : ciment " + dos + " kg (" + fmt(dos / SAC, 1) +
+      " sacs de 50 kg). Les quantités de sable, " + (p.t === "b" ? "gravier " : "") + "et eau ci-dessous sont modifiables.";
+  }
+  function rd(r, id, def) { var n = num(r + "-" + id); return n >= 0 ? n : def; }
+
+  function buildForm(r) {
+    var p = cur(r), h = "", i;
+    if (p.t === "b") {
+      for (i = 0; i < 4; i++) { h += inp(r, "f" + i, p.l[i], p.v[i]); }
+      h += dosSel(r, "Dosage du béton", p.dos) + '<div class="info" id="' + r + '-info"></div>' +
+        inp(r, "sa", "Sable par m³ de béton (m³)", 0.4) + inp(r, "gr", "Gravier par m³ de béton (m³)", 0.8) +
+        inp(r, "ea", "Eau par m³ de béton (litres)", 175) + inp(r, "per", "Perte (%)", 5);
+    } else if (p.t === "m") {
+      h += inp(r, "L", "Longueur du mur (m)", "") + inp(r, "H", "Hauteur du mur (m)", "") +
+        inp(r, "O", "Portes et fenêtres à retirer (m²)", 0) +
+        sel(r, "ep", "Épaisseur du parpaing", [["10", "10 cm"], ["15", "15 cm"], ["20", "20 cm"]], "15") +
+        sel(r, "ty", "Type de parpaing", [["c", "Creux"], ["p", "Plein"]], "c") +
+        dosSel(r, "Dosage du mortier de pose", p.dos) + '<div class="info" id="' + r + '-info"></div>' +
+        inp(r, "sa", "Sable par m³ de mortier (m³)", 1) + inp(r, "ea", "Eau par m³ de mortier (litres)", 200) +
+        inp(r, "per", "Casse et perte (%)", 5);
+    } else {
+      h += inp(r, "S", "Surface à enduire (m²)", "") + inp(r, "e", "Épaisseur (cm)", 2) +
+        dosSel(r, "Dosage du mortier", p.dos) + '<div class="info" id="' + r + '-info"></div>' +
+        inp(r, "sa", "Sable par m³ de mortier (m³)", 1) + inp(r, "ea", "Eau par m³ de mortier (litres)", 200) +
+        inp(r, "per", "Perte (%)", 10);
+    }
+    $("form-" + r).innerHTML = h;
+    fillDef(r);
+    $(r + "-dos").addEventListener("change", function () { fillDef(r); });
+    $("res-" + r).className = "res";
+    $("add-" + r).disabled = true;
+    pend[r] = null;
+  }
+
+  function bad(r, msg) {
+    var x = $("res-" + r);
+    x.className = "res err show";
+    x.textContent = msg;
+    pend[r] = null;
+    $("add-" + r).disabled = true;
+  }
+  function out(r, e) {
+    var rows = [];
+    Object.keys(e.parp).forEach(function (k) { rows.push([Cap(plab(k)), fmt(e.parp[k], 0)]); });
+    rows.push(["Ciment", fmt(e.kg, 0) + " kg (" + sacs(e.kg) + " sacs)"]);
+    rows.push(["Sable", fmt(e.sable, 2) + " m³"]);
+    if (e.gravier > 0) { rows.push(["Gravier", fmt(e.gravier, 2) + " m³"]); }
+    rows.push(["Eau (environ)", fmt(e.eau, 0) + " litres"]);
+    var h = "<b>" + esc(e.nom) + "</b><table>";
+    rows.forEach(function (x) { h += "<tr><td>" + esc(x[0]) + "</td><td>" + esc(x[1]) + "</td></tr>"; });
+    var box = $("res-" + r);
+    box.className = "res show";
+    box.innerHTML = h + "</table>";
+    e.rub = r;
+    pend[r] = e;
+    $("add-" + r).disabled = false;
+  }
+  function Cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  function calc(r) {
+    var p = cur(r), P = n0(r + "-per"), dos = parseFloat($(r + "-dos").value), e, V, S, i;
+    if (p.t === "b") {
+      var a = [];
+      for (i = 0; i < 4; i++) { a.push(num(r + "-f" + i)); }
+      if (!(a[0] > 0 && a[1] > 0 && a[2] > 0 && a[3] > 0)) { return bad(r, "Remplissez toutes les cases avec des nombres supérieurs à 0."); }
+      V = a[0] * a[1] * a[2] * a[3] * (1 + P / 100);
+      e = { nom: p.nom + " " + dos + " kg/m³ (" + fmt(V, 2) + " m³ avec perte)", kg: V * dos, sable: V * rd(r, "sa", 0.4), gravier: V * rd(r, "gr", 0.8), eau: V * rd(r, "ea", 175), parp: {} };
+      } else if (p.t === "m") {
+      var L = num(r + "-L"), H = num(r + "-H"), O = n0(r + "-O");
+      var ep = $(r + "-ep").value, ty = $(r + "-ty").value;
+      if (!(L > 0) || !(H > 0)) { return bad(r, "Entrez la longueur et la hauteur du mur (nombres supérieurs à 0)."); }
+      S = L * H - O;
+      if (!(S > 0)) { return bad(r, "Les portes et fenêtres sont plus grandes que le mur."); }
+      var mort = S * MORT[ep], pk = {};
+      pk[ep + ty] = Math.ceil(S * 12.5 * (1 + P / 100));
+      e = { nom: p.nom + " " + ep + " cm " + (ty === "c" ? "creux" : "plein") + " (" + fmt(S, 2) + " m², mortier " + dos + ")",
+            kg: mort * dos, sable: mort * rd(r, "sa", 1), gravier: 0, eau: mort * rd(r, "ea", 200), parp: pk };
+    } else {
+      S = num(r + "-S");
+      var ee = num(r + "-e");
+      if (!(S > 0) || !(ee > 0)) { return bad(r, "Entrez la surface et l'épaisseur (nombres supérieurs à 0)."); }
+      V = (S * ee / 100) * (1 + P / 100);
+      e = { nom: p.nom + " " + fmt(S, 1) + " m² sur " + fmt(ee, 1) + " cm (" + dos + " kg/m³)", kg: V * dos, sable: V * rd(r, "sa", 1), gravier: 0, eau: V * rd(r, "ea", 200), parp: {} };
+    }
+    out(r, e);
+  }
+
+  function mat(e) {
+    var s = [];
+    Object.keys(e.parp).forEach(function (k) { s.push(fmt(e.parp[k], 0) + " " + plab(k)); });
+    s.push(fmt(e.kg / SAC, 1) + " sacs de ciment", fmt(e.sable, 2) + " m³ de sable");
+    if (e.gravier > 0) { s.push(fmt(e.gravier, 2) + " m³ de gravier"); }
+    s.push(fmt(e.eau, 0) + " L d'eau");
+    return s.join(" · ");
+  }
+  function cost(e) {
+    var c = (e.kg / SAC) * n0("p-ciment") + e.sable * n0("p-sable") + e.gravier * n0("p-gravier");
+    Object.keys(e.parp).forEach(function (k) { c += e.parp[k] * n0("p-" + k); });
+    return c;
+  }
+
+  function save() {
+    try {
+      var p = {};
+      PRIX.forEach(function (x) { p[x[0]] = $(x[0]).value; });
+      p["p-client"] = $("p-client").value;
+      localStorage.setItem(KEY, JSON.stringify({ entries: entries, p: p }));
+    } catch (er) {}
+  }
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (!raw) { return; }
+      var d = JSON.parse(raw);
+      if (d && Array.isArray(d.entries)) { entries = d.entries; }
+      if (d && d.p) { Object.keys(d.p).forEach(function (id) { if ($(id)) { $(id).value = d.p[id]; } }); }
+    } catch (er) {}
+  }
+
+  function renderDevis() {
+    var cl = $("p-client").value;
+    $("dv-date").textContent = "Date : " + new Date().toLocaleDateString("fr-FR") + (cl ? "  |  Client : " + cl : "");
+    if (!entries.length) {
+      $("dv-body").innerHTML = '<p class="aide">Aucun poste ajouté. Faites un calcul dans Fondation, Élévation ou Enduit, puis appuyez sur « Ajouter au devis ».</p>';
+      return;
+    }
+    var h = "", recap = [], tot = 0;
+    ORD.forEach(function (r) {
+      var s = 0, rows = "";
+      entries.forEach(function (e, i) {
+        if (e.rub !== r) { return; }
+        var c = cost(e);
+        s += c;
+        rows += "<tr><td><b>" + esc(e.nom) + "</b><br><small>" + esc(mat(e)) + '</small></td><td class="n">' + money(c) +
+          '</td><td class="noprint"><button type="button" class="sup" data-del="' + i + '">Retirer</button></td></tr>';
+      });
+      if (!rows) { return; }
+      h += "<h3>" + RUB[r] + '</h3><table class="dv"><tr><th>Poste</th><th class="n">Montant</th><th class="noprint"></th></tr>' + rows +
+        '<tr class="tot"><td>Total ' + RUB[r] + '</td><td class="n">' + money(s) + '</td><td class="noprint"></td></tr></table>';
+      recap.push([RUB[r], s]);
+      tot += s;
+    });
+    var mo = n0("p-mo");
+    h += '<h3>Récapitulatif</h3><table class="dv">';
+    recap.forEach(function (x) { h += "<tr><td>" + x[0] + '</td><td class="n">' + money(x[1]) + "</td></tr>"; });
+    if (mo > 0) { h += "<tr><td>Main d'œuvre</td><td class=\"n\">" + money(mo) + "</td></tr>"; }
+    h += '<tr class="tot"><td>TOTAL ESTIMATIF</td><td class="n">' + money(tot + mo) + "</td></tr></table>";
+    var T = { kg: 0, sable: 0, gravier: 0, eau: 0, parp: {} };
+    entries.forEach(function (e) {
+      T.kg += e.kg; T.sable += e.sable; T.gravier += e.gravier; T.eau += e.eau;
+      Object.keys(e.parp).forEach(function (k) { T.parp[k] = (T.parp[k] || 0) + e.parp[k]; });
