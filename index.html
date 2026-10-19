@@ -168,6 +168,7 @@ footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;font-size:12px;color:
  <h3>Bien remplir les calculs</h3>
  <ul>
   <li><b>Plusieurs types d'un même élément.</b> Si vous avez par exemple des poteaux de tailles différentes, choisissez « Nombre de types différents » et remplissez chaque type séparément (A, B, C...).</li>
+  <li><b>Poteaux et amorces de poteaux.</b> Choisissez d'abord la forme (carrée, rectangulaire ou circulaire) : les cases à remplir s'adaptent. Pour une ossature métallique, choisissez le profilé IPE dans la liste : sa masse au mètre est appliquée automatiquement.</li>
   <li><b>Murs en parpaings.</b> Entrez le nombre de murs identiques, leur longueur et leur hauteur. Dans « Portes et fenêtres à retirer », mettez la surface des ouvertures d'un mur. Exemple : un mur de 10 m sur 3 m avec deux portes de 2 m² donne 1 mur, 10, 3 et 4 m² d'ouvertures, soit 26 m² et environ 342 parpaings de 15 cm avec 5 % de perte.</li>
   <li><b>Dosage du béton ou du mortier.</b> Le dosage en kg de ciment par m³ est proposé par défaut. Vous pouvez le changer, ainsi que les quantités de sable, de gravier et d'eau.</li>
   <li><b>Perte (%).</b> Elle ajoute une marge pour la casse et les chutes. Gardez 5 à 10 % si vous n'avez pas de raison de la changer.</li>
@@ -244,7 +245,15 @@ footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;font-size:12px;color:
 
   var WL = ["Nombre de murs de ce type", "Longueur (m)", "Hauteur (m)", "Portes et fenêtres à retirer, par mur (m²)"];
   var BX = ["Nombre", "Longueur (m)", "Largeur (m)", "Hauteur (m)"];
-  var IPEN = "Masses courantes : IPE 100 = 8,1 ; IPE 140 = 12,9 ; IPE 200 = 22,4 ; IPE 240 = 30,7 ; IPE 300 = 42,2 kg par mètre.";
+  var IPEN = "Choisissez le profilé IPE : sa masse au mètre est appliquée automatiquement (par exemple IPE 200 = 22,4 kg/m).";
+  var IPES = [["IPE 80", 6], ["IPE 100", 8.1], ["IPE 120", 10.4], ["IPE 140", 12.9], ["IPE 160", 15.8], ["IPE 180", 18.8], ["IPE 200", 22.4],
+    ["IPE 220", 26.2], ["IPE 240", 30.7], ["IPE 270", 36.1], ["IPE 300", 42.2], ["IPE 330", 49.1], ["IPE 360", 57.1], ["IPE 400", 66.3],
+    ["IPE 450", 77.6], ["IPE 500", 90.7], ["IPE 550", 106], ["IPE 600", 122]];
+  function ipeNom(m) {
+    var i;
+    for (i = 0; i < IPES.length; i++) { if (IPES[i][1] === m) { return IPES[i][0]; } }
+    return "profilé";
+  }
   function boxVol(c) { return c[0] * c[1] * c[2] * c[3]; }
   function boxTxt(c) { return fmt(c[0], 0) + " x " + fmt(c[1], 2) + " x " + fmt(c[2], 2) + " x " + fmt(c[3], 2) + " m"; }
   function cylVol(c) { return c[0] * Math.PI * c[1] * c[1] / 4 * c[2]; }
@@ -260,15 +269,20 @@ footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;font-size:12px;color:
     rec: { n: "Rectangulaire", nm: "rectangulaires", l: ["Nombre de poteaux de ce type", "Côté a (m)", "Côté b (m)", "Hauteur (m)"], v: ["", 0.2, 0.15, 3], vol: boxVol, txt: boxTxt },
     cir: { n: "Circulaire", nm: "circulaires", l: ["Nombre de poteaux de ce type", "Diamètre (m)", "Hauteur (m)"], v: ["", 0.25, 3], vol: cylVol,
       txt: function (c) { return fmt(c[0], 0) + " x diamètre " + fmt(c[1], 2) + " m x hauteur " + fmt(c[2], 2) + " m"; } },
-    ipe: { n: "Métallique IPE", nm: "métalliques (IPE)", steel: true, note: IPEN, l: ["Nombre de poteaux de ce type", "Hauteur (m)", "Masse du profilé (kg/m)"], v: ["", 3, 22.4],
+    ipe: { n: "Métallique IPE", nm: "métalliques (IPE)", steel: true, mi: 2, note: IPEN, l: ["Nombre de poteaux de ce type", "Hauteur (m)", "Profilé IPE (la masse au mètre est automatique)"], v: ["", 3, 22.4],
       vol: function (c) { return c[0] * c[1] * c[2]; },
-      txt: function (c) { return fmt(c[0], 0) + " x " + fmt(c[1], 2) + " m x " + fmt(c[2], 1) + " kg/m"; } }
+      txt: function (c) { return fmt(c[0], 0) + " x " + fmt(c[1], 2) + " m x " + ipeNom(c[2]) + " (" + fmt(c[2], 1) + " kg/m)"; } }
+  };
+  var FORMES_AMO = {
+    car: { n: "Carrée", nm: "carrées", l: ["Nombre d'amorces de ce type", "Côté (m)", "Hauteur (m)"], v: ["", 0.2, ""], vol: FORMES.car.vol, txt: FORMES.car.txt },
+    rec: { n: "Rectangulaire", nm: "rectangulaires", l: ["Nombre d'amorces de ce type", "Côté a (m)", "Côté b (m)", "Hauteur (m)"], v: ["", 0.2, 0.2, ""], vol: boxVol, txt: boxTxt },
+    cir: { n: "Circulaire", nm: "circulaires", l: ["Nombre d'amorces de ce type", "Diamètre (m)", "Hauteur (m)"], v: ["", 0.25, ""], vol: FORMES.cir.vol, txt: FORMES.cir.txt }
   };
   var CAT = {
     prop: B("Béton de propreté", 150, ["Nombre de zones", "Longueur (m)", "Largeur (m)", "Épaisseur (m)"], [1, "", "", 0.05], "zone", true),
     semi: B("Semelles isolées", 350, ["Nombre de semelles de ce type", "Longueur (m)", "Largeur (m)", "Hauteur (m)"], ["", "", "", 0.3], "semelle"),
     semf: B("Semelles filantes", 350, ["Nombre de tronçons de ce type", "Longueur d'un tronçon (m)", "Largeur (m)", "Hauteur (m)"], [1, "", "", 0.3], "semelle filante"),
-    amo: B("Amorces de poteaux", 350, ["Nombre d'amorces de ce type", "Côté a (m)", "Côté b (m)", "Hauteur (m)"], ["", 0.2, 0.2, ""], "amorce"),
+    amo: { nom: "Amorces de poteaux", t: "b", dos: 350, el: "amorce", pot: true, amo: true },
     lon: B("Longrines", 350, ["Nombre de longrines de ce type", "Longueur (m)", "Largeur (m)", "Hauteur (m)"], ["", "", 0.2, 0.3], "longrine"),
     sou: { nom: "Mur de soubassement", t: "m", dos: 300, el: "mur", l: WL, v: [1, "", "", 0] },
     chb: B("Chaînage bas", 350, ["Nombre", "Longueur totale (m)", "Largeur (m)", "Hauteur (m)"], [1, "", 0.15, 0.2], "chaînage", true),
@@ -279,9 +293,9 @@ footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;font-size:12px;color:
     chev: B("Semelles de liaison (chevêtres)", 350, ["Nombre de chevêtres de ce type", "Longueur (m)", "Largeur (m)", "Hauteur (m)"], ["", "", "", 0.6], "chevêtre"),
     pot: { nom: "Poteaux", t: "b", dos: 350, el: "poteau", pot: true },
     pou: B("Poutres", 350, ["Nombre de poutres de ce type", "Longueur (m)", "Largeur (m)", "Hauteur (m)"], ["", "", 0.15, 0.3], "poutre"),
-    poum: { nom: "Poutres métalliques (IPE)", t: "b", dos: 0, el: "poutre", steel: true, note: IPEN, l: ["Nombre de poutres de ce type", "Longueur (m)", "Masse du profilé (kg/m)"], v: ["", "", 22.4],
+    poum: { nom: "Poutres métalliques (IPE)", t: "b", dos: 0, el: "poutre", steel: true, mi: 2, note: IPEN, l: ["Nombre de poutres de ce type", "Longueur (m)", "Profilé IPE (la masse au mètre est automatique)"], v: ["", "", 22.4],
       vol: function (c) { return c[0] * c[1] * c[2]; },
-      txt: function (c) { return fmt(c[0], 0) + " x " + fmt(c[1], 2) + " m x " + fmt(c[2], 1) + " kg/m"; } },
+      txt: function (c) { return fmt(c[0], 0) + " x " + fmt(c[1], 2) + " m x " + ipeNom(c[2]) + " (" + fmt(c[2], 1) + " kg/m)"; } },
     chh: B("Chaînage haut", 350, ["Nombre", "Longueur totale (m)", "Largeur (m)", "Hauteur (m)"], [1, "", 0.15, 0.2], "chaînage", true),
     chv: B("Chaînages verticaux (raidisseurs)", 350, ["Nombre de raidisseurs de ce type", "Largeur (m)", "Épaisseur (m)", "Hauteur (m)"], ["", 0.15, 0.15, 3], "raidisseur"),
     lin: B("Linteaux", 350, ["Nombre de linteaux de ce type", "Longueur (m)", "Largeur (m)", "Hauteur (m)"], ["", 1.2, 0.15, 0.2], "linteau"),
@@ -352,7 +366,7 @@ footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;font-size:12px;color:
   function cur(r) { return plist(r)[$("sel-" + r).selectedIndex]; }
   function F(r, p, fm) {
     if (!p.pot) { return p; }
-    return FORMES[fm || ($(r + "-fm") ? $(r + "-fm").value : "car")];
+    return (p.amo ? FORMES_AMO : FORMES)[fm || ($(r + "-fm") ? $(r + "-fm").value : "car")];
   }
 
   function fillDef(r) {
@@ -372,14 +386,19 @@ footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;font-size:12px;color:
   }
   function buildTypes(r) {
     var p = cur(r), f = F(r, p), n = p.u ? 1 : (parseInt($(r + "-nt").value, 10) || 1), old = {}, h = "", t, i, id;
-    var els = $(r + "-types").querySelectorAll("input");
+    var els = $(r + "-types").querySelectorAll("input, select");
     for (i = 0; i < els.length; i++) { old[els[i].id] = els[i].value; }
     if (f.note) { h += '<div class="info">' + esc(f.note) + "</div>"; }
     for (t = 0; t < n; t++) {
       h += '<div class="typ"><h3>' + esc(p.u ? Cap(p.el) : Cap(p.el) + " " + String.fromCharCode(65 + t)) + "</h3>";
       for (i = 0; i < f.l.length; i++) {
         id = r + "-t" + t + "f" + i;
-        h += inp(r, "t" + t + "f" + i, f.l[i], old[id] !== undefined ? old[id] : f.v[i]);
+        if (f.steel && i === f.mi) {
+          var ov = old[id], okv = IPES.some(function (m) { return String(m[1]) === String(ov); });
+          h += sel(r, "t" + t + "f" + i, f.l[i], IPES.map(function (m) { return [String(m[1]), m[0] + " (" + fmt(m[1], 1) + " kg/m)"]; }), okv ? ov : f.v[i]);
+        } else {
+          h += inp(r, "t" + t + "f" + i, f.l[i], old[id] !== undefined ? old[id] : f.v[i]);
+        }
       }
       h += "</div>";
     }
@@ -390,7 +409,7 @@ footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;font-size:12px;color:
     var fm = $(r + "-fm") ? $(r + "-fm").value : "car";
     var p = cur(r), h = "", f = F(r, p, fm);
     if (p.t === "b") {
-      if (p.pot) { h += sel(r, "fm", "Forme du poteau", Object.keys(FORMES).map(function (k) { return [k, FORMES[k].n]; }), fm); }
+      if (p.pot) { var FM = p.amo ? FORMES_AMO : FORMES; h += sel(r, "fm", p.amo ? "Forme de l'amorce" : "Forme du poteau", Object.keys(FM).map(function (k) { return [k, FM[k].n]; }), fm); }
       h += p.u ? '<div class="info">Élément unique : une seule section pour tout l\'ouvrage.</div><div id="' + r + '-types"></div>' : ntSel(r);
       if (!f.steel) {
         h += dosSel(r, "Dosage du béton", p.dos) + '<div class="info" id="' + r + '-info"></div>' +
