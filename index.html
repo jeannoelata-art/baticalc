@@ -66,8 +66,8 @@ body.modepro .problk{display:block}
 .chr button{padding:6px 10px;font-size:14px;border-radius:6px;border:1px solid #1f4e79;background:#fff;color:#1f4e79}
 .promo{background:#fff8e6;border:1px solid #e6c36a;border-radius:10px;padding:10px;margin-top:14px;font-size:14px}
 footer a{color:#1f4e79;font-weight:bold}
-ul{padding-left:20px;line-height:1.7}
-#legal p,#legal li{font-size:15px;line-height:1.6}
+ul,ol{padding-left:20px;line-height:1.7}
+#legal p,#legal li,#guide p,#guide li{font-size:15px;line-height:1.6}
 footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;font-size:12px;color:#566678;text-align:center}
 @media print{nav,.noprint,footer,header p{display:none !important}.panel{display:none !important}#devis{display:block !important;box-shadow:none}body{background:#fff}}
 </style>
@@ -81,6 +81,7 @@ footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;font-size:12px;color:
  <button type="button" data-tab="devis">Mon devis</button>
  <button type="button" data-tab="acier" class="proonly">Acier</button>
  <button type="button" data-tab="rev" class="proonly">Revêtements</button>
+ <button type="button" data-tab="guide">Guide</button>
  <button type="button" data-tab="pro">Version Pro</button>
  <button type="button" data-tab="legal">Légal</button>
 </nav>
@@ -100,8 +101,21 @@ footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;font-size:12px;color:
  <p class="note">Les montants sont calculés avec les quantités exactes ; la liste d'achat les arrondit au sac. Estimation indicative. Les quantités réelles varient selon les matériaux et les méthodes de travail. Faites vérifier ce devis par un professionnel avant tout achat.</p>
 </section>
 <section class="panel" id="pro">
- <h2>Version Pro (mode test gratuit)</h2>
- <p class="aide">En mode test, toutes les fonctions Pro sont ouvertes gratuitement. Plus tard, elles seront réservées aux abonnés.</p>
+ <h2>Version Pro</h2>
+ <div id="pro-bientot">
+  <div class="promo" style="margin-top:0"><b>Bientôt disponible.</b> Une partie Pro arrive dans BatiCalc. Le mode de paiement est en cours de mise en place : en attendant, la version Pro n'est pas encore ouverte. Les fonctions gratuites (Fondation, Élévation, Enduit, Mon devis) restent gratuites.</div>
+  <h3>Ce que contiendra la version Pro</h3>
+  <ul>
+   <li><b>Acier d'armature</b> : semelles, longrines, poteaux, poutres, chaînages, linteaux, radier, puits, pieux, treillis soudé</li>
+   <li><b>Revêtements et finitions</b> : carrelage, faïence, marbre, granito, parement, parquet, faux plafond, peinture, enduits de finition, chape</li>
+   <li>Devis avec votre logo, votre marge, une remise et la TVA</li>
+   <li>Main d'œuvre poste par poste</li>
+   <li>Export Excel (CSV) et liste d'achat envoyée par WhatsApp</li>
+   <li>Plusieurs chantiers et plusieurs listes de prix (par ville)</li>
+  </ul>
+  <p class="note">À venir ensuite : dalles, planchers et toiture. Les conditions et le prix seront annoncés ici dès que le paiement sera prêt.</p>
+ </div>
+ <p class="aide" id="pro-aide">En mode test, toutes les fonctions Pro sont ouvertes gratuitement. Plus tard, elles seront réservées aux abonnés.</p>
  <button type="button" class="btn" id="pro-tg">Activer le mode Pro (test gratuit)</button>
  <div id="pro-set" style="display:none">
   <h3>Mon entreprise (en-tête du devis)</h3>
@@ -138,6 +152,52 @@ footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;font-size:12px;color:
   <p class="note">À venir : dalles, planchers et toiture.</p>
  </div>
 </section>
+<section class="panel" id="guide">
+ <h2>Guide d'utilisation</h2>
+ <p class="aide">BatiCalc calcule les matériaux d'un ouvrage (parpaings, ciment, sable, gravier, eau) et en fait un devis estimatif. Toutes les mesures sont en mètres, sauf indication contraire. Vous pouvez écrire les décimales avec une virgule ou un point.</p>
+
+ <h3>Faire un premier devis en 5 étapes</h3>
+ <ol>
+  <li><b>Fondation</b> : choisissez le type de fondation, puis un élément à calculer (semelles, longrines, murs de soubassement...). Remplissez les cases et appuyez sur « Calculer ». Si le résultat vous convient, appuyez sur « Ajouter au devis ». Recommencez pour chaque élément.</li>
+  <li><b>Élévation</b> : même méthode pour la structure (poteaux, poutres, chaînages, linteaux, murs en parpaings).</li>
+  <li><b>Enduit</b> : entrez la surface à crépir et l'épaisseur de l'enduit, puis calculez et ajoutez.</li>
+  <li><b>Mon devis</b> : écrivez le nom du client ou du chantier. Ouvrez « Mes prix en FCFA » et remplacez les prix d'exemple par ceux de votre ville. Le devis et le total se mettent à jour tout seuls.</li>
+  <li><b>Imprimer</b> : appuyez sur « Imprimer ou enregistrer en PDF ». Sur téléphone, choisissez « Enregistrer en PDF » pour obtenir un fichier à envoyer au client.</li>
+ </ol>
+
+ <h3>Bien remplir les calculs</h3>
+ <ul>
+  <li><b>Plusieurs types d'un même élément.</b> Si vous avez par exemple des poteaux de tailles différentes, choisissez « Nombre de types différents » et remplissez chaque type séparément (A, B, C...).</li>
+  <li><b>Murs en parpaings.</b> Entrez le nombre de murs identiques, leur longueur et leur hauteur. Dans « Portes et fenêtres à retirer », mettez la surface des ouvertures d'un mur. Exemple : un mur de 10 m sur 3 m avec deux portes de 2 m² donne 1 mur, 10, 3 et 4 m² d'ouvertures, soit 26 m² et environ 342 parpaings de 15 cm avec 5 % de perte.</li>
+  <li><b>Dosage du béton ou du mortier.</b> Le dosage en kg de ciment par m³ est proposé par défaut. Vous pouvez le changer, ainsi que les quantités de sable, de gravier et d'eau.</li>
+  <li><b>Perte (%).</b> Elle ajoute une marge pour la casse et les chutes. Gardez 5 à 10 % si vous n'avez pas de raison de la changer.</li>
+  <li><b>Main d'œuvre.</b> Dans « Mes prix en FCFA », la case « Main d'œuvre (total) » s'ajoute au devis comme un forfait général.</li>
+ </ul>
+
+ <h3>Lire le devis</h3>
+ <ul>
+  <li>Le devis est classé par rubrique (Fondation, Élévation, Enduit), avec un total par rubrique puis un total général.</li>
+  <li>La <b>liste des matériaux à acheter</b> en bas arrondit le ciment au sac entier. Les montants du devis utilisent, eux, les quantités exactes.</li>
+  <li>Pour retirer un poste du devis, appuyez sur « Retirer ce poste ». « Vider le devis » efface tout.</li>
+ </ul>
+
+ <h3>Vos données</h3>
+ <ul>
+  <li>Vos prix, vos calculs et le nom du chantier sont gardés <b>uniquement dans le navigateur de votre appareil</b>. Rien n'est envoyé à l'éditeur.</li>
+  <li>Si vous effacez les données du site, changez de navigateur ou de téléphone, vous perdez ces informations. Enregistrez votre devis en PDF pour le conserver.</li>
+ </ul>
+
+ <h3>Questions fréquentes</h3>
+ <ul>
+  <li><b>Le total affiche 0 ou une valeur bizarre.</b> Vérifiez les prix dans « Mes prix en FCFA » : un prix à 0 ou une case vide donne un montant nul.</li>
+  <li><b>Le bouton « Ajouter au devis » est grisé.</b> Appuyez d'abord sur « Calculer » et corrigez les cases signalées en rouge.</li>
+  <li><b>Les prix ne sont pas ceux de ma ville.</b> Les prix affichés sont des exemples : modifiez-les avant d'utiliser le devis.</li>
+  <li><b>Les résultats sont-ils garantis ?</b> Non. Ce sont des estimations indicatives, sans étude de structure ni de sol. Faites vérifier votre ouvrage par un professionnel avant de construire ou d'acheter.</li>
+ </ul>
+
+ <h3>Version Pro</h3>
+ <p>Une partie Pro (acier, revêtements, logo et TVA sur le devis, export Excel, plusieurs chantiers) est annoncée. Elle sera ouverte dès que le paiement sera prêt. Voir l'onglet « Version Pro ».</p>
+</section>
 <section class="panel" id="legal">
  <h2>Informations légales</h2>
  <p class="aide">Dernière mise à jour : octobre 2026</p>
@@ -165,7 +225,7 @@ footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;font-size:12px;color:
  </ul>
 </section>
 </main>
-<footer>BatiCalc - Estimations indicatives, à vérifier avec un professionnel.<br><a href="#" data-go="legal">Mentions légales</a> · <a href="#" data-go="legal">Confidentialité</a> · <a href="#" data-go="legal">Conditions d'utilisation</a></footer>
+<footer>BatiCalc - Estimations indicatives, à vérifier avec un professionnel.<br><a href="#" data-go="guide">Guide d'utilisation</a> · <a href="#" data-go="legal">Mentions légales</a> · <a href="#" data-go="legal">Confidentialité</a> · <a href="#" data-go="legal">Conditions d'utilisation</a></footer>
 <script>
 (function () {
   // === À COMPLÉTER AVANT DE PUBLIER : votre nom et votre e-mail ===
@@ -596,7 +656,7 @@ footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;font-size:12px;color:
       '<label for="sel-' + r + '">Élément à calculer</label><select id="sel-' + r + '"></select><div id="form-' + r + '"></div>' +
       '<button type="button" class="btn" id="go-' + r + '">Calculer</button><div class="res" id="res-' + r + '"></div>' +
       '<button type="button" class="btn bleu" id="add-' + r + '" disabled>Ajouter au devis</button>' +
-      '' + (PRO_DISPONIBLE ? '<div class="promo">L\'acier (armatures) est disponible dans la <b>version Pro</b>.</div>' : '') + '</section>';
+      '<div class="promo">L\'acier (armatures), les revêtements et d\'autres options seront dans la <b>version Pro</b> (bientôt disponible, voir l\'onglet « Version Pro »).</div></section>';
   });
   $("devis").insertAdjacentHTML("beforebegin", html);
 
@@ -1022,9 +1082,14 @@ footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;font-size:12px;color:
   load();
   renderDevis();
   if (!PRO_DISPONIBLE) {
-    ["pro", "acier", "rev"].forEach(function (id) { var el = $(id); if (el) { el.parentNode.removeChild(el); } });
-    var pbs = document.querySelectorAll('#tabs button.proonly, #tabs button[data-tab="pro"]');
+    ["acier", "rev"].forEach(function (id) { var el = $(id); if (el) { el.parentNode.removeChild(el); } });
+    var pbs = document.querySelectorAll('#tabs button.proonly');
     for (var z = 0; z < pbs.length; z++) { pbs[z].parentNode.removeChild(pbs[z]); }
+    $("pro-tg").style.display = "none";
+    $("pro-set").style.display = "none";
+    $("pro-aide").style.display = "none";
+  } else {
+    $("pro-bientot").style.display = "none";
   }
 })();
 </script>
