@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="theme-color" content="#1f4e79">
+<meta property="og:type" content="website">
+<meta property="og:title" content="BatiCalc - Devis estimatif du bâtiment">
+<meta property="og:description" content="Calculez en quelques secondes les matériaux de vos travaux : parpaings, ciment, sable, gravier. Gratuit, sur téléphone.">
+<title>BatiCalc - Devis estimatif du bâtiment</title>
+<meta name="description" content="Application gratuite pour calculer les matériaux et le devis estimatif d'un ouvrage : fondation, élévation, enduit.">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f2f5f9;color:#1b2a3a;font-size:16px}
+header{background:#1f4e79;color:#fff;padding:14px;text-align:center}
+header h1{margin:0;font-size:26px}
+header p{margin:4px 0 0;font-size:14px;opacity:.9}
+nav{display:flex;gap:6px;overflow-x:auto;padding:10px;background:#fff;position:sticky;top:0;border-bottom:1px solid #d5dde6;z-index:5}
+nav button{flex:0 0 auto;padding:10px 14px;border:1px solid #1f4e79;background:#fff;color:#1f4e79;border-radius:20px;font-size:15px;font-weight:bold}
+nav button.on{background:#1f4e79;color:#fff}
+main{max-width:640px;margin:0 auto;padding:12px}
+.panel{display:none;background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.panel.on{display:block}
+h2{margin:0 0 4px;font-size:20px;color:#1f4e79}
+h3{margin:18px 0 0;font-size:17px;color:#1f4e79}
+.aide{margin:0 0 10px;font-size:14px;color:#566678}
+label{display:block;margin:10px 0 4px;font-weight:bold;font-size:15px}
+input,select{width:100%;padding:12px;font-size:17px;border:1px solid #b8c4d0;border-radius:8px;background:#fff;color:#1b2a3a}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.btn{display:block;width:100%;margin-top:14px;padding:14px;font-size:17px;font-weight:bold;border:0;border-radius:10px;color:#fff;background:#1f7a3d}
+.btn.bleu{background:#1f4e79}
+.btn.rouge{background:#b3261e}
+.btn:disabled{opacity:.45}
+.res{margin-top:14px;padding:12px;background:#eaf6ea;border:1px solid #9fcfa8;border-radius:10px;display:none}
+.res.err{background:#fdecea;border-color:#e3a19b}
+.res.show{display:block}
+.res table{width:100%;border-collapse:collapse}
+.res td{padding:5px 0;border-bottom:1px solid #cfe5d3}
+.res td:last-child{text-align:right;font-weight:bold}
+table.dv{width:100%;border-collapse:collapse;margin-top:8px;font-size:15px}
+table.dv th,table.dv td{border:1px solid #c9d3dd;padding:7px;text-align:left;vertical-align:top}
+table.dv th{background:#dce9f5}
+table.dv .n{text-align:right;white-space:nowrap}
+table.dv tr.tot td{font-weight:bold;background:#f0f6fc}
+small{color:#566678}
+.sup{padding:4px 9px;font-size:14px;border:1px solid #b3261e;color:#b3261e;background:#fff;border-radius:6px}
+.note{margin-top:14px;font-size:13px;color:#566678}
+.info{background:#eaf1fa;border:1px solid #9db9d8;border-radius:10px;padding:10px;margin-top:10px;font-size:14px}
+.typ{border:1px solid #c9d3dd;border-radius:10px;padding:2px 12px 12px;margin-top:12px;background:#f8fafc}
+.typ h3{margin:10px 0 0}
+.sc{overflow-x:auto}
+.dvt{font-size:22px;font-weight:bold;color:#1f4e79;text-align:center;margin:16px 0 8px;letter-spacing:1px}
+table.dvi td:first-child{width:38%;background:#f0f6fc;font-weight:bold}
+table.dv tr.pt td{background:#dce9f5;font-weight:bold}
+table.dv tr.tg td{background:#1f4e79;color:#fff;font-size:17px;font-weight:bold;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+details{margin-top:12px;border:1px solid #c9d3dd;border-radius:10px;padding:6px 12px;background:#f8fafc}
+summary{font-weight:bold;color:#1f4e79;padding:6px 0}
+nav button.proonly{display:none}
+body.pro nav button.proonly{display:block}
+body .problk{display:none}
+body.pro .problk{display:block}
+.co{display:flex;gap:12px;align-items:center;border-bottom:2px solid #1f4e79;padding-bottom:8px}
+.co img{max-height:70px;max-width:120px}
+.chr{display:flex;gap:8px;align-items:center;justify-content:space-between;border-bottom:1px solid #e1e7ee;padding:6px 0}
+.chr button{padding:6px 10px;font-size:14px;border-radius:6px;border:1px solid #1f4e79;background:#fff;color:#1f4e79}
+.pro{background:#fff8e6;border:1px solid #e6c36a;border-radius:10px;padding:10px;margin-top:14px;font-size:14px}
+footer a{color:#1f4e79;font-weight:bold}
+ul{padding-left:20px;line-height:1.7}
+#legal p,#legal li{font-size:15px;line-height:1.6}
+footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;font-size:12px;color:#566678;text-align:center}
+@media print{nav,.noprint,footer,header p{display:none !important}.panel{display:none !important}#devis{display:block !important;box-shadow:none}body{background:#fff}}
+</style>
+</head>
+<body>
+<header><h1>BatiCalc</h1><p>Devis estimatif du bâtiment</p></header>
+<nav id="tabs">
+ <button type="button" data-tab="fond" class="on">Fondation</button>
+ <button type="button" data-tab="elev">Élévation</button>
+ <button type="button" data-tab="enduit">Enduit</button>
+ <button type="button" data-tab="devis">Mon devis</button>
+ <button type="button" data-tab="acier" class="proonly">Acier</button>
+ <button type="button" data-tab="rev" class="proonly">Revêtements</button>
+ <button type="button" data-tab="pro">Version Pro</button>
+ <button type="button" data-tab="legal">Légal</button>
+</nav>
+<main>
+<section class="panel" id="devis">
+ <h2>Devis estimatif de l'ouvrage</h2>
+ <p class="aide noprint">Entrez vos prix (les valeurs sont des exemples à modifier). Le devis se met à jour tout seul.</p>
+ <label for="p-client">Nom du client ou du chantier</label>
+ <input id="p-client" type="text" placeholder="ex : Maison M. Dupont">
+ <details class="noprint"><summary>Mes prix en FCFA (appuyer pour modifier)</summary><div class="grid" id="prix"></div></details>
+ <div id="dv-head"></div>
+ <div id="dv-body"></div>
+ <button type="button" class="btn bleu noprint" id="dv-print">Imprimer ou enregistrer en PDF</button>
+ <button type="button" class="btn bleu noprint problk" id="dv-csv">Exporter vers Excel (fichier CSV)</button>
+ <button type="button" class="btn bleu noprint problk" id="dv-wa">Envoyer la liste d'achat par WhatsApp</button>
+ <button type="button" class="btn rouge noprint" id="dv-clear">Vider le devis</button>
+ <p class="note">Les montants sont calculés avec les quantités exactes ; la liste d'achat les arrondit au sac. Estimation indicative. Les quantités réelles varient selon les matériaux et les méthodes de travail. Faites vérifier ce devis par un professionnel avant tout achat.</p>
+</section>
+<section class="panel" id="pro">
+ <h2>Version Pro (mode test gratuit)</h2>
+ <p class="aide">En mode test, toutes les fonctions Pro sont ouvertes gratuitement. Plus tard, elles seront réservées aux abonnés.</p>
+ <button type="button" class="btn" id="pro-tg">Activer le mode Pro (test gratuit)</button>
+ <div id="pro-set" style="display:none">
+  <h3>Mon entreprise (en-tête du devis)</h3>
+  <label for="pr-nom">Nom de l'entreprise</label><input id="pr-nom" type="text">
+  <label for="pr-adr">Adresse et téléphone</label><input id="pr-adr" type="text">
+  <label for="pr-niu">N° contribuable ou RCCM</label><input id="pr-niu" type="text">
+  <label for="pr-logo">Logo (image de 300 Ko maximum)</label><input id="pr-logo" type="file" accept="image/*">
+  <div id="pr-logoimg"></div>
+  <button type="button" class="sup" id="pr-logo-del">Retirer le logo</button>
+  <h3>Conditions du devis</h3>
+  <p class="aide">Laissez 0 si vous n'en voulez pas. Pour la TVA, vérifiez le taux en vigueur avec votre comptable.</p>
+  <div class="grid">
+   <div><label for="pr-marge">Marge (%)</label><input id="pr-marge" type="text" inputmode="decimal"></div>
+   <div><label for="pr-remise">Remise (%)</label><input id="pr-remise" type="text" inputmode="decimal"></div>
+  </div>
+  <label for="pr-tva">TVA (%)</label><input id="pr-tva" type="text" inputmode="decimal">
+  <h3>Mes chantiers enregistrés</h3>
+  <p class="aide">Le nom du chantier est celui écrit dans « Mon devis ».</p>
+  <button type="button" class="btn bleu" id="ch-save">Enregistrer le devis actuel</button>
+  <div id="ch-list"></div>
+  <h3>Mes prix par ville</h3>
+  <label for="ps-nom">Nom de la liste de prix (ex : Douala)</label><input id="ps-nom" type="text">
+  <button type="button" class="btn bleu" id="ps-save">Enregistrer mes prix actuels</button>
+  <div id="ps-list"></div>
+  <h3>Fonctions Pro ouvertes</h3>
+  <ul>
+   <li><b>Acier</b> : semelles, longrines, poteaux, poutres, chaînages, linteaux, radier, puits, pieux, treillis soudé</li>
+   <li><b>Revêtements</b> : carrelage, faïence, marbre, granito, parement, parquet, faux plafond, peinture, enduits de finition, chape</li>
+   <li>Devis avec logo, marge, remise et TVA</li>
+   <li>Main d'œuvre par poste</li>
+   <li>Export Excel et liste d'achat par WhatsApp</li>
+   <li>Plusieurs chantiers et listes de prix</li>
+  </ul>
+  <p class="note">À venir : dalles, planchers et toiture.</p>
+ </div>
+</section>
+<section class="panel" id="legal">
+ <h2>Informations légales</h2>
+ <p class="aide">Dernière mise à jour : octobre 2026</p>
+
+ <h3>Mentions légales</h3>
+ <p>Éditeur du site : <b class="lg-nom"></b>, Cameroun.<br>Contact : <b class="lg-mail"></b><br>Hébergeur : Vercel Inc. (États-Unis).<br>BatiCalc est un outil de calcul de matériaux et de devis estimatif pour le bâtiment.</p>
+
+ <h3>Conditions d'utilisation</h3>
+ <ul>
+  <li><b>Estimations indicatives.</b> Les quantités et les montants affichés sont des estimations basées sur des valeurs courantes. Ils n'ont aucune valeur contractuelle et ne remplacent pas un devis établi par un professionnel.</li>
+  <li><b>Pas une étude technique.</b> BatiCalc ne réalise ni calcul de structure, ni dimensionnement, ni étude de sol. Faites valider tout ouvrage par un ingénieur ou un technicien qualifié avant de construire ou d'acheter.</li>
+  <li><b>Responsabilité.</b> L'utilisateur reste responsable de l'usage des résultats. Dans la limite permise par la loi, l'éditeur ne peut être tenu responsable des pertes, erreurs d'achat ou dommages liés à l'utilisation de l'outil.</li>
+  <li><b>Disponibilité.</b> Le service est fourni tel quel, sans garantie d'accès continu. Il peut être modifié ou interrompu à tout moment.</li>
+  <li><b>Propriété intellectuelle.</b> Le nom BatiCalc, le code, les textes et la présentation du site appartiennent à l'éditeur. Toute copie ou réutilisation sans autorisation écrite est interdite.</li>
+  <li><b>Droit applicable.</b> Les présentes conditions sont soumises au droit camerounais. L'éditeur peut les modifier ; la date de mise à jour figure en haut de cette page.</li>
+ </ul>
+
+ <h3>Politique de confidentialité</h3>
+ <ul>
+  <li><b>Aucune collecte.</b> Cette version ne demande ni compte, ni e-mail, ni numéro de téléphone, et ne contient ni publicité ni outil de suivi.</li>
+  <li><b>Vos données restent chez vous.</b> Les prix, les calculs et le nom du client ou du chantier sont enregistrés uniquement dans le navigateur de votre appareil. Ils ne sont jamais envoyés à l'éditeur. Vous pouvez les effacer avec le bouton « Vider le devis » ou en supprimant les données du site dans votre navigateur.</li>
+  <li><b>Hébergement.</b> L'hébergeur peut enregistrer des journaux techniques standards (par exemple l'adresse IP) pour assurer la sécurité et le fonctionnement du site.</li>
+  <li><b>Évolutions.</b> Si des fonctions utilisant des données personnelles sont ajoutées (comptes, paiements), cette politique sera mise à jour et votre consentement sera demandé, conformément à la loi camerounaise n° 2024/017 sur la protection des données personnelles.</li>
+  <li><b>Vos droits.</b> Pour toute question ou demande concernant vos données : <span class="lg-mail"></span>.</li>
+ </ul>
+</section>
+</main>
+<footer>BatiCalc - Estimations indicatives, à vérifier avec un professionnel.<br><a href="#" data-go="legal">Mentions légales</a> · <a href="#" data-go="legal">Confidentialité</a> · <a href="#" data-go="legal">Conditions d'utilisation</a></footer>
+<script>
+(function () {
+  // === À COMPLÉTER AVANT DE PUBLIER : votre nom et votre e-mail ===
+  var EDITEUR = "ATA A DJOOH MERVEIL JEAN-NOËL";
+  var CONTACT = "jeannoelata@gmail.com";
+  // ==================================================================
+  var SAC = 50, KEY = "baticalc_v2";
+  var MORT = { "10": 0.018, "15": 0.025, "20": 0.033 };
+  var RUB = { fond: "Fondation", elev: "Élévation", enduit: "Enduit (crépissage)", fin: "Finitions et revêtements" };
+  var ORD = ["fond", "elev", "enduit"], ORDD = ["fond", "elev", "enduit", "fin"];
+  var DOS = [150, 200, 250, 300, 350, 400, 450];
+  var MAXT = 10;
+  var entries = [], pend = {};
+
+  var WL = ["Nombre de murs de ce type", "Longueur (m)", "Hauteur (m)", "Portes et fenêtres à retirer, par mur (m²)"];
+  var BX = ["Nombre", "Longueur (m)", "Largeur (m)", "Hauteur (m)"];
+  var IPEN = "Masses courantes : IPE 100 = 8,1 ; IPE 140 = 12,9 ; IPE 200 = 22,4 ; IPE 240 = 30,7 ; IPE 300 = 42,2 kg par mètre.";
+  function boxVol(c) { return c[0] * c[1] * c[2] * c[3]; }
+  function boxTxt(c) { return fmt(c[0], 0) + " x " + fmt(c[1], 2) + " x " + fmt(c[2], 2) + " x " + fmt(c[3], 2) + " m"; }
+  function cylVol(c) { return c[0] * Math.PI * c[1] * c[1] / 4 * c[2]; }
+  function B(nom, dos, l, v, el, u) { return { nom: nom, t: "b", dos: dos, l: l || BX, v: v, el: el, u: u, vol: boxVol, txt: boxTxt }; }
+  function C(nom, dos, el, v) {
+    return { nom: nom, t: "b", dos: dos, el: el, l: ["Nombre de " + el + "s de ce type", "Diamètre (m)", "Profondeur (m)"], v: v, vol: cylVol,
+      txt: function (c) { return fmt(c[0], 0) + " x diamètre " + fmt(c[1], 2) + " m x profondeur " + fmt(c[2], 2) + " m"; } };
+  }
+  var FORMES = {
+    car: { n: "Carré", nm: "carrés", l: ["Nombre de poteaux de ce type", "Côté (m)", "Hauteur (m)"], v: ["", 0.2, 3],
+      vol: function (c) { return c[0] * c[1] * c[1] * c[2]; },
+      txt: function (c) { return fmt(c[0], 0) + " x côté " + fmt(c[1], 2) + " m x hauteur " + fmt(c[2], 2) + " m"; } },
+    rec: { n: "Rectangulaire", nm: "rectangulaires", l: ["Nombre de poteaux de ce type", "Côté a (m)", "Côté b (m)", "Hauteur (m)"], v: ["", 0.2, 0.15, 3], vol: boxVol, txt: boxTxt },
+    cir: { n: "Circulaire", nm: "circulaires", l: ["Nombre de poteaux de ce type", "Diamètre (m)", "Hauteur (m)"], v: ["", 0.25, 3], vol: cylVol,
+      txt: function (c) { return fmt(c[0], 0) + " x diamètre " + fmt(c[1], 2) + " m x hauteur " + fmt(c[2], 2) + " m"; } },
+    ipe: { n: "Métallique IPE", nm: "métalliques (IPE)", steel: true, note: IPEN, l: ["Nombre de poteaux de ce type", "Hauteur (m)", "Masse du profilé (kg/m)"], v: ["", 3, 22.4],
+      vol: function (c) { return c[0] * c[1] * c[2]; },
+      txt: function (c) { return fmt(c[0], 0) + " x " + fmt(c[1], 2) + " m x " + fmt(c[2], 1) + " kg/m"; } }
+  };
+  var CAT = {
+    prop: B("Béton de propreté", 150, ["Nombre de zones", "Longueur (m)", "Largeur (m)", "Épaisseur (m)"], [1, "", "", 0.05], "zone", true),
+    semi: B("Semelles isolées", 350, ["Nombre de semelles de ce type", "Longueur (m)", "Largeur (m)", "Hauteur (m)"], ["", "", "", 0.3], "semelle"),
+    semf: B("Semelles filantes", 350, ["Nombre de tronçons de ce type", "Longueur d'un tronçon (m)", "Largeur (m)", "Hauteur (m)"], [1, "", "", 0.3], "semelle filante"),
+    amo: B("Amorces de poteaux", 350, ["Nombre d'amorces de ce type", "Côté a (m)", "Côté b (m)", "Hauteur (m)"], ["", 0.2, 0.2, ""], "amorce"),
+    lon: B("Longrines", 350, ["Nombre de longrines de ce type", "Longueur (m)", "Largeur (m)", "Hauteur (m)"], ["", "", 0.2, 0.3], "longrine"),
+    sou: { nom: "Mur de soubassement", t: "m", dos: 300, el: "mur", l: WL, v: [1, "", "", 0] },
+    chb: B("Chaînage bas", 350, ["Nombre", "Longueur totale (m)", "Largeur (m)", "Hauteur (m)"], [1, "", 0.15, 0.2], "chaînage", true),
+    rad: B("Radier général", 350, ["Nombre de radiers", "Longueur (m)", "Largeur (m)", "Épaisseur (m)"], [1, "", "", 0.2], "radier", true),
+    ner: B("Nervures et bêches du radier", 350, ["Nombre de nervures de ce type", "Longueur (m)", "Largeur (m)", "Hauteur (m)"], ["", "", 0.2, 0.4], "nervure"),
+    pui: C("Puits", 350, "puits", ["", 0.8, 3]),
+    pie: C("Pieux", 350, "pieu", ["", 0.4, 8]),
+    chev: B("Semelles de liaison (chevêtres)", 350, ["Nombre de chevêtres de ce type", "Longueur (m)", "Largeur (m)", "Hauteur (m)"], ["", "", "", 0.6], "chevêtre"),
+    pot: { nom: "Poteaux", t: "b", dos: 350, el: "poteau", pot: true },
+    pou: B("Poutres", 350, ["Nombre de poutres de ce type", "Longueur (m)", "Largeur (m)", "Hauteur (m)"], ["", "", 0.15, 0.3], "poutre"),
+    poum: { nom: "Poutres métalliques (IPE)", t: "b", dos: 0, el: "poutre", steel: true, note: IPEN, l: ["Nombre de poutres de ce type", "Longueur (m)", "Masse du profilé (kg/m)"], v: ["", "", 22.4],
+      vol: function (c) { return c[0] * c[1] * c[2]; },
+      txt: function (c) { return fmt(c[0], 0) + " x " + fmt(c[1], 2) + " m x " + fmt(c[2], 1) + " kg/m"; } },
+    chh: B("Chaînage haut", 350, ["Nombre", "Longueur totale (m)", "Largeur (m)", "Hauteur (m)"], [1, "", 0.15, 0.2], "chaînage", true),
+    chv: B("Chaînages verticaux (raidisseurs)", 350, ["Nombre de raidisseurs de ce type", "Largeur (m)", "Épaisseur (m)", "Hauteur (m)"], ["", 0.15, 0.15, 3], "raidisseur"),
+    lin: B("Linteaux", 350, ["Nombre de linteaux de ce type", "Longueur (m)", "Largeur (m)", "Hauteur (m)"], ["", 1.2, 0.15, 0.2], "linteau"),
+    con: B("Consoles", 350, ["Nombre de consoles de ce type", "Longueur (m)", "Largeur (m)", "Hauteur (m)"], ["", 0.5, 0.2, 0.2], "console"),
+    mur: { nom: "Murs en parpaings", t: "m", dos: 300, el: "mur", l: WL, v: [1, "", "", 0] }
+  };
+  var TYPES = {
+    fond: [
+      { nom: "Semelles isolées + longrines", d: "Une semelle sous chaque poteau, reliées par des longrines. Très courant pour les maisons à poteaux et poutres.", el: ["prop", "semi", "amo", "lon", "sou"] },
+      { nom: "Semelles filantes (sous les murs)", d: "Une semelle continue sous chaque mur porteur. La fondation la plus répandue pour les petites constructions.", el: ["prop", "semf", "amo", "sou", "chb"] },
+      { nom: "Mixte : semelles isolées + filantes", d: "Semelles isolées sous les poteaux et semelles filantes sous certains murs.", el: ["prop", "semi", "semf", "amo", "lon", "sou", "chb"] },
+      { nom: "Radier général", d: "Dalle épaisse sous tout le bâtiment, pour les sols faibles, humides ou inondables.", el: ["prop", "rad", "ner", "amo", "sou", "chb"] },
+      { nom: "Puits + longrines (semi-profonde)", d: "Puits en béton jusqu'au bon sol, reliés par des longrines.", el: ["pui", "chev", "amo", "lon", "sou"] },
+      { nom: "Pieux + longrines (profonde)", d: "Pieux forés ou battus jusqu'au sol résistant, avec semelles de liaison et longrines. Plus coûteux.", el: ["pie", "chev", "amo", "lon", "sou"] }
+    ],
+    elev: [
+      { nom: "Poteaux-poutres + murs de remplissage", d: "La structure la plus courante : poteaux et poutres en béton, murs en parpaings entre eux.", el: ["pot", "pou", "chh", "lin", "con", "mur"] },
+      { nom: "Murs porteurs en parpaings chaînés", d: "Les murs portent le bâtiment, renforcés par des chaînages horizontaux et verticaux.", el: ["mur", "chv", "chh", "lin", "con"] },
+      { nom: "Mixte : murs porteurs + poteaux", d: "Des murs porteurs et quelques poteaux, avec poutres et chaînages.", el: ["mur", "pot", "pou", "chv", "chh", "lin", "con"] },
+      { nom: "Ossature métallique (IPE) + remplissage", d: "Poteaux et poutres en profilés d'acier, murs de remplissage en parpaings.", el: ["pot", "poum", "mur", "lin"] }
+    ]
+  };
+  var POSTES = { enduit: [{ nom: "Crépissage (enduit)", t: "e", dos: 350 }] };
+  var PRIX = [
+    ["p-ciment", "Sac de ciment 50 kg", 6000], ["p-sable", "Sable (m³)", 12000],
+    ["p-gravier", "Gravier (m³)", 20000], ["p-mo", "Main d'œuvre (total)", 0],
+    ["p-10c", "Parpaing 10 creux", 350], ["p-10p", "Parpaing 10 plein", 450],
+    ["p-15c", "Parpaing 15 creux", 400], ["p-15p", "Parpaing 15 plein", 500],
+    ["p-20c", "Parpaing 20 creux", 500], ["p-20p", "Parpaing 20 plein", 600],
+    ["p-acier", "Acier profilé IPE (kg)", 900],
+    ["p-arm", "Acier d'armature (kg)", 800], ["p-fil", "Fil d'attache (kg)", 1200],
+    ["p-colle", "Colle carrelage (sac 25 kg)", 6500], ["p-joint", "Joint carrelage (sac 5 kg)", 3000]
+  ];
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function num(id) {
+    var n = parseFloat(String($(id).value).replace(/\s/g, "").replace(",", "."));
+    return isNaN(n) ? NaN : n;
+  }
+  function n0(id) { var n = num(id); return isNaN(n) ? 0 : n; }
+  function fmt(n, d) { return n.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function sacs(kg) { return Math.ceil(Math.round((kg / SAC) * 100) / 100); }
+  function money(n) { return fmt(Math.round(n), 0) + " FCFA"; }
+  function plab(k) { return "parpaing " + k.slice(0, -1) + " cm " + (k.slice(-1) === "c" ? "creux" : "plein"); }
+
+  function inp(r, id, label, val) {
+    return '<label for="' + r + "-" + id + '">' + esc(label) + '</label><input id="' + r + "-" + id +
+      '" type="text" inputmode="decimal" value="' + esc(String(val).replace(".", ",")) + '">';
+  }
+  function sel(r, id, label, opts, cur) {
+    var h = '<label for="' + r + "-" + id + '">' + esc(label) + '</label><select id="' + r + "-" + id + '">';
+    opts.forEach(function (o) {
+      h += '<option value="' + o[0] + '"' + (String(o[0]) === String(cur) ? " selected" : "") + ">" + esc(o[1]) + "</option>";
+    });
+    return h + "</select>";
+  }
+  function dosSel(r, label, cur) {
+    return sel(r, "dos", label, DOS.map(function (d) { return [d, d + " kg/m³"]; }), cur);
+  }
+  function plist(r) {
+    return r === "enduit" ? POSTES.enduit : TYPES[r][$("typ-" + r).selectedIndex].el.map(function (k) { return CAT[k]; });
+  }
+  function cur(r) { return plist(r)[$("sel-" + r).selectedIndex]; }
+  function F(r, p, fm) {
+    if (!p.pot) { return p; }
+    return FORMES[fm || ($(r + "-fm") ? $(r + "-fm").value : "car")];
+  }
+
+  function fillDef(r) {
+    if (!$(r + "-dos")) { return; }
+    var p = cur(r), dos = parseFloat($(r + "-dos").value);
+    var d = p.t === "b" ? { sa: 0.4, gr: 0.8, ea: 175 } : { sa: 1, ea: 200 };
+    Object.keys(d).forEach(function (k) { $(r + "-" + k).value = String(d[k]).replace(".", ","); });
+    $(r + "-info").textContent = "Pour 1 m³ à " + dos + " kg/m³ : ciment " + dos + " kg (" + fmt(dos / SAC, 1) +
+      " sacs de 50 kg). Les quantités de sable, " + (p.t === "b" ? "gravier " : "") + "et eau ci-dessous sont modifiables.";
+  }
+  function rd(r, id, def) { var n = num(r + "-" + id); return n >= 0 ? n : def; }
+
+  function ntSel(r) {
+    var o = [], k;
+    for (k = 1; k <= MAXT; k++) { o.push([k, String(k)]); }
+    return sel(r, "nt", "Nombre de types différents (maximum " + MAXT + ")", o, 1) + '<div id="' + r + '-types"></div>';
+  }
+  function buildTypes(r) {
+    var p = cur(r), f = F(r, p), n = p.u ? 1 : (parseInt($(r + "-nt").value, 10) || 1), old = {}, h = "", t, i, id;
+    var els = $(r + "-types").querySelectorAll("input");
+    for (i = 0; i < els.length; i++) { old[els[i].id] = els[i].value; }
+    if (f.note) { h += '<div class="info">' + esc(f.note) + "</div>"; }
+    for (t = 0; t < n; t++) {
+      h += '<div class="typ"><h3>' + esc(p.u ? Cap(p.el) : Cap(p.el) + " " + String.fromCharCode(65 + t)) + "</h3>";
+      for (i = 0; i < f.l.length; i++) {
+        id = r + "-t" + t + "f" + i;
+        h += inp(r, "t" + t + "f" + i, f.l[i], old[id] !== undefined ? old[id] : f.v[i]);
+      }
+      h += "</div>";
+    }
+    $(r + "-types").innerHTML = h;
+  }
+
+  function buildForm(r) {
+    var fm = $(r + "-fm") ? $(r + "-fm").value : "car";
+    var p = cur(r), h = "", f = F(r, p, fm);
+    if (p.t === "b") {
+      if (p.pot) { h += sel(r, "fm", "Forme du poteau", Object.keys(FORMES).map(function (k) { return [k, FORMES[k].n]; }), fm); }
+      h += p.u ? '<div class="info">Élément unique : une seule section pour tout l\'ouvrage.</div><div id="' + r + '-types"></div>' : ntSel(r);
+      if (!f.steel) {
+        h += dosSel(r, "Dosage du béton", p.dos) + '<div class="info" id="' + r + '-info"></div>' +
+          inp(r, "sa", "Sable par m³ de béton (m³)", 0.4) + inp(r, "gr", "Gravier par m³ de béton (m³)", 0.8) +
+          inp(r, "ea", "Eau par m³ de béton (litres)", 175);
+      }
+      h += inp(r, "per", f.steel ? "Perte et chutes (%)" : "Perte (%)", 5);
+    } else if (p.t === "m") {
+      h += ntSel(r) +
+        sel(r, "ep", "Épaisseur du parpaing", [["10", "10 cm"], ["15", "15 cm"], ["20", "20 cm"]], "15") +
+        sel(r, "ty", "Type de parpaing", [["c", "Creux"], ["p", "Plein"]], "c") +
+        dosSel(r, "Dosage du mortier de pose", p.dos) + '<div class="info" id="' + r + '-info"></div>' +
+        inp(r, "sa", "Sable par m³ de mortier (m³)", 1) + inp(r, "ea", "Eau par m³ de mortier (litres)", 200) +
+        inp(r, "per", "Casse et perte (%)", 5);
+    } else {
+      h += inp(r, "S", "Surface à enduire (m²)", "") + inp(r, "e", "Épaisseur (cm)", 2) +
+        dosSel(r, "Dosage du mortier", p.dos) + '<div class="info" id="' + r + '-info"></div>' +
+        inp(r, "sa", "Sable par m³ de mortier (m³)", 1) + inp(r, "ea", "Eau par m³ de mortier (litres)", 200) +
+        inp(r, "per", "Perte (%)", 10);
+    }
+    $("form-" + r).innerHTML = h;
+    if (p.t !== "e") {
+      buildTypes(r);
+      if ($(r + "-nt")) { $(r + "-nt").addEventListener("change", function () { buildTypes(r); }); }
+    }
+    if ($(r + "-fm")) { $(r + "-fm").addEventListener("change", function () { buildForm(r); }); }
+    fillDef(r);
+    if ($(r + "-dos")) { $(r + "-dos").addEventListener("change", function () { fillDef(r); }); }
+    $("res-" + r).className = "res";
+    $("add-" + r).disabled = true;
+    pend[r] = null;
+  }
+
+  function bad(r, msg) {
+    var x = $("res-" + r);
+    x.className = "res err show";
+    x.textContent = msg;
+    pend[r] = null;
+    $("add-" + r).disabled = true;
+  }
+  function out(r, e) {
+    var rows = [];
+    Object.keys(e.parp).forEach(function (k) { rows.push([Cap(plab(k)), fmt(e.parp[k], 0)]); });
+    if (e.acier) { rows.push(["Acier (profilés)", fmt(e.acier, 0) + " kg"]); } else if (e.kg > 0 || !e.lines) {
+      rows.push(["Ciment", fmt(e.kg, 0) + " kg (" + sacs(e.kg) + " sacs)"]);
+      rows.push(["Sable", fmt(e.sable, 2) + " m³"]);
+      if (e.gravier > 0) { rows.push(["Gravier", fmt(e.gravier, 2) + " m³"]); }
+      rows.push(["Eau (environ)", fmt(e.eau, 0) + " litres"]);
+    }
+    (e.lines || []).forEach(function (x) { rows.push([x[0], x[1]]); });
+    var h = "<b>" + esc(e.nom) + "</b>";
+    (e.det || []).forEach(function (x) { h += "<div><small>" + esc(x) + "</small></div>"; });
+    h += "<table>";
+    rows.forEach(function (x) { h += "<tr><td>" + esc(x[0]) + "</td><td>" + esc(x[1]) + "</td></tr>"; });
+    var box = $("res-" + r);
+    box.className = "res show";
+    box.innerHTML = h + "</table>";
+    e.rub = e.rub || r;
+    pend[r] = e;
+    $("add-" + r).disabled = false;
+  }
+  function Cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  function calc(r) {
+    var p = cur(r), f = F(r, p), P = n0(r + "-per"), dos = $(r + "-dos") ? parseFloat($(r + "-dos").value) : 0, e, V, S, i, t, c, lt, det = [];
+    var n = (p.t === "e" || p.u) ? 1 : (parseInt($(r + "-nt").value, 10) || 1);
+    if (p.t === "b") {
+      var V0 = 0, vv, nm = p.nom + (p.pot ? " " + f.nm : "");
+      for (t = 0; t < n; t++) {
+        lt = p.u ? "" : " " + String.fromCharCode(65 + t);
+        c = [];
+        for (i = 0; i < f.l.length; i++) { c.push(num(r + "-t" + t + "f" + i)); }
+        if (!c.every(function (x) { return x > 0; })) { return bad(r, "Remplissez toutes les cases (" + Cap(p.el) + lt + ") avec des nombres supérieurs à 0."); }
+        vv = f.vol(c);
+        V0 += vv;
+        det.push(Cap(p.el) + lt + " : " + f.txt(c) + " = " + fmt(vv, 2) + (f.steel ? " kg" : " m³"));
+      }
+      V = V0 * (1 + P / 100);
+      if (f.steel) {
+        e = { nom: nm + " (" + fmt(V, 0) + " kg avec perte)", det: det, kg: 0, sable: 0, gravier: 0, eau: 0, parp: {}, acier: V };
+      } else {
+        e = { nom: nm + " " + dos + " kg/m³ (" + (p.u ? "" : n + (n > 1 ? " types, " : " type, ")) + fmt(V, 2) + " m³ avec perte)", det: det,
+              kg: V * dos, sable: V * rd(r, "sa", 0.4), gravier: V * rd(r, "gr", 0.8), eau: V * rd(r, "ea", 175), parp: {} };
+      }
+    } else if (p.t === "m") {
+      var ep = $(r + "-ep").value, ty = $(r + "-ty").value, q, L, H, O, s;
+      S = 0;
+      for (t = 0; t < n; t++) {
+        lt = String.fromCharCode(65 + t);
+        q = num(r + "-t" + t + "f0"); L = num(r + "-t" + t + "f1"); H = num(r + "-t" + t + "f2"); O = n0(r + "-t" + t + "f3");
+        if (!(q > 0) || !(L > 0) || !(H > 0)) { return bad(r, "Mur " + lt + " : entrez le nombre, la longueur et la hauteur (nombres supérieurs à 0)."); }
+        s = q * (L * H - O);
+        if (!(s > 0)) { return bad(r, "Mur " + lt + " : les portes et fenêtres sont plus grandes que le mur."); }
+        S += s;
+        det.push("Mur " + lt + " : " + fmt(q, 0) + " x " + fmt(L, 2) + " m x " + fmt(H, 2) + " m, ouvertures " + fmt(O, 2) + " m² = " + fmt(s, 2) + " m²");
+      }
+      var mort = S * MORT[ep], pk = {};
+      pk[ep + ty] = Math.ceil(S * 12.5 * (1 + P / 100));
+      e = { nom: p.nom + " " + ep + " cm " + (ty === "c" ? "creux" : "plein") + " (" + fmt(S, 2) + " m², mortier " + dos + ")", det: det,
+            kg: mort * dos, sable: mort * rd(r, "sa", 1), gravier: 0, eau: mort * rd(r, "ea", 200), parp: pk };
+    } else {
+      S = num(r + "-S");
+      var ee = num(r + "-e");
+      if (!(S > 0) || !(ee > 0)) { return bad(r, "Entrez la surface et l'épaisseur (nombres supérieurs à 0)."); }
+      V = (S * ee / 100) * (1 + P / 100);
+      e = { nom: p.nom + " " + fmt(S, 1) + " m² sur " + fmt(ee, 1) + " cm (" + dos + " kg/m³)", kg: V * dos, sable: V * rd(r, "sa", 1), gravier: 0, eau: V * rd(r, "ea", 200), parp: {} };
+    }
+    if (r !== "enduit") { e.det.unshift("Type : " + TYPES[r][$("typ-" + r).selectedIndex].nom); }
+    out(r, e);
+  }
+
+  function mat(e) {
+    var s = [];
+    Object.keys(e.parp).forEach(function (k) { s.push(fmt(e.parp[k], 0) + " " + plab(k)); });
+    if (e.acier) { s.push(fmt(e.acier, 0) + " kg d'acier"); return s.join(" · "); }
+    s.push(fmt(e.kg / SAC, 1) + " sacs de ciment", fmt(e.sable, 2) + " m³ de sable");
+    if (e.gravier > 0) { s.push(fmt(e.gravier, 2) + " m³ de gravier"); }
+    s.push(fmt(e.eau, 0) + " L d'eau");
+    return s.join(" · ");
+  }
+  function cost(e) {
+    var c = (e.kg / SAC) * n0("p-ciment") + e.sable * n0("p-sable") + e.gravier * n0("p-gravier") + (e.acier || 0) * n0("p-acier");
+    Object.keys(e.parp).forEach(function (k) { c += e.parp[k] * n0("p-" + k); });
+    return c;
+  }
+
+  function save() {
+    try {
+      var p = {};
+      PRIX.forEach(function (x) { p[x[0]] = $(x[0]).value; });
+      p["p-client"] = $("p-client").value;
+      localStorage.setItem(KEY, JSON.stringify({ entries: entries, p: p }));
+    } catch (er) {}
+  }
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (!raw) { return; }
+      var d = JSON.parse(raw);
+      if (d && Array.isArray(d.entries)) { entries = d.entries; }
+      if (d && d.p) { Object.keys(d.p).forEach(function (id) { if ($(id)) { $(id).value = d.p[id]; } }); }
+    } catch (er) {}
+  }
+
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function pcs(x) { return String(pnum(x)).replace(".", ","); }
+  function pnum(x) { var n = parseFloat(String(x).replace(",", ".")); return isNaN(n) ? 0 : n; }
+  function dlines(e) {
+    var L = [], sc = e.kg / SAC;
+    Object.keys(e.parp).forEach(function (k) { L.push([Cap(plab(k)), fmt(e.parp[k], 0) + " u", n0("p-" + k), e.parp[k] * n0("p-" + k)]); });
+    if (e.kg > 0) { L.push(["Ciment (sac de 50 kg)", fmt(sc, 1) + " sacs", n0("p-ciment"), sc * n0("p-ciment")]); }
+    if (e.sable > 0) { L.push(["Sable", fmt(e.sable, 2) + " m³", n0("p-sable"), e.sable * n0("p-sable")]); }
+    if (e.gravier > 0) { L.push(["Gravier", fmt(e.gravier, 2) + " m³", n0("p-gravier"), e.gravier * n0("p-gravier")]); }
+    if (e.acier > 0) { L.push(["Acier profilé IPE", fmt(e.acier, 0) + " kg", n0("p-acier"), e.acier * n0("p-acier")]); }
+    (e.lines || []).forEach(function (x) { L.push(x); });
+    if (e.mo > 0) { L.push(["Main d'œuvre", "forfait", e.mo, e.mo]); }
+    return L;
+  }
+  var BUY = [];
+  function renderDevis() {
+    var cl = $("p-client").value, d = new Date(), co = "", by = esc(EDITEUR) + "<br>" + esc(CONTACT);
+    if (PRO.on && (PRO.nom || PRO.logo)) {
+      co = '<div class="co">' + (PRO.logo ? '<img src="' + esc(PRO.logo) + '" alt="">' : "") + "<div><b>" + esc(PRO.nom) + "</b>" +
+        (PRO.adr ? "<br>" + esc(PRO.adr) : "") + (PRO.niu ? "<br>N° contribuable / RCCM : " + esc(PRO.niu) : "") + "</div></div>";
+      by = esc(PRO.nom) + (PRO.adr ? "<br>" + esc(PRO.adr) : "");
+    }
+    $("dv-head").innerHTML = co + '<div class="dvt">DEVIS ESTIMATIF</div><table class="dv dvi"><tr><td>Client / chantier</td><td><b>' + esc(cl || "à préciser") +
+      "</b></td></tr><tr><td>Date</td><td>" + d.toLocaleDateString("fr-FR") + "</td></tr><tr><td>Référence</td><td>BC-" + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) +
+      "</td></tr><tr><td>Établi par</td><td>" + by + "</td></tr></table>";
+    BUY = [];
+    if (!entries.length) {
+      $("dv-body").innerHTML = '<p class="aide">Aucun poste ajouté. Faites un calcul dans Fondation, Élévation ou Enduit, puis appuyez sur « Ajouter au devis ».</p>';
+      return;
+    }
+    var h = "", recap = [], tot = 0, k = 0, TH = '<tr><th>Désignation</th><th class="n">Quantité</th><th class="n">P.U.</th><th class="n">Montant</th></tr>';
+    ORDD.forEach(function (r) {
+      var s = 0, rows = "";
+      entries.forEach(function (e, i) {
+        if (e.rub !== r) { return; }
+        k++;
+        var L = dlines(e), c = 0, info = (e.det || []).slice();
+        L.forEach(function (x) { c += x[3]; });
+        s += c;
+        if (e.eau > 0) { info.push("Eau nécessaire : " + fmt(e.eau, 0) + " litres (non chiffrée)"); }
+        rows += '<tr class="pt"><td colspan="3">' + k + ". " + esc(e.nom) + '</td><td class="n">' + fmt(Math.round(c), 0) + "</td></tr>" +
+          '<tr><td colspan="4"><small>' + info.map(esc).join("<br>") + "</small></td></tr>";
+        L.forEach(function (x) {
+          rows += "<tr><td>" + esc(x[0]) + '</td><td class="n">' + esc(x[1]) + '</td><td class="n">' + fmt(Math.round(x[2]), 0) + '</td><td class="n">' + fmt(Math.round(x[3]), 0) + "</td></tr>";
+        });
+        if (PRO.on) {
+          rows += '<tr class="noprint"><td colspan="4">Main d\'œuvre de ce poste (FCFA) : <input type="text" inputmode="decimal" data-mo="' + i + '" value="' + (e.mo || "") + '" style="width:150px;display:inline-block"></td></tr>';
+        }
+        rows += '<tr class="noprint"><td colspan="4" style="text-align:right"><button type="button" class="sup" data-del="' + i + '">Retirer ce poste</button></td></tr>';
+      });
+      if (!rows) { return; }
+      h += "<h3>" + RUB[r] + '</h3><div class="sc"><table class="dv">' + TH + rows +
+        '<tr class="tot"><td colspan="3">TOTAL ' + RUB[r].toUpperCase() + '</td><td class="n">' + fmt(Math.round(s), 0) + "</td></tr></table></div>";
+      recap.push([RUB[r], s]);
+      tot += s;
+    });
+    var mo = n0("p-mo"), base = tot + mo, net = base, lab = "TOTAL ESTIMATIF";
+    h += '<h3>Récapitulatif</h3><div class="sc"><table class="dv">';
+    recap.forEach(function (x) { h += "<tr><td>" + x[0] + '</td><td class="n">' + money(x[1]) + "</td></tr>"; });
+    if (mo > 0) { h += "<tr><td>Main d'œuvre générale</td><td class=\"n\">" + money(mo) + "</td></tr>"; }
+    if (PRO.on) {
+      var mg = base * pnum(PRO.marge) / 100, sub = base + mg, rm = sub * pnum(PRO.remise) / 100, ht = sub - rm, tv = ht * pnum(PRO.tva) / 100;
+      h += '<tr class="tot"><td>Total des travaux</td><td class="n">' + money(base) + "</td></tr>";
+      if (mg) { h += "<tr><td>Marge (" + pcs(PRO.marge) + ' %)</td><td class="n">+ ' + money(mg) + "</td></tr>"; }
+      if (rm) { h += "<tr><td>Remise (" + pcs(PRO.remise) + ' %)</td><td class="n">- ' + money(rm) + "</td></tr>"; }
+      net = ht;
+      if (tv) {
+        h += '<tr class="tot"><td>Total hors taxes</td><td class="n">' + money(ht) + "</td></tr><tr><td>TVA (" + pcs(PRO.tva) + ' %)</td><td class="n">' + money(tv) + "</td></tr>";
+        net = ht + tv; lab = "TOTAL TTC";
+      }
+    }
+    h += '<tr class="tg"><td>' + lab + '</td><td class="n">' + money(net) + "</td></tr></table></div>";
+
+    var T = { kg: 0, sable: 0, gravier: 0, eau: 0, acier: 0, parp: {}, x: {} };
+    entries.forEach(function (e) {
+      T.acier += e.acier || 0; T.kg += e.kg; T.sable += e.sable; T.gravier += e.gravier; T.eau += e.eau;
+      Object.keys(e.parp).forEach(function (q) { T.parp[q] = (T.parp[q] || 0) + e.parp[q]; });
+      (e.mat || []).forEach(function (m) { var z = T.x[m[0]] || (T.x[m[0]] = { q: 0, u: m[2] }); z.q += m[1]; });
+    });
+    h += '<h3>Liste des matériaux à acheter</h3><div class="sc"><table class="dv"><tr><th>Désignation</th><th class="n">Quantité</th></tr>';
+    var brow = function (a, b) { BUY.push("- " + a + " : " + b); h += "<tr><td>" + esc(a) + '</td><td class="n">' + b + "</td></tr>"; };
+    Object.keys(T.parp).forEach(function (q) { brow(Cap(plab(q)), fmt(T.parp[q], 0)); });
+    if (T.kg > 0) {
+      brow("Ciment (sacs de 50 kg)", fmt(sacs(T.kg), 0) + " sacs");
+      brow("Sable", fmt(T.sable, 2) + " m³");
+      if (T.gravier > 0) { brow("Gravier", fmt(T.gravier, 2) + " m³"); }
+      brow("Eau (environ)", fmt(T.eau, 0) + " litres");
+    }
+    if (T.acier > 0) { brow("Acier profilé IPE", fmt(T.acier, 0) + " kg"); }
+    Object.keys(T.x).forEach(function (a) {
+      var z = T.x[a];
+      brow(a, z.u === "kg" ? fmt(z.q, 0) + " kg" : z.u === "sacs" ? fmt(Math.ceil(z.q - 1e-9), 0) + " sacs" : fmt(z.q, 2) + " " + z.u);
+    });
+    $("dv-body").innerHTML = h + "</table></div>";
+  }
+
+  function go(tab) {
+    var ps = document.querySelectorAll(".panel"), bs = document.querySelectorAll("#tabs button"), i;
+    for (i = 0; i < ps.length; i++) { ps[i].classList.remove("on"); }
+    for (i = 0; i < bs.length; i++) { bs[i].classList.toggle("on", bs[i].getAttribute("data-tab") === tab); }
+    $(tab).classList.add("on");
+    if (tab === "devis") { renderDevis(); }
+    window.scrollTo(0, 0);
+  }
+
+  function fillPostes(r) {
+    var o = "";
+    plist(r).forEach(function (p, i) {
+      o += '<option value="' + i + '">' + esc(p.nom + (p.t === "e" ? "" : p.u ? " (unique)" : " (plusieurs types possibles)")) + "</option>";
+    });
+    $("sel-" + r).innerHTML = o;
+    if (r !== "enduit") { $("td-" + r).textContent = TYPES[r][$("typ-" + r).selectedIndex].d; }
+    buildForm(r);
+  }
+  var AIDE = {
+    fond: "1) Choisissez le type de fondation. 2) Calculez les éléments un par un, puis « Ajouter au devis ». Mesures en mètres.",
+    elev: "1) Choisissez le type de structure. 2) Calculez les éléments un par un, puis « Ajouter au devis ». Mesures en mètres.",
+    enduit: "Entrez la surface à crépir et l'épaisseur de l'enduit."
+  };
+  var html = "";
+  ORD.forEach(function (r) {
+    html += '<section class="panel' + (r === "fond" ? " on" : "") + '" id="' + r + '"><h2>' + RUB[r] + '</h2><p class="aide">' + AIDE[r] +
+      '</p>' + (r === "enduit" ? "" : '<label for="typ-' + r + '">Type de ' + (r === "fond" ? "fondation" : "structure") + '</label><select id="typ-' + r + '"></select><p class="aide" id="td-' + r + '"></p>') +
+      '<label for="sel-' + r + '">Élément à calculer</label><select id="sel-' + r + '"></select><div id="form-' + r + '"></div>' +
+      '<button type="button" class="btn" id="go-' + r + '">Calculer</button><div class="res" id="res-' + r + '"></div>' +
+      '<button type="button" class="btn bleu" id="add-' + r + '" disabled>Ajouter au devis</button>' +
+      '<div class="pro">L\'acier (armatures) est disponible dans la <b>version Pro</b>.</div></section>';
+  });
+  $("devis").insertAdjacentHTML("beforebegin", html);
+
+  var ph = "";
+  PRIX.forEach(function (x) {
+    ph += '<div><label for="' + x[0] + '">' + x[1] + '</label><input id="' + x[0] + '" type="text" inputmode="decimal" value="' + x[2] + '"></div>';
+  });
+  $("prix").innerHTML = ph;
+
+  ORD.forEach(function (r) {
+    if (r !== "enduit") {
+      var tt = "";
+      TYPES[r].forEach(function (x, i) { tt += '<option value="' + i + '">' + esc(x.nom) + "</option>"; });
+      $("typ-" + r).innerHTML = tt;
+      $("typ-" + r).addEventListener("change", function () { fillPostes(r); });
+    }
+    $("sel-" + r).addEventListener("change", function () { buildForm(r); });
+    fillPostes(r);
+    $("go-" + r).addEventListener("click", function () { calc(r); });
+    $("add-" + r).addEventListener("click", function () {
+      if (!pend[r]) { return; }
+      entries.push(pend[r]);
+      pend[r] = null;
+      $("add-" + r).disabled = true;
+      $("res-" + r).innerHTML += "<p><b>Ajouté au devis.</b> Ouvrez « Mon devis » pour voir le total.</p>";
+      save();
+      renderDevis();
+    });
+  });
+
+  var bs = document.querySelectorAll("#tabs button");
+  for (var i = 0; i < bs.length; i++) {
+    bs[i].addEventListener("click", function (ev) { go(ev.currentTarget.getAttribute("data-tab")); });
+  }
+  PRIX.map(function (x) { return x[0]; }).concat(["p-client"]).forEach(function (id) {
+    $(id).addEventListener("input", function () { renderDevis(); save(); });
+  });
+  $("dv-body").addEventListener("click", function (ev) {
+    var d = ev.target.getAttribute ? ev.target.getAttribute("data-del") : null;
+    if (d !== null && d !== undefined) { entries.splice(parseInt(d, 10), 1); save(); renderDevis(); }
+  });
+  $("dv-print").addEventListener("click", function () { renderDevis(); window.print(); });
+  $("dv-clear").addEventListener("click", function () {
+    if (window.confirm("Vider tout le devis ?")) { entries = []; save(); renderDevis(); }
+  });
+  var nn = document.querySelectorAll(".lg-nom"), mm = document.querySelectorAll(".lg-mail"), q;
+  for (q = 0; q < nn.length; q++) { nn[q].textContent = EDITEUR; }
+  for (q = 0; q < mm.length; q++) { mm[q].textContent = CONTACT; }
+  var gl = document.querySelectorAll("[data-go]");
+  for (q = 0; q < gl.length; q++) {
+    gl[q].addEventListener("click", function (ev) { ev.preventDefault(); go(ev.currentTarget.getAttribute("data-go")); });
+  }
+  // ================= MODE PRO (TEST GRATUIT) =================
+  var PKEY = "baticalc_pro_v1";
+  var PRO = { on: false, nom: "", adr: "", niu: "", logo: "", tva: "0", marge: "0", remise: "0", ch: {}, ps: {} };
+  function psave() { try { localStorage.setItem(PKEY, JSON.stringify(PRO)); } catch (er) {} }
+  function pload() {
+    try {
+      var raw = localStorage.getItem(PKEY);
+      if (raw) { var d = JSON.parse(raw); Object.keys(d).forEach(function (k) { PRO[k] = d[k]; }); }
+    } catch (er) {}
+  }
+  var MS = { "5": 0.154, "6": 0.222, "8": 0.395, "10": 0.617, "12": 0.888, "14": 1.208, "16": 1.578, "20": 2.466, "25": 3.853, "32": 6.313 };
+  function mkg(v) { return MS[String(v).replace(/\D/g, "")]; }
+  function dl(v) { return v.slice(0, 2) + " " + v.slice(2); }
+  var DIA = [["HA6", "HA 6"], ["HA8", "HA 8"], ["HA10", "HA 10"], ["HA12", "HA 12"], ["HA14", "HA 14"], ["HA16", "HA 16"], ["HA20", "HA 20"], ["HA25", "HA 25"], ["HA32", "HA 32"],
+    ["RL6", "Rond lisse 6"], ["RL8", "Rond lisse 8"], ["RL10", "Rond lisse 10"]];
+  var MESH = [[5, 100], [5, 150], [5, 200], [6, 100], [6, 150], [6, 200], [8, 100], [8, 150], [8, 200], [10, 150], [10, 200]];
+  var AR = {
+    fond: [["Semelle isolée", "slab"], ["Semelle filante", "strip"], ["Longrine", "beam"], ["Chaînage bas", "beam"], ["Radier général", "slab"], ["Amorces de poteaux", "beam"],
+      ["Chevêtre (semelle de liaison)", "beam"], ["Nervures du radier", "beam"], ["Puits", "cage"], ["Pieux", "cage"], ["Treillis soudé (dallage, radier)", "mesh"]],
+    elev: [["Poteau carré ou rectangulaire", "beam"], ["Poteau circulaire", "cage"], ["Poutre", "beam"], ["Linteau", "beam"], ["Chaînage haut", "beam"],
+      ["Chaînage vertical (raidisseur)", "beam"], ["Console", "beam"], ["Treillis soudé", "mesh"]]
+  };
+  var DD = {
+    "Poteau carré ou rectangulaire": { b: 20, h: 20, nb: 4, d1: "HA12", es: 15 }, "Poutre": { b: 15, h: 30, nb: 6, d1: "HA12", es: 15 },
+    "Longrine": { b: 20, h: 30, nb: 6, d1: "HA12", es: 15 }, "Linteau": { b: 15, h: 20, nb: 4, d1: "HA10", es: 15 },
+    "Chaînage haut": { b: 15, h: 20, nb: 4, d1: "HA10", es: 20 }, "Chaînage bas": { b: 15, h: 20, nb: 4, d1: "HA10", es: 20 },
+    "Radier général": { nap: 2, d1: "HA12", e1: 20, d2: "HA12", e2: 20 }, "Puits": { D: 80, nb: 8, d1: "HA12", es: 20 }, "Pieux": { D: 40, nb: 6, d1: "HA14", es: 15 },
+    "Poteau circulaire": { D: 25, nb: 6, d1: "HA12", es: 15 }
+  };
+  function dd(nm, key, def) { var o = DD[nm]; return o && o[key] !== undefined ? o[key] : def; }
+  function diaSel(r, id, label, cur) { return sel(r, id, label, DIA.map(function (x) { return [x[0], x[1] + " mm"]; }), cur); }
+
+  function buildAr() {
+    var part = $("ar-part").value, el = AR[part][$("ar-el").selectedIndex], k = el[1], nm = el[0], h = "", r = "ar";
+    if (k === "beam") {
+      h += inp(r, "n", "Nombre d'éléments de ce type", "") + inp(r, "L", "Longueur ou hauteur d'un élément (m)", "") +
+        inp(r, "b", "Largeur b de la section (cm)", dd(nm, "b", 20)) + inp(r, "h", "Hauteur h de la section (cm)", dd(nm, "h", 20)) +
+        inp(r, "c", "Enrobage (cm)", 3) + inp(r, "nb", "Nombre de barres longitudinales", dd(nm, "nb", 4)) +
+        diaSel(r, "d1", "Diamètre des barres longitudinales", dd(nm, "d1", "HA12")) + diaSel(r, "d2", "Diamètre des cadres", "RL6") +
+        inp(r, "es", "Espacement des cadres (cm)", dd(nm, "es", 15));
+    } else if (k === "slab") {
+      h += inp(r, "n", "Nombre d'éléments de ce type", "") + inp(r, "L", "Longueur (m)", "") + inp(r, "l", "Largeur (m)", "") +
+        inp(r, "h", "Hauteur ou épaisseur (m)", 0.3) + inp(r, "c", "Enrobage (cm)", 5) +
+        diaSel(r, "d1", "Barres dans le sens de la longueur", dd(nm, "d1", "HA10")) + inp(r, "e1", "Espacement de ces barres (cm)", dd(nm, "e1", 15)) +
+        diaSel(r, "d2", "Barres dans le sens de la largeur", dd(nm, "d2", "HA10")) + inp(r, "e2", "Espacement de ces barres (cm)", dd(nm, "e2", 15)) +
+        sel(r, "nap", "Nombre de nappes", [["1", "1 nappe (en bas)"], ["2", "2 nappes (bas et haut)"]], String(dd(nm, "nap", 1)));
+    } else if (k === "strip") {
+      h += inp(r, "L", "Longueur totale (m)", "") + inp(r, "l", "Largeur de la semelle (m)", "") + inp(r, "h", "Hauteur de la semelle (m)", 0.3) +
+        inp(r, "c", "Enrobage (cm)", 5) + inp(r, "nb", "Nombre de barres longitudinales", 4) + diaSel(r, "d1", "Diamètre des barres longitudinales", "HA10") +
+        diaSel(r, "d2", "Diamètre des barres transversales", "HA10") + inp(r, "es", "Espacement des barres transversales (cm)", 20);
+    } else if (k === "cage") {
+      h += inp(r, "n", "Nombre d'éléments de ce type", "") + inp(r, "L", "Profondeur ou hauteur (m)", "") + inp(r, "D", "Diamètre (cm)", dd(nm, "D", 40)) +
+        inp(r, "c", "Enrobage (cm)", 4) + inp(r, "nb", "Nombre de barres verticales", dd(nm, "nb", 6)) + diaSel(r, "d1", "Diamètre des barres verticales", dd(nm, "d1", "HA12")) +
+        diaSel(r, "d2", "Diamètre des cerces ou spirales", "RL6") + inp(r, "es", "Espacement des cerces (cm)", dd(nm, "es", 20));
+    } else {
+      h += inp(r, "S", "Surface à armer (m²)", "") +
+        sel(r, "mesh", "Treillis soudé (maille, diamètre du fil)", MESH.map(function (x, i) { return [i, "Maille " + x[1] + " x " + x[1] + " mm, fil " + x[0] + " mm"]; }), 4) +
+        sel(r, "nap", "Nombre de nappes", [["1", "1 nappe"], ["2", "2 nappes"]], "1");
+    }
+    if (k !== "mesh") { h += inp(r, "fil", "Fil d'attache (% du poids d'acier)", 1); }
+    h += inp(r, "rec", "Recouvrements et pertes (%)", 10);
+    $("form-acier").innerHTML = h;
+    $("res-acier").className = "res";
+    $("add-acier").disabled = true;
+    pend.acier = null;
+  }
+
+  function calcAr() {
+    var part = $("ar-part").value, el = AR[part][$("ar-el").selectedIndex], k = el[1], M = {}, info = [], rec = 1 + n0("ar-rec") / 100;
+    var pa = n0("p-arm"), pf = n0("p-fil"), tot = 0, nom = el[0], n, L, l, b, h, c, cm, nb, es, d1, d2, e1, e2, nap, hk;
+    var add = function (v, kg) { var key = "Acier " + dl(v); M[key] = (M[key] || 0) + kg; };
+    var bad1 = function () { return bad("acier", "Remplissez toutes les cases avec des nombres supérieurs à 0 (l'enrobage doit rester petit par rapport à la section)."); };
+    if (k === "beam") {
+      n = num("ar-n"); L = num("ar-L"); b = num("ar-b"); h = num("ar-h"); c = n0("ar-c"); nb = num("ar-nb"); es = num("ar-es"); d1 = $("ar-d1").value; d2 = $("ar-d2").value;
+      if (!(n > 0 && L > 0 && b > 2 * c && h > 2 * c && nb > 0 && es > 0)) { return bad1(); }
+      var nc = Math.ceil(L * 100 / es) + 1, pc = 2 * ((b - 2 * c) + (h - 2 * c)) / 100 + 0.2;
+      add(d1, n * nb * L * rec * mkg(d1)); add(d2, n * nc * pc * mkg(d2));
+      nom += " " + fmt(b, 0) + " x " + fmt(h, 0) + " cm (" + fmt(n, 0) + " élément" + (n > 1 ? "s" : "") + " de " + fmt(L, 2) + " m)";
+      info.push("Barres longitudinales : " + fmt(nb, 0) + " " + dl(d1) + " par élément");
+      info.push("Cadres : " + nc + " cadres " + dl(d2) + " par élément, espacés de " + fmt(es, 0) + " cm (" + fmt(pc, 2) + " m chacun)");
+    } else if (k === "slab") {
+      n = num("ar-n"); L = num("ar-L"); l = num("ar-l"); h = num("ar-h"); c = n0("ar-c"); cm = c / 100; e1 = num("ar-e1"); e2 = num("ar-e2");
+      d1 = $("ar-d1").value; d2 = $("ar-d2").value; nap = parseInt($("ar-nap").value, 10) || 1;
+      if (!(n > 0 && L > 2 * cm && l > 2 * cm && h > 0 && e1 > 0 && e2 > 0)) { return bad1(); }
+      hk = 2 * Math.max(h - 2 * cm, 0);
+      var nL = Math.floor((l - 2 * cm) / (e1 / 100)) + 1, lenL = (L - 2 * cm) + hk, nl = Math.floor((L - 2 * cm) / (e2 / 100)) + 1, lenl = (l - 2 * cm) + hk;
+      add(d1, n * nap * nL * lenL * rec * mkg(d1)); add(d2, n * nap * nl * lenl * rec * mkg(d2));
+      nom += " " + fmt(L, 2) + " x " + fmt(l, 2) + " m (" + fmt(n, 0) + " élément" + (n > 1 ? "s" : "") + ")";
+      info.push("Sens de la longueur : " + nL + " barres " + dl(d1) + " de " + fmt(lenL, 2) + " m, espacées de " + fmt(e1, 0) + " cm");
+      info.push("Sens de la largeur : " + nl + " barres " + dl(d2) + " de " + fmt(lenl, 2) + " m, espacées de " + fmt(e2, 0) + " cm");
+      info.push(nap + " nappe" + (nap > 1 ? "s" : "") + " par élément");
+    } else if (k === "strip") {
+      L = num("ar-L"); l = num("ar-l"); h = num("ar-h"); c = n0("ar-c"); cm = c / 100; nb = num("ar-nb"); es = num("ar-es"); d1 = $("ar-d1").value; d2 = $("ar-d2").value;
+      if (!(L > 0 && l > 2 * cm && h > 0 && nb > 0 && es > 0)) { return bad1(); }
+      var nt = Math.ceil(L * 100 / es) + 1, lt = (l - 2 * cm) + 2 * Math.max(h - 2 * cm, 0);
+      add(d1, nb * L * rec * mkg(d1)); add(d2, nt * lt * rec * mkg(d2));
+      nom += " " + fmt(L, 2) + " m x " + fmt(l, 2) + " m";
+      info.push("Barres longitudinales : " + fmt(nb, 0) + " " + dl(d1) + " sur " + fmt(L, 2) + " m");
+      info.push("Barres transversales : " + nt + " " + dl(d2) + " de " + fmt(lt, 2) + " m, espacées de " + fmt(es, 0) + " cm");
+    } else if (k === "cage") {
+      n = num("ar-n"); L = num("ar-L"); var D = num("ar-D"); c = n0("ar-c"); nb = num("ar-nb"); es = num("ar-es"); d1 = $("ar-d1").value; d2 = $("ar-d2").value;
+      if (!(n > 0 && L > 0 && D > 2 * c && nb > 0 && es > 0)) { return bad1(); }
+      var ncer = Math.ceil(L * 100 / es) + 1, lce = Math.PI * (D - 2 * c) / 100 + 0.2;
+      add(d1, n * nb * L * rec * mkg(d1)); add(d2, n * ncer * lce * rec * mkg(d2));
+      nom += " diamètre " + fmt(D, 0) + " cm (" + fmt(n, 0) + " élément" + (n > 1 ? "s" : "") + " de " + fmt(L, 2) + " m)";
+      info.push("Barres verticales : " + fmt(nb, 0) + " " + dl(d1) + " par élément");
+      info.push("Cerces : " + ncer + " cerces " + dl(d2) + " par élément, espacées de " + fmt(es, 0) + " cm (" + fmt(lce, 2) + " m chacune)");
+    } else {
+      var S = num("ar-S"), ms = MESH[parseInt($("ar-mesh").value, 10) || 0];
+      nap = parseInt($("ar-nap").value, 10) || 1;
+      if (!(S > 0)) { return bad1(); }
+      var key = "Treillis soudé fil " + ms[0] + " mm, maille " + ms[1] + " x " + ms[1] + " mm";
+      M[key] = S * nap * rec * 2 * (1000 / ms[1]) * MS[String(ms[0])];
+      nom += " " + fmt(S, 2) + " m²";
+      info.push(nap + " nappe" + (nap > 1 ? "s" : "") + ", poids du treillis : " + fmt(2 * (1000 / ms[1]) * MS[String(ms[0])], 2) + " kg/m² par nappe");
+    }
+    var lines = [], mat = [];
+    Object.keys(M).forEach(function (key) {
+      tot += M[key];
+      lines.push([key, fmt(M[key], 0) + " kg", pa, M[key] * pa]);
+      mat.push([key, M[key], "kg"]);
+    });
+    if (k !== "mesh") {
+      var fk = tot * n0("ar-fil") / 100;
+      if (fk > 0) { lines.push(["Fil d'attache (fil recuit)", fmt(fk, 1) + " kg", pf, fk * pf]); mat.push(["Fil d'attache (fil recuit)", fk, "kg"]); }
+    }
+    info.push("Poids total d'acier : " + fmt(tot, 0) + " kg (recouvrements et pertes compris)");
+    out("acier", { rub: part, nom: "Acier d'armature : " + nom, det: info, parp: {}, kg: 0, sable: 0, gravier: 0, eau: 0, lines: lines, mat: mat });
+  }
+
+  // ----- Revêtements -----
+  var FMT = [["Autre (saisir les mesures)", 0, 0], ["10 x 10", 10, 10], ["15 x 15", 15, 15], ["20 x 20", 20, 20], ["25 x 25", 25, 25], ["30 x 30", 30, 30], ["33 x 33", 33, 33],
+    ["40 x 40", 40, 40], ["45 x 45", 45, 45], ["50 x 50", 50, 50], ["60 x 60", 60, 60], ["80 x 80", 80, 80], ["15 x 25", 15, 25], ["10 x 30", 10, 30],
+    ["20 x 25", 20, 25], ["25 x 40", 25, 40], ["20 x 60", 20, 60], ["30 x 60", 30, 60], ["60 x 120", 60, 120], ["20 x 120", 20, 120]];
+  var REVS = [
+    { nom: "Carrelage de sol", k: "tile", fm: "60 x 60", per: 10, pm2: 7000, po: "m" },
+    { nom: "Carrelage mural et faïence", k: "tile", fm: "25 x 40", per: 10, pm2: 6000, po: "c" },
+    { nom: "Marbre (dalles)", k: "tile", fm: "60 x 60", per: 12, pm2: 25000, po: "m" },
+    { nom: "Granito (terrazzo)", k: "tile", fm: "40 x 40", per: 8, pm2: 9000, po: "m" },
+    { nom: "Parement en pierre ou briquette", k: "tile", fm: "Autre (saisir les mesures)", per: 12, pm2: 8000, po: "c", L: 22, l: 6.5 },
+    { nom: "Parquet ou stratifié", k: "area", per: 7, pm2: 12000 },
+    { nom: "Faux plafond (plâtre ou PVC)", k: "area", per: 5, pm2: 5000 },
+    { nom: "Peinture", k: "paint" },
+    { nom: "Enduit de finition (monocouche, tyrolien, projeté)", k: "mono" },
+    { nom: "Chape lissée ou béton ciré", k: "chape" }
+  ];
+  function buildRev() {
+    var v = REVS[$("rv-el").selectedIndex], r = "rv", h = "", fx, f;
+    if (v.k === "tile") {
+      fx = Math.max(0, FMT.findIndex(function (x) { return x[0] === v.fm; }));
+      f = FMT[fx];
+      h += inp(r, "S", "Surface à revêtir (m²)", "") + sel(r, "fm", "Format courant", FMT.map(function (x, i) { return [i, x[0]]; }), fx) +
+        inp(r, "L", "Longueur d'une pièce (cm)", f[1] || v.L || "") + inp(r, "l", "Largeur d'une pièce (cm)", f[2] || v.l || "") +
+        inp(r, "per", "Casse et perte (%)", v.per) + inp(r, "pm2", "Prix du m² (FCFA)", v.pm2) +
+        sel(r, "po", "Mode de pose", [["m", "Mortier sable-ciment (300 kg/m³)"], ["c", "Colle"]], v.po) +
+        inp(r, "ep", "Épaisseur du mortier de pose (cm)", 3) + inp(r, "co", "Colle (kg par m²)", 5) + inp(r, "jo", "Joint (kg par m²)", 0.5) +
+        inp(r, "pl", "Plinthes (mètres linéaires)", 0) + inp(r, "ppl", "Prix d'un mètre de plinthe (FCFA)", 1500);
+    } else if (v.k === "area") {
+      h += inp(r, "S", "Surface (m²)", "") + inp(r, "per", "Perte (%)", v.per) + inp(r, "pm2", "Prix du m² (FCFA)", v.pm2) +
+        inp(r, "pl", "Plinthes ou corniches (mètres linéaires)", 0) + inp(r, "ppl", "Prix d'un mètre (FCFA)", 1500);
+    } else if (v.k === "paint") {
+      h += inp(r, "S", "Surface à peindre (m²)", "") + inp(r, "cs", "Nombre de couches", 2) + inp(r, "re", "Rendement de la peinture (m² par litre et par couche)", 8) +
+        sel(r, "sc", "Sous-couche (impression)", [["n", "Sans"], ["o", "Avec"]], "o") + inp(r, "rs", "Rendement de la sous-couche (m² par litre)", 10) +
+        inp(r, "pl", "Prix du litre de peinture (FCFA)", 3500) + inp(r, "ps", "Prix du litre de sous-couche (FCFA)", 2500);
+    } else if (v.k === "mono") {
+      h += inp(r, "S", "Surface à enduire (m²)", "") +
+        sel(r, "ty", "Type d'enduit", [["15", "Monocouche (15 kg/m²)"], ["6", "Tyrolien (6 kg/m²)"], ["8", "Crépi projeté (8 kg/m²)"], ["4", "Enduit de lissage (4 kg/m²)"]], "15") +
+        inp(r, "co", "Consommation (kg par m²)", 15) + inp(r, "per", "Perte (%)", 5) + inp(r, "pm2", "Prix d'un sac de 25 kg (FCFA)", 6000);
+    } else {
+      h += inp(r, "S", "Surface (m²)", "") + inp(r, "ep", "Épaisseur (cm)", 4) + dosSel(r, "Dosage du mortier", 350) + inp(r, "per", "Perte (%)", 5);
+    }
+    $("form-rev").innerHTML = h;
+    $("res-rev").className = "res";
+    $("add-rev").disabled = true;
+    pend.rev = null;
+    if ($("rv-fm")) {
+      $("rv-fm").addEventListener("change", function () {
+        var x = FMT[parseInt($("rv-fm").value, 10) || 0];
+        if (x[1]) { $("rv-L").value = String(x[1]); $("rv-l").value = String(x[2]); }
+      });
+    }
+    if (v.k === "mono") { $("rv-ty").addEventListener("change", function () { $("rv-co").value = $("rv-ty").value; }); }
+  }
+
+  function calcRev() {
+    var v = REVS[$("rv-el").selectedIndex], S = num("rv-S"), lines = [], mat = [], info = [], e, m2, pm, per;
+    if (!(S > 0)) { return bad("rev", "Entrez la surface (nombre supérieur à 0)."); }
+    e = { rub: "fin", nom: v.nom + " (" + fmt(S, 2) + " m²)", det: info, parp: {}, kg: 0, sable: 0, gravier: 0, eau: 0, lines: lines, mat: mat };
+    if (v.k === "tile") {
+      var Lc = num("rv-L"), lc = num("rv-l");
+      per = n0("rv-per"); pm = n0("rv-pm2"); m2 = S * (1 + per / 100);
+      if (!(Lc > 0 && lc > 0)) { return bad("rev", "Entrez la longueur et la largeur d'une pièce (en cm)."); }
+      var nm = v.nom + " " + fmt(Lc, 1) + " x " + fmt(lc, 1) + " cm", pcs = Math.ceil(m2 / (Lc * lc / 10000));
+      e.nom = nm + " (" + fmt(S, 2) + " m²)";
+      lines.push([nm, fmt(m2, 2) + " m²", pm, m2 * pm]); mat.push([nm, m2, "m²"]);
+      info.push("Surface " + fmt(S, 2) + " m² + " + fmt(per, 0) + " % de perte = " + fmt(m2, 2) + " m², soit environ " + fmt(pcs, 0) + " pièces");
+      if ($("rv-po").value === "m") {
+        var ep = n0("rv-ep"), vol = S * ep / 100;
+        e.kg = vol * 300; e.sable = vol; e.eau = vol * 200;
+        info.push("Pose au mortier de " + fmt(ep, 1) + " cm (300 kg de ciment par m³)");
+      } else {
+        var kc = S * n0("rv-co"), pc = n0("p-colle");
+        lines.push(["Colle (sac de 25 kg)", fmt(kc / 25, 1) + " sacs", pc, kc / 25 * pc]); mat.push(["Colle carrelage (sac de 25 kg)", kc / 25, "sacs"]);
+        info.push("Pose à la colle : " + fmt(n0("rv-co"), 1) + " kg par m²");
+      }
+      var kj = S * n0("rv-jo"), pj = n0("p-joint");
+      if (kj > 0) { lines.push(["Joint (sac de 5 kg)", fmt(kj / 5, 1) + " sacs", pj, kj / 5 * pj]); mat.push(["Joint carrelage (sac de 5 kg)", kj / 5, "sacs"]); }
+    } else if (v.k === "area") {
+      per = n0("rv-per"); pm = n0("rv-pm2"); m2 = S * (1 + per / 100);
+      lines.push([v.nom, fmt(m2, 2) + " m²", pm, m2 * pm]); mat.push([v.nom, m2, "m²"]);
+      info.push("Surface " + fmt(S, 2) + " m² + " + fmt(per, 0) + " % de perte = " + fmt(m2, 2) + " m²");
+    } else if (v.k === "paint") {
+      var cs = n0("rv-cs"), re = num("rv-re"), rs = num("rv-rs");
+      if (!(cs > 0 && re > 0)) { return bad("rev", "Entrez le nombre de couches et le rendement (nombres supérieurs à 0)."); }
+      var lp = S * cs / re;
+      lines.push(["Peinture", fmt(lp, 1) + " L", n0("rv-pl"), lp * n0("rv-pl")]); mat.push(["Peinture", lp, "litres"]);
+      info.push(fmt(cs, 0) + " couche" + (cs > 1 ? "s" : "") + " à " + fmt(re, 1) + " m² par litre");
+      if ($("rv-sc").value === "o" && rs > 0) {
+        var ls = S / rs;
+        lines.push(["Sous-couche", fmt(ls, 1) + " L", n0("rv-ps"), ls * n0("rv-ps")]); mat.push(["Sous-couche", ls, "litres"]);
+      }
+    } else if (v.k === "mono") {
+      var kg = S * n0("rv-co") * (1 + n0("rv-per") / 100), sk = kg / 25;
+      lines.push(["Enduit de finition (sac de 25 kg)", fmt(sk, 1) + " sacs", n0("rv-pm2"), sk * n0("rv-pm2")]); mat.push(["Enduit de finition (sac de 25 kg)", sk, "sacs"]);
+      info.push(fmt(kg, 0) + " kg d'enduit (" + fmt(n0("rv-co"), 1) + " kg par m², perte comprise)");
+    } else {
+      var epc = num("rv-ep");
+      if (!(epc > 0)) { return bad("rev", "Entrez l'épaisseur (nombre supérieur à 0)."); }
+      var vc = S * epc / 100 * (1 + n0("rv-per") / 100), dc = parseFloat($("rv-dos").value);
+      e.kg = vc * dc; e.sable = vc; e.eau = vc * 200;
+      info.push("Volume de mortier : " + fmt(vc, 2) + " m³ à " + dc + " kg/m³");
+    }
+    if (v.k === "tile" || v.k === "area") {
+      var pl = n0("rv-pl"), ppl = n0("rv-ppl");
+      if (pl > 0) { lines.push(["Plinthes ou corniches", fmt(pl, 1) + " m", ppl, pl * ppl]); mat.push(["Plinthes ou corniches", pl, "m"]); }
+    }
+    out("rev", e);
+  }
+
+  // ----- Panneaux Pro -----
+  function proPanel(id, titre, aide, ctl) {
+    return '<section class="panel" id="' + id + '"><h2>' + titre + '</h2><p class="aide">' + aide + "</p>" + ctl +
+      '<div id="form-' + id + '"></div><button type="button" class="btn" id="go-' + id + '">Calculer</button><div class="res" id="res-' + id + '"></div>' +
+      '<button type="button" class="btn bleu" id="add-' + id + '" disabled>Ajouter au devis</button></section>';
+  }
+  $("devis").insertAdjacentHTML("beforebegin",
+    proPanel("acier", "Acier d'armature", "Choisissez la partie de l'ouvrage, l'élément, puis les barres. Pour plusieurs sections différentes, ajoutez-les une par une au devis.",
+      '<label for="ar-part">Partie de l\'ouvrage</label><select id="ar-part"><option value="fond">Fondation</option><option value="elev">Élévation</option></select>' +
+      '<label for="ar-el">Élément</label><select id="ar-el"></select>') +
+    proPanel("rev", "Revêtements et finitions", "Choisissez le revêtement, entrez la surface, puis les détails.",
+      '<label for="rv-el">Revêtement</label><select id="rv-el"></select>'));
+  function fillAr() {
+    var o = "";
+    AR[$("ar-part").value].forEach(function (x, i) { o += '<option value="' + i + '">' + esc(x[0]) + "</option>"; });
+    $("ar-el").innerHTML = o;
+    buildAr();
+  }
+  var ro = "";
+  REVS.forEach(function (x, i) { ro += '<option value="' + i + '">' + esc(x.nom) + "</option>"; });
+  $("rv-el").innerHTML = ro;
+  $("ar-part").addEventListener("change", fillAr);
+  $("ar-el").addEventListener("change", buildAr);
+  $("rv-el").addEventListener("change", buildRev);
+  fillAr();
+  buildRev();
+  $("go-acier").addEventListener("click", calcAr);
+  $("go-rev").addEventListener("click", calcRev);
+  ["acier", "rev"].forEach(function (r) {
+    $("add-" + r).addEventListener("click", function () {
+      if (!pend[r]) { return; }
+      entries.push(pend[r]);
+      pend[r] = null;
+      $("add-" + r).disabled = true;
+      $("res-" + r).innerHTML += "<p><b>Ajouté au devis.</b> Ouvrez « Mon devis » pour voir le total.</p>";
+      save();
+      renderDevis();
+    });
+  });
+
+  // ----- Réglages Pro, chantiers, prix, exports -----
+  function proUI() {
+    document.body.className = PRO.on ? "pro" : "";
+    $("pro-tg").textContent = PRO.on ? "Désactiver le mode Pro" : "Activer le mode Pro (test gratuit)";
+    $("pro-set").style.display = PRO.on ? "block" : "none";
+    $("pr-logoimg").innerHTML = PRO.logo ? '<img src="' + esc(PRO.logo) + '" alt="logo" style="max-height:60px;margin-top:8px">' : "";
+  }
+  function listes() {
+    var h = "", k;
+    Object.keys(PRO.ch).forEach(function (n) {
+      h += '<div class="chr"><b>' + esc(n) + '</b><span><button type="button" data-cho="' + esc(n) + '">Ouvrir</button> <button type="button" data-chd="' + esc(n) + '">Supprimer</button></span></div>';
+    });
+    $("ch-list").innerHTML = h || '<p class="aide">Aucun chantier enregistré.</p>';
+    h = "";
+    Object.keys(PRO.ps).forEach(function (n) {
+      h += '<div class="chr"><b>' + esc(n) + '</b><span><button type="button" data-psa="' + esc(n) + '">Appliquer</button> <button type="button" data-psd="' + esc(n) + '">Supprimer</button></span></div>';
+    });
+    $("ps-list").innerHTML = h || '<p class="aide">Aucune liste de prix enregistrée.</p>';
+  }
+  ["nom", "adr", "niu", "tva", "marge", "remise"].forEach(function (k) {
+    $("pr-" + k).value = PRO[k];
+    $("pr-" + k).addEventListener("input", function () { PRO[k] = $("pr-" + k).value; psave(); renderDevis(); });
+  });
+  $("pro-tg").addEventListener("click", function () {
+    PRO.on = !PRO.on;
+    psave(); proUI(); renderDevis();
+    if (!PRO.on && ($("acier").className.indexOf("on") >= 0 || $("rev").className.indexOf("on") >= 0)) { go("pro"); }
+  });
+  $("pr-logo").addEventListener("change", function (ev) {
+    var f = ev.target.files && ev.target.files[0];
+    if (!f) { return; }
+    if (f.size > 300000) { window.alert("Image trop lourde (300 Ko maximum)."); return; }
+    var rd2 = new FileReader();
+    rd2.onload = function () { PRO.logo = rd2.result; psave(); proUI(); renderDevis(); };
+    rd2.readAsDataURL(f);
+  });
+  $("pr-logo-del").addEventListener("click", function () { PRO.logo = ""; psave(); proUI(); renderDevis(); });
+  $("ch-save").addEventListener("click", function () {
+    var n = $("p-client").value.trim() || "Chantier sans nom";
+    PRO.ch[n] = { entries: JSON.parse(JSON.stringify(entries)), mo: $("p-mo").value };
+    psave(); listes();
+  });
+  $("ch-list").addEventListener("click", function (ev) {
+    var o = ev.target.getAttribute("data-cho"), d = ev.target.getAttribute("data-chd");
+    if (o && PRO.ch[o]) {
+      entries = JSON.parse(JSON.stringify(PRO.ch[o].entries));
+      $("p-client").value = o; $("p-mo").value = PRO.ch[o].mo || "0";
+      save(); renderDevis(); go("devis");
+    } else if (d && window.confirm("Supprimer ce chantier enregistré ?")) { delete PRO.ch[d]; psave(); listes(); }
+  });
+  $("ps-save").addEventListener("click", function () {
+    var n = $("ps-nom").value.trim() || "Mes prix", p = {};
+    PRIX.forEach(function (x) { p[x[0]] = $(x[0]).value; });
+    PRO.ps[n] = p; psave(); listes();
+  });
+  $("ps-list").addEventListener("click", function (ev) {
+    var a = ev.target.getAttribute("data-psa"), d = ev.target.getAttribute("data-psd");
+    if (a && PRO.ps[a]) {
+      Object.keys(PRO.ps[a]).forEach(function (id) { if ($(id)) { $(id).value = PRO.ps[a][id]; } });
+      save(); renderDevis(); go("devis");
+    } else if (d && window.confirm("Supprimer cette liste de prix ?")) { delete PRO.ps[d]; psave(); listes(); }
+  });
+  $("dv-body").addEventListener("change", function (ev) {
+    var i = ev.target.getAttribute ? ev.target.getAttribute("data-mo") : null;
+    if (i !== null && i !== undefined && entries[parseInt(i, 10)]) { entries[parseInt(i, 10)].mo = pnum(ev.target.value); save(); renderDevis(); }
+  });
+  $("dv-csv").addEventListener("click", function () {
+    var rows = document.querySelectorAll("#dv-head tr, #dv-body tr"), out2 = [], i, j, cells, line, t;
+    for (i = 0; i < rows.length; i++) {
+      if (String(rows[i].className).indexOf("noprint") >= 0) { continue; }
+      cells = rows[i].querySelectorAll("th,td"); line = [];
+      for (j = 0; j < cells.length; j++) {
+        t = cells[j].textContent.replace(/\s+/g, " ").trim();
+        if (/^[\d\s\u202f\u00a0,]+$/.test(t) && /\d/.test(t)) { t = t.replace(/[\s\u202f\u00a0]/g, ""); }
+        line.push('"' + t.replace(/"/g, '""') + '"');
+      }
+      out2.push(line.join(";"));
+    }
+    var blob = new Blob(["\ufeff" + out2.join("\r\n")], { type: "text/csv;charset=utf-8" }), a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = "devis-baticalc.csv";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  });
+  $("dv-wa").addEventListener("click", function () {
+    var txt = "Liste d'achat BatiCalc" + ($("p-client").value ? " - " + $("p-client").value : "") + "\n" + BUY.join("\n");
+    window.open("https://wa.me/?text=" + encodeURIComponent(txt), "_blank");
+  });
+  pload();
+  ["nom", "adr", "niu", "tva", "marge", "remise"].forEach(function (k) { $("pr-" + k).value = PRO[k]; });
+  proUI();
+  listes();
+  load();
+  renderDevis();
+})();
+</script>
+</body>
+</html>
