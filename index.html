@@ -197,13 +197,13 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     <li>1 chantier enregistré</li>
    </ul></div>
 
-  <div class="of"><h3>Pass 7 jours</h3><div class="px">500 FCFA <small>pour 7 jours</small></div>
+  <div class="of"><h3>Pass 7 jours</h3><div class="px">600 FCFA <small>pour 7 jours</small></div>
    <p class="aide">Pour un technicien qui a besoin du Pro de temps en temps.</p>
    <ul>
     <li>Toutes les fonctions de l'offre Technicien pendant 7 jours</li>
-   </ul></div>
+   </ul><button type="button" class="btn" id="achat-p7">Acheter le Pass 7 jours</button></div>
 
-  <div class="of"><h3>Technicien</h3><div class="px">1 500 FCFA <small>par mois, ou 15 000 FCFA par an</small></div>
+  <div class="of"><h3>Technicien</h3><div class="px">1 800 FCFA <small>par mois, ou 17 700 FCFA par an</small></div>
    <p class="aide">Pour les petits techniciens et les maçons.</p>
    <ul>
     <li>Élévation complète : poteaux (carré, rectangle, circulaire), poutres, linteaux, chaînages, consoles, murs</li>
@@ -215,7 +215,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     <li class="ni">Non inclus : fondations complètes, revêtements, structure métallique, logo, marge et TVA, export Excel</li>
    </ul></div>
 
-  <div class="of"><h3>Pass Projet</h3><div class="px">5 000 FCFA <small>une seule fois, valable 3 mois</small></div>
+  <div class="of"><h3>Pass Projet</h3><div class="px">5 900 FCFA <small>une seule fois, valable 3 mois</small></div>
    <p class="aide">Pour les particuliers qui construisent leur maison.</p>
    <ul>
     <li>Fondations : semelles isolées, filantes, mixtes, radier, puits</li>
@@ -228,7 +228,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     <li class="ni">Non inclus : pieux, structure métallique, logo, marge et TVA, export Excel</li>
    </ul></div>
 
-  <div class="of"><h3>Entreprise</h3><div class="px">10 000 FCFA <small>par mois, ou 100 000 FCFA par an</small></div>
+  <div class="of"><h3>Entreprise</h3><div class="px">11 800 FCFA <small>par mois, ou 117 700 FCFA par an</small></div>
    <p class="aide">Pour les entreprises du bâtiment.</p>
    <ul>
     <li>Tout est inclus, y compris pieux, structure métallique (IPE) et treillis soudé</li>
@@ -239,11 +239,32 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     <li>Chantiers illimités et listes de prix par ville</li>
    </ul></div>
 
+  <div id="achat-zone" style="display:none">
+   <h3>Acheter le Pass 7 jours (600 FCFA)</h3>
+   <p class="aide">Entrez vos informations. Vous serez dirigé vers la page de paiement sécurisée (Orange Money, MTN Mobile Money). Votre clé vous sera envoyée par e-mail.</p>
+   <label for="ac-prenom">Prénom</label><input id="ac-prenom" type="text" autocomplete="given-name">
+   <label for="ac-nom">Nom</label><input id="ac-nom" type="text" autocomplete="family-name">
+   <label for="ac-mail">Adresse e-mail (pour recevoir la clé)</label><input id="ac-mail" type="email" autocomplete="email">
+   <label for="ac-tel">Téléphone (Cameroun, 9 chiffres)</label><input id="ac-tel" type="tel" inputmode="tel" placeholder="ex : 6 99 00 00 00">
+   <button type="button" class="btn" id="ac-go">Payer 600 FCFA</button>
+   <p class="note" id="ac-msg"></p>
+  </div>
+
+  <div id="lic-zone">
+   <h3>J'ai déjà une clé</h3>
+   <p class="aide" id="lic-etat"></p>
+   <label for="lic-cle">Ma clé reçue par e-mail</label>
+   <input id="lic-cle" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ex : P7-xxxxxxxxxxxxxxxx">
+   <button type="button" class="btn bleu" id="lic-go">Activer ma clé</button>
+   <button type="button" class="btn rouge" id="lic-off" style="display:none">Retirer la clé de cet appareil</button>
+   <p class="note" id="lic-msg"></p>
+  </div>
+
   <a class="btn" id="of-mail" href="#">Me prévenir du lancement</a>
   <p class="note">Les prix sont ceux prévus au lancement et peuvent changer. Prix en euros et en dollars annoncés au lancement. À venir ensuite : dalles, planchers et toiture.</p>
  </div>
- <p class="aide" id="pro-aide">En mode test, toutes les fonctions Pro sont ouvertes gratuitement. Plus tard, elles seront réservées aux abonnés.</p>
- <button type="button" class="btn" id="pro-tg">Activer le mode Pro (test gratuit)</button>
+ <p class="aide" id="pro-aide">Votre accès Pro est actif grâce à votre clé de licence.</p>
+ <button type="button" class="btn" id="pro-tg">Activer le mode Pro</button>
  <div id="pro-set" style="display:none">
   <h3>Mon entreprise (en-tête du devis)</h3>
   <label for="pr-nom">Nom de l'entreprise</label><input id="pr-nom" type="text">
@@ -360,8 +381,11 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   var EDITEUR = "ATA A DJOOH MERVEIL JEAN-NOËL";
   var CONTACT = "jeannoelata@gmail.com";
   // ==================================================================
-  // Version Pro : false = désactivée (onglets, bandeaux et options Pro retirés). Mettre true pour la réactiver.
-  var PRO_DISPONIBLE = false;
+  // Version Pro : ouverte seulement si une clé de licence valide est enregistrée sur l'appareil.
+  var LIC_KEY = "baticalc_licence_v1";
+  function lireLic() { try { var r = localStorage.getItem(LIC_KEY); if (r) { var d = JSON.parse(r); if (d && d.cle && d.exp > Date.now()) { return d; } } } catch (er) {} return null; }
+  var LIC = lireLic();
+  var PRO_DISPONIBLE = !!LIC;
   var SAC = 50, KEY = "baticalc_v2";
   var MORT = { "10": 0.018, "15": 0.025, "20": 0.033 };
   var RUB = { fond: "Fondation", elev: "Élévation", enduit: "Enduit (crépissage)", fin: "Finitions et revêtements" };
@@ -1185,7 +1209,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   // ----- Réglages Pro, chantiers, prix, exports -----
   function proUI() {
     document.body.className = PRO.on ? "modepro" : "";
-    $("pro-tg").textContent = PRO.on ? "Désactiver le mode Pro" : "Activer le mode Pro (test gratuit)";
+    $("pro-tg").textContent = PRO.on ? "Désactiver le mode Pro" : "Activer le mode Pro";
     $("pro-set").style.display = PRO.on ? "block" : "none";
     $("pr-logoimg").innerHTML = PRO.logo ? '<img src="' + esc(PRO.logo) + '" alt="logo" style="max-height:60px;margin-top:8px">' : "";
   }
@@ -1369,6 +1393,61 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     $("pro-aide").style.display = "none";
   } else {
     $("pro-bientot").style.display = "none";
+  }
+  // ================= PAIEMENT ET LICENCE =================
+  function msg(id, t, ok) { var e = $(id); e.textContent = t; e.style.color = ok ? "#1a7f37" : "#b3261e"; }
+  function appel(url, corps) {
+    return fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corps) })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j._ok = r.ok; return j; }); });
+  }
+  function licEtat() {
+    var d = lireLic();
+    $("lic-etat").textContent = d ? "Pro actif sur cet appareil jusqu'au " + new Date(d.exp).toLocaleString("fr-FR", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }) + "." : "Aucune clé active sur cet appareil.";
+    $("lic-off").style.display = d ? "" : "none";
+  }
+  licEtat();
+  $("achat-p7").addEventListener("click", function () {
+    $("achat-zone").style.display = "block";
+    try { $("achat-zone").scrollIntoView({ behavior: "smooth", block: "start" }); } catch (er) {}
+  });
+  $("ac-go").addEventListener("click", function () {
+    var b = $("ac-go");
+    var corps = { offre: "p7", prenom: $("ac-prenom").value, nom: $("ac-nom").value, email: $("ac-mail").value, tel: $("ac-tel").value };
+    if (!corps.prenom.trim() || !corps.nom.trim() || !corps.email.trim() || !corps.tel.trim()) { msg("ac-msg", "Remplissez les quatre champs.", false); return; }
+    b.disabled = true; msg("ac-msg", "Ouverture de la page de paiement...", true);
+    appel("/api/acheter", corps).then(function (j) {
+      if (j.url) { window.location.href = j.url; return; }
+      msg("ac-msg", j.erreur || "Le paiement n'a pas pu démarrer.", false); b.disabled = false;
+    }).catch(function () { msg("ac-msg", "Pas de connexion. Réessayez.", false); b.disabled = false; });
+  });
+  $("lic-go").addEventListener("click", function () {
+    var b = $("lic-go"), cle = $("lic-cle").value.trim();
+    if (cle.length < 8) { msg("lic-msg", "Collez la clé reçue par e-mail.", false); return; }
+    b.disabled = true; msg("lic-msg", "Vérification de la clé...", true);
+    appel("/api/verifier", { cle: cle }).then(function (j) {
+      b.disabled = false;
+      if (!j.valide) { msg("lic-msg", j.erreur || "Clé non valide.", false); return; }
+      var exp = j.expire_le ? Date.parse(j.expire_le) : Date.now() + (j.jours || 7) * 86400000;
+      try { localStorage.setItem(LIC_KEY, JSON.stringify({ cle: cle, exp: exp, offre: j.offre })); } catch (er) {}
+      PRO.on = true; psave();
+      msg("lic-msg", "Clé acceptée. Le Pro s'ouvre...", true);
+      window.setTimeout(function () { window.location.reload(); }, 900);
+    }).catch(function () { b.disabled = false; msg("lic-msg", "Pas de connexion. Réessayez.", false); });
+  });
+  $("lic-off").addEventListener("click", function () {
+    if (!window.confirm("Retirer la clé de cet appareil ? Le Pro sera fermé ici.")) { return; }
+    try { localStorage.removeItem(LIC_KEY); } catch (er) {}
+    PRO.on = false; psave(); window.location.reload();
+  });
+  if (LIC) {
+    appel("/api/verifier", { cle: LIC.cle }).then(function (j) {
+      if (j._ok && j.valide === false) { try { localStorage.removeItem(LIC_KEY); } catch (er) {} PRO.on = false; psave(); window.location.reload(); }
+    }).catch(function () {});
+  }
+  if (/[?&]paiement=ok/.test(window.location.search)) {
+    go("pro");
+    msg("lic-msg", "Paiement reçu. Votre clé arrive par e-mail : collez-la ci-dessus.", true);
+    try { window.history.replaceState(null, "", window.location.pathname + "#pro"); } catch (er) {}
   }
 })();
 </script>
