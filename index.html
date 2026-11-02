@@ -143,6 +143,7 @@ button[id^="add-"]::before{content:"\2795  "}
 #dv-clear::before{content:"\1F5D1\FE0F  "}
 footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18px;letter-spacing:6px;margin-bottom:4px}
 }
+#guide-ov{position:fixed;top:0;left:0;right:0;bottom:0;z-index:10000;background:#eaf1fa;overflow-y:auto;padding:10px}#guide-ov .gbox{max-width:640px;margin:0 auto;background:#fff;border-radius:14px;padding:14px;border-top:5px solid #f97316}#guide-ov p,#guide-ov li{font-size:15px;line-height:1.6}#guide-ov .btn:disabled{background:#8a94a0;box-shadow:none}
 </style>
 </head>
 <body>
@@ -222,7 +223,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     <li>Élévation complète et enduit</li>
     <li>Acier d'armature (fondation et élévation)</li>
     <li>Revêtements : carrelage, peinture, marbre, faux plafond...</li>
-    <li>Dalle dès qu'elle sera prête</li>
+    <li>Dalle pleine (béton et acier)</li>
     <li>Catalogue complet des matériaux, moellons, hérissonnage, remblai</li>
     <li>1 chantier actif, PDF sans mention</li>
     <li class="ni">Non inclus : pieux, structure métallique, logo, marge et TVA, export Excel</li>
@@ -261,7 +262,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   </div>
 
   <a class="btn" id="of-mail" href="#">Me prévenir du lancement</a>
-  <p class="note">Les prix sont ceux prévus au lancement et peuvent changer. Prix en euros et en dollars annoncés au lancement. À venir ensuite : dalles, planchers et toiture.</p>
+  <p class="note">Les prix sont ceux prévus au lancement et peuvent changer. Prix en euros et en dollars annoncés au lancement. À venir ensuite : planchers à poutrelles et toiture.</p>
  </div>
  <p class="aide" id="pro-aide">Votre accès Pro est actif grâce à votre clé de licence.</p>
  <button type="button" class="btn" id="pro-tg">Activer le mode Pro</button>
@@ -297,54 +298,50 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
    <li>Export Excel et liste d'achat par WhatsApp</li>
    <li>Plusieurs chantiers et listes de prix</li>
   </ul>
-  <p class="note">À venir : dalles, planchers et toiture.</p>
+  <p class="note">À venir : planchers à poutrelles et toiture.</p>
  </div>
 </section>
 <section class="panel" id="guide">
  <h2>Guide d'utilisation</h2>
- <p class="aide">BatiCalc calcule les matériaux d'un ouvrage (parpaings, ciment, sable, gravier, eau) et en fait un devis estimatif. Toutes les mesures sont en mètres, sauf indication contraire. Vous pouvez écrire les décimales avec une virgule ou un point.</p>
-
- <h3>Faire un premier devis en 5 étapes</h3>
- <ol>
-  <li><b>Fondation</b> : choisissez le type de fondation, puis un élément à calculer (semelles, longrines, murs de soubassement...). Remplissez les cases et appuyez sur « Calculer ». Si le résultat vous convient, appuyez sur « Ajouter au devis ». Recommencez pour chaque élément.</li>
-  <li><b>Élévation</b> : même méthode pour la structure (poteaux, poutres, chaînages, linteaux, murs en parpaings).</li>
-  <li><b>Enduit</b> : entrez la surface à crépir et l'épaisseur de l'enduit, puis calculez et ajoutez.</li>
-  <li><b>Mon devis</b> : écrivez le nom du client ou du chantier. Ouvrez « Mes prix en FCFA » et remplacez les prix d'exemple par ceux de votre ville. Le devis et le total se mettent à jour tout seuls.</li>
-  <li><b>Imprimer</b> : appuyez sur « Imprimer ou enregistrer en PDF ». Sur téléphone, choisissez « Enregistrer en PDF » pour obtenir un fichier à envoyer au client.</li>
- </ol>
-
- <h3>Bien remplir les calculs</h3>
- <ul>
-  <li><b>Plusieurs types d'un même élément.</b> Si vous avez par exemple des poteaux de tailles différentes, choisissez « Nombre de types différents » et remplissez chaque type séparément (A, B, C...).</li>
-  <li><b>Murs en parpaings.</b> Entrez le nombre de murs identiques, leur longueur et leur hauteur. Dans « Portes et fenêtres à retirer », mettez la surface des ouvertures d'un mur. Exemple : un mur de 10 m sur 3 m avec deux portes de 2 m² donne 1 mur, 10, 3 et 4 m² d'ouvertures, soit 26 m² et environ 342 parpaings de 15 cm avec 5 % de perte.</li>
-  <li><b>Dosage du béton ou du mortier.</b> Le dosage en kg de ciment par m³ est proposé par défaut. Vous pouvez le changer, ainsi que les quantités de sable, de gravier et d'eau.</li>
-  <li><b>Perte (%).</b> Elle ajoute une marge pour la casse et les chutes. Gardez 5 à 10 % si vous n'avez pas de raison de la changer.</li>
-  <li><b>Main d'œuvre.</b> Dans « Mes prix en FCFA », la case « Main d'œuvre (total) » s'ajoute au devis comme un forfait général.</li>
- </ul>
-
- <h3>Lire le devis</h3>
- <ul>
-  <li>Le devis est classé par rubrique (Fondation, Élévation, Enduit), avec un total par rubrique puis un total général.</li>
-  <li>La <b>liste des matériaux à acheter</b> en bas arrondit le ciment au sac entier. Les montants du devis utilisent, eux, les quantités exactes.</li>
-  <li>Pour retirer un poste du devis, appuyez sur « Retirer ce poste ». « Vider le devis » efface tout.</li>
- </ul>
-
- <h3>Vos données</h3>
- <ul>
-  <li>Vos prix, vos calculs et le nom du chantier sont gardés <b>uniquement dans le navigateur de votre appareil</b>. Rien n'est envoyé à l'éditeur.</li>
-  <li>Si vous effacez les données du site, changez de navigateur ou de téléphone, vous perdez ces informations. Enregistrez votre devis en PDF pour le conserver.</li>
- </ul>
-
- <h3>Questions fréquentes</h3>
- <ul>
-  <li><b>Le total affiche 0 ou une valeur bizarre.</b> Vérifiez les prix dans « Mes prix en FCFA » : un prix à 0 ou une case vide donne un montant nul.</li>
-  <li><b>Le bouton « Ajouter au devis » est grisé.</b> Appuyez d'abord sur « Calculer » et corrigez les cases signalées en rouge.</li>
-  <li><b>Les prix ne sont pas ceux de ma ville.</b> Les prix affichés sont des exemples : modifiez-les avant d'utiliser le devis.</li>
-  <li><b>Les résultats sont-ils garantis ?</b> Non. Ce sont des estimations indicatives, sans étude de structure ni de sol. Faites vérifier votre ouvrage par un professionnel avant de construire ou d'acheter.</li>
- </ul>
-
- <h3>Version Pro</h3>
- <p>Une partie Pro (acier, revêtements, logo et TVA sur le devis, export Excel, plusieurs chantiers) est annoncée. Elle sera ouverte dès que le paiement sera prêt. Voir l'onglet « Version Pro ».</p>
+ <p class="aide">BatiCalc calcule les matériaux d'un ouvrage et en fait un devis estimatif. Toutes les mesures sont en mètres, sauf indication contraire. Écrivez les décimales avec une virgule ou un point. Lisez ce guide en entier : chaque fonction est expliquée avec un exemple.</p>
+ <details open><summary>1. Le principe : calculer, ajouter, lire le devis</summary>
+  <ol><li>Choisissez l'onglet (Fondation, Élévation, Enduit), le type d'ouvrage, puis l'élément à calculer.</li>
+  <li>Remplissez les cases et appuyez sur « Calculer ». Les cases en rouge sont à corriger.</li>
+  <li>Si le résultat vous convient, appuyez sur « Ajouter au devis ». Faites de même pour chaque élément.</li>
+  <li>Ouvrez « Mon devis », écrivez le nom du client, mettez vos prix, puis « Imprimer ou enregistrer en PDF ».</li></ol></details>
+ <details><summary>2. Plusieurs types d'un même élément (A, B, C...)</summary>
+  <p>Quand les éléments n'ont pas tous la même taille, choisissez « Nombre de types différents » et remplissez chaque type à part.</p>
+  <p><b>Exemple : semelles isolées.</b> Fondation, type « Semelles isolées + longrines », élément « Semelles isolées », 2 types. <b>Type A</b> : nombre 8, longueur 1, largeur 1, hauteur 0,3. <b>Type B</b> : nombre 4, longueur 1,2, largeur 1,5, hauteur 0,3. Volume : 8 x 1 x 1 x 0,3 = 2,40 m³ pour A et 4 x 1,2 x 1,5 x 0,3 = 2,16 m³ pour B, soit 4,56 m³, et 4,79 m³ avec 5 % de perte. Avec un dosage de 350 kg/m³ : environ 1 676 kg de ciment (34 sacs), 1,92 m³ de sable, 3,83 m³ de gravier et 838 litres d'eau.</p></details>
+ <details><summary>3. Les quantités en m³, en camions et en brouettes</summary>
+  <p>Pour le sable, le gravier, les moellons, la latérite et le tout-venant, BatiCalc donne la quantité en m³ puis en brouettes et en camions, dans le résultat, le devis et la liste d'achat.</p>
+  <p><b>Exemple :</b> 1,92 m³ de sable = environ 30 brouettes (à 0,065 m³ la brouette) ou 0,19 camion (à 10 m³ le camion).</p>
+  <p>Ces capacités changent d'un chantier à l'autre : dans « Mon devis », ouvrez « Mes prix en FCFA » et corrigez « Capacité d'une brouette » et « Capacité d'un camion » selon ce que vous utilisez. Le nombre de brouettes est arrondi vers le haut.</p></details>
+ <details><summary>4. Le sable des élévations : mélange sable fin + sable de la Sanaga</summary>
+  <p>Dans l'onglet Élévation, la case « Type de sable » propose « Mélange sable fin + sable de la Sanaga » (choisi au départ). Une case « Part de sable fin (%) » apparaît : le reste est du sable de la Sanaga.</p>
+  <p><b>Exemple :</b> 1,00 m³ de sable avec 50 % de sable fin donne 0,50 m³ de sable fin et 0,50 m³ de sable de la Sanaga, chacun chiffré à son prix. Le devis écrit la composition du mélange. Pour un seul sable, choisissez-le dans la liste. Réglez les deux prix dans « Mes prix en FCFA ».</p></details>
+ <details><summary>5. Murs en parpaings</summary>
+  <p>Entrez le nombre de murs identiques, la longueur, la hauteur, puis les portes et fenêtres à retirer (surface par mur).</p>
+  <p><b>Exemple :</b> 1 mur de 10 m sur 3 m avec deux portes de 2 m² : 26 m², environ 342 parpaings de 15 cm avec 5 % de perte.</p></details>
+ <details><summary>6. Dosage, perte, eau</summary>
+  <ul><li><b>Dosage</b> : kg de ciment par m³ de béton (350 est courant pour les éléments porteurs). Le sable, le gravier et l'eau par m³ sont modifiables.</li>
+  <li><b>Perte (%)</b> : marge pour la casse et les chutes. Gardez 5 à 10 %.</li>
+  <li><b>Dalle pleine</b> (Élévation) : nombre, longueur, largeur, épaisseur. Exemple : 1 dalle de 5 x 4 m épaisse de 0,12 m = 2,40 m³, soit 2,52 m³ avec 5 % de perte.</li></ul></details>
+ <details><summary>7. Enduit</summary>
+  <p>Entrez la surface et l'épaisseur. <b>Exemple :</b> 100 m² sur 2 cm = 2 m³ de mortier, plus 10 % de perte.</p></details>
+ <details><summary>8. Mon devis, prix, impression</summary>
+  <ul><li>Les prix de départ sont des exemples : remplacez-les par ceux de votre ville.</li>
+  <li>Le devis est classé par rubrique avec un total par rubrique puis un total général. La liste d'achat arrondit le ciment au sac entier.</li>
+  <li>« Retirer ce poste » enlève un poste ; « Vider le devis » efface tout.</li></ul></details>
+ <details><summary>9. Version Pro : acier d'armature</summary>
+  <p>Onglet Acier : choisissez la partie de l'ouvrage, l'élément, puis les barres. Fonctions : semelles, longrines, poteaux, poutres, linteaux, chaînages, consoles, radier, puits, pieux, treillis soudé, <b>dalle pleine</b>, et deux fonctions à part : <b>cadres seuls</b> et <b>chapeaux et barres d'attente</b>.</p>
+  <p><b>Exemple : cadres de 4 poteaux 20 x 20 cm, hauteur 3 m.</b> Enrobage 3 cm, cadres en rond lisse 6 mm tous les 15 cm : 21 cadres de 0,76 m par poteau, soit environ 16 kg avec 10 % de recouvrements et pertes. Pour les poutres et les linteaux, faites la même chose avec leur section et leur longueur.</p></details>
+ <details><summary>10. Version Pro : revêtements, logo, TVA, chantiers</summary>
+  <p>Revêtements : carrelage, faïence, marbre, parquet, faux plafond, peinture, enduits de finition, chape. Le mode Pro ajoute aussi le logo, la marge, la remise, la TVA, la main d'œuvre par poste, l'export Excel, la liste d'achat par WhatsApp, plusieurs chantiers et listes de prix.</p></details>
+ <details><summary>11. Vos données et questions fréquentes</summary>
+  <ul><li>Vos prix et vos calculs restent uniquement dans le navigateur de votre appareil. Si vous effacez les données du site, vous les perdez : gardez vos devis en PDF.</li>
+  <li><b>Le total affiche 0.</b> Vérifiez les prix : un prix à 0 donne un montant nul.</li>
+  <li><b>« Ajouter au devis » est grisé.</b> Appuyez d'abord sur « Calculer ».</li>
+  <li><b>Les résultats sont-ils garantis ?</b> Non, ce sont des estimations indicatives, sans étude de structure ni de sol.</li></ul></details>
 </section>
 <section class="panel" id="legal">
  <h2>Informations légales</h2>
@@ -437,6 +434,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     chh: B("Chaînage haut", 350, ["Nombre", "Longueur totale (m)", "Largeur (m)", "Hauteur (m)"], [1, "", 0.15, 0.2], "chaînage", true),
     chv: B("Chaînages verticaux (raidisseurs)", 350, ["Nombre de raidisseurs de ce type", "Largeur (m)", "Épaisseur (m)", "Hauteur (m)"], ["", 0.15, 0.15, 3], "raidisseur"),
     lin: B("Linteaux", 350, ["Nombre de linteaux de ce type", "Longueur (m)", "Largeur (m)", "Hauteur (m)"], ["", 1.2, 0.15, 0.2], "linteau"),
+    dal: B("Dalle pleine", 350, ["Nombre de dalles", "Longueur (m)", "Largeur (m)", "Épaisseur (m)"], [1, "", "", 0.12], "dalle", true),
     con: B("Consoles", 350, ["Nombre de consoles de ce type", "Longueur (m)", "Largeur (m)", "Hauteur (m)"], ["", 0.5, 0.2, 0.2], "console"),
     mur: { nom: "Murs en parpaings", t: "m", dos: 300, el: "mur", l: WL, v: [1, "", "", 0] },
     cyc: B("Béton cyclopéen (béton + moellons)", 250, ["Nombre", "Longueur (m)", "Largeur (m)", "Hauteur (m)"], [1, "", "", ""], "massif"),
@@ -454,9 +452,9 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
       { nom: "Pieux + longrines (profonde)", d: "Pieux forés ou battus jusqu'au sol résistant, avec semelles de liaison et longrines. Plus coûteux.", el: ["pie", "chev", "amo", "lon", "sou", "rem", "her"] }
     ],
     elev: [
-      { nom: "Poteaux-poutres + murs de remplissage", d: "La structure la plus courante : poteaux et poutres en béton, murs en parpaings entre eux.", el: ["pot", "pou", "chh", "lin", "con", "mur"] },
-      { nom: "Murs porteurs en parpaings chaînés", d: "Les murs portent le bâtiment, renforcés par des chaînages horizontaux et verticaux.", el: ["mur", "chv", "chh", "lin", "con"] },
-      { nom: "Mixte : murs porteurs + poteaux", d: "Des murs porteurs et quelques poteaux, avec poutres et chaînages.", el: ["mur", "pot", "pou", "chv", "chh", "lin", "con"] },
+      { nom: "Poteaux-poutres + murs de remplissage", d: "La structure la plus courante : poteaux et poutres en béton, murs en parpaings entre eux.", el: ["pot", "pou", "chh", "lin", "con", "mur", "dal"] },
+      { nom: "Murs porteurs en parpaings chaînés", d: "Les murs portent le bâtiment, renforcés par des chaînages horizontaux et verticaux.", el: ["mur", "chv", "chh", "lin", "con", "dal"] },
+      { nom: "Mixte : murs porteurs + poteaux", d: "Des murs porteurs et quelques poteaux, avec poutres et chaînages.", el: ["mur", "pot", "pou", "chv", "chh", "lin", "con", "dal"] },
       { nom: "Ossature métallique (IPE) + remplissage", d: "Poteaux et poutres en profilés d'acier, murs de remplissage en parpaings.", el: ["pot", "poum", "mur", "lin"] }
     ]
   };
@@ -468,7 +466,8 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     ["p-20c", "Parpaing 20 creux", 500], ["p-20p", "Parpaing 20 plein", 600],
     ["p-acier", "Acier profilé IPE (kg)", 900],
     ["p-arm", "Acier d'armature (kg)", 800], ["p-fil", "Fil d'attache (kg)", 1200],
-    ["p-colle", "Colle carrelage (sac 25 kg)", 6500], ["p-joint", "Joint carrelage (sac 5 kg)", 3000]
+    ["p-colle", "Colle carrelage (sac 25 kg)", 6500], ["p-joint", "Joint carrelage (sac 5 kg)", 3000],
+    ["p-brou", "Capacité d'une brouette (m³)", 0.065], ["p-cam", "Capacité d'un camion (m³)", 10]
   ];
   var MATS = [
     { k: "c325", g: "c", n: "Ciment 32,5 (portland composé)", p: 6000, free: 1 },
@@ -477,6 +476,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     { k: "sg", g: "s", n: "Sable grossier (béton)", p: 12000, free: 1 },
     { k: "sm", g: "s", n: "Sable moyen (mortier)", p: 12000, free: 1 },
     { k: "sf", g: "s", n: "Sable fin (enduit, finition)", p: 14000, free: 1 },
+    { k: "ssan", g: "s", n: "Sable de la Sanaga", p: 12000, free: 1 },
     { k: "sl", g: "s", n: "Sable lavé de rivière", p: 15000 },
     { k: "sc", g: "s", n: "Sable concassé de carrière", p: 13000 },
     { k: "g38", g: "g", n: "Gravillon 3/8", p: 20000 },
@@ -491,10 +491,12 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   ];
   var MATBY = {};
   MATS.forEach(function (m) { MATBY[m.k] = m; });
+  MATBY.smix = { k: "smix", n: "Mélange sable fin + sable de la Sanaga" };
   PRIX = MATS.map(function (m) { return ["p-" + m.k, m.n + (m.g === "c" ? " : prix du sac de 50 kg" : " : prix du m³"), m.p]; }).concat(PRIX);
   function matn(k, d) { return (MATBY[k] || MATBY[d] || { n: "Matériau" }).n; }
   function matSel(r, id, label, g, cur) {
     var o = MATS.filter(function (m) { return m.g === g && (m.free || (typeof PRO !== "undefined" && PRO && PRO.on)); }).map(function (m) { return [m.k, m.n]; });
+    if (g === "s" && r === "elev") { o.unshift(["smix", MATBY.smix.n]); cur = "smix"; }
     return sel(r, id, label, o, cur);
   }
 
@@ -512,6 +514,8 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   function fmt(n, d) { return n.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d }); }
   function sacs(kg) { return Math.ceil(Math.round((kg / SAC) * 100) / 100); }
   function money(n) { return fmt(Math.round(n), 0) + " FCFA"; }
+  function vx(v) { var b = n0("p-brou") || 0.065, c = n0("p-cam") || 10; return "≈ " + fmt(Math.ceil(v / b - 1e-9), 0) + " brouettes · " + fmt(v / c, 2) + " camion(s)"; }
+  function sandParts(e) { if (e.smix) { return [["sf", e.sable * e.smix.sf], ["ssan", e.sable * e.smix.ssan]]; } return e.sable > 0 ? [[e.ts || "sg", e.sable]] : []; }
   function plab(k) { return "parpaing " + k.slice(0, -1) + " cm " + (k.slice(-1) === "c" ? "creux" : "plein"); }
 
   function inp(r, id, label, val) {
@@ -547,6 +551,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   }
   function rd(r, id, def) { var n = num(r + "-" + id); return n >= 0 ? n : def; }
 
+  function pfBox(r) { return r === "elev" ? '<div id="elev-pfbox">' + inp(r, "pf", "Part de sable fin dans le mélange (%) ; le reste est du sable de la Sanaga", 50) + "</div>" : ""; }
   function ntSel(r) {
     var o = [], k;
     for (k = 1; k <= MAXT; k++) { o.push([k, String(k)]); }
@@ -576,7 +581,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
       h += p.u ? '<div class="info">Élément unique : une seule section pour tout l\'ouvrage.</div><div id="' + r + '-types"></div>' : ntSel(r);
       if (!f.steel) {
         h += dosSel(r, "Dosage du béton", p.dos) + '<div class="info" id="' + r + '-info"></div>' +
-          matSel(r, "tc", "Type de ciment", "c", "c325") + matSel(r, "ts", "Type de sable", "s", "sg") +
+          matSel(r, "tc", "Type de ciment", "c", "c325") + matSel(r, "ts", "Type de sable", "s", "sg") + pfBox(r) +
           matSel(r, "tg", "Type de gravier", "g", r === "fond" ? "g1525" : "g515") +
           inp(r, "sa", "Sable par m³ de béton (m³)", 0.4) + inp(r, "gr", "Gravier par m³ de béton (m³)", 0.8) +
           inp(r, "ea", "Eau par m³ de béton (litres)", 175) + (p.cyc ? inp(r, "mo", "Part de moellons dans le volume (%)", 40) : "");
@@ -587,7 +592,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
         sel(r, "ep", "Épaisseur du parpaing", [["10", "10 cm"], ["15", "15 cm"], ["20", "20 cm"]], "15") +
         sel(r, "ty", "Type de parpaing", [["c", "Creux"], ["p", "Plein"]], "c") +
         dosSel(r, "Dosage du mortier de pose", p.dos) + '<div class="info" id="' + r + '-info"></div>' +
-        matSel(r, "tc", "Type de ciment", "c", "c325") + matSel(r, "ts", "Type de sable", "s", "sm") +
+        matSel(r, "tc", "Type de ciment", "c", "c325") + matSel(r, "ts", "Type de sable", "s", "sm") + pfBox(r) +
         inp(r, "sa", "Sable par m³ de mortier (m³)", 1) + inp(r, "ea", "Eau par m³ de mortier (litres)", 200) +
         inp(r, "per", "Casse et perte (%)", 5);
     } else if (p.t === "v") {
@@ -607,6 +612,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
       if ($(r + "-nt")) { $(r + "-nt").addEventListener("change", function () { buildTypes(r); }); }
     }
     if ($(r + "-fm")) { $(r + "-fm").addEventListener("change", function () { buildForm(r); }); }
+    if (r === "elev" && $("elev-ts") && $("elev-pfbox")) { var tgp = function () { $("elev-pfbox").style.display = $("elev-ts").value === "smix" ? "" : "none"; }; $("elev-ts").addEventListener("change", tgp); tgp(); }
     fillDef(r);
     if ($(r + "-dos")) { $(r + "-dos").addEventListener("change", function () { fillDef(r); }); }
     $("res-" + r).className = "res";
@@ -626,15 +632,15 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     Object.keys(e.parp).forEach(function (k) { rows.push([Cap(plab(k)), fmt(e.parp[k], 0)]); });
     if (e.acier) { rows.push(["Acier (profilés)", fmt(e.acier, 0) + " kg"]); } else if (e.kg > 0 || !e.lines) {
       rows.push([matn(e.tc, "c325"), fmt(e.kg, 0) + " kg (" + sacs(e.kg) + " sacs)"]);
-      rows.push([matn(e.ts, "sg"), fmt(e.sable, 2) + " m³"]);
-      if (e.gravier > 0) { rows.push([matn(e.tg, "g515"), fmt(e.gravier, 2) + " m³"]); }
+      sandParts(e).forEach(function (s2) { rows.push([matn(s2[0]), fmt(s2[1], 2) + " m³", vx(s2[1])]); });
+      if (e.gravier > 0) { rows.push([matn(e.tg, "g515"), fmt(e.gravier, 2) + " m³", vx(e.gravier)]); }
       rows.push(["Eau (environ)", fmt(e.eau, 0) + " litres"]);
     }
-    (e.lines || []).forEach(function (x) { rows.push([x[0], x[1]]); });
+    (e.lines || []).forEach(function (x) { rows.push([x[0], x[1], x[4]]); });
     var h = "<b>" + esc(e.nom) + "</b>";
     (e.det || []).forEach(function (x) { h += "<div><small>" + esc(x) + "</small></div>"; });
     h += "<table>";
-    rows.forEach(function (x) { h += "<tr><td>" + esc(x[0]) + "</td><td>" + esc(x[1]) + "</td></tr>"; });
+    rows.forEach(function (x) { h += "<tr><td>" + esc(x[0]) + "</td><td>" + esc(x[1]) + (x[2] ? "<br><small>" + esc(x[2]) + "</small>" : "") + "</td></tr>"; });
     var box = $("res-" + r);
     box.className = "res show";
     box.innerHTML = h + "</table>";
@@ -667,7 +673,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
               kg: vb * dos, sable: vb * rd(r, "sa", 0.4), gravier: vb * rd(r, "gr", 0.8), eau: vb * rd(r, "ea", 175), parp: {} };
         if (mo2 > 0) {
           var vm = V * mo2, pmo = n0("p-moel");
-          e.lines = [["Moellons", fmt(vm, 2) + " m³", pmo, vm * pmo]];
+          e.lines = [["Moellons", fmt(vm, 2) + " m³", pmo, vm * pmo, vx(vm)]];
           e.mat = [["Moellons", vm, "m³"]];
           e.det.push(fmt(mo2 * 100, 0) + " % de moellons : " + fmt(vm, 2) + " m³ de moellons et " + fmt(vb, 2) + " m³ de béton");
         }
@@ -695,7 +701,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
       V = S * epv / 100 * (1 + P / 100);
       var pk2 = n0("p-" + mk);
       e = { nom: p.nom + " " + fmt(S, 1) + " m² sur " + fmt(epv, 0) + " cm", det: ["Volume avec foisonnement et pertes : " + fmt(V, 2) + " m³"],
-            kg: 0, sable: 0, gravier: 0, eau: 0, parp: {}, lines: [[MATBY[mk].n, fmt(V, 2) + " m³", pk2, V * pk2]], mat: [[MATBY[mk].n, V, "m³"]] };
+            kg: 0, sable: 0, gravier: 0, eau: 0, parp: {}, lines: [[MATBY[mk].n, fmt(V, 2) + " m³", pk2, V * pk2, vx(V)]], mat: [[MATBY[mk].n, V, "m³"]] };
     } else {
       S = num(r + "-S");
       var ee = num(r + "-e");
@@ -705,6 +711,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     }
     if ($(r + "-tc")) { e.tc = $(r + "-tc").value; }
     if ($(r + "-ts")) { e.ts = $(r + "-ts").value; }
+    if (e.ts === "smix") { var pf = Math.min(Math.max(n0(r + "-pf"), 0), 100) / 100; e.smix = { sf: pf, ssan: 1 - pf }; }
     if ($(r + "-tg")) { e.tg = $(r + "-tg").value; }
     e.det = e.det || [];
     var mt = [];
@@ -712,6 +719,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     if (e.ts && e.sable > 0) { mt.push(matn(e.ts)); }
     if (e.tg && e.gravier > 0) { mt.push(matn(e.tg)); }
     if (mt.length) { e.det.push("Matériaux : " + mt.join(", ")); }
+    if (e.smix) { e.det.push("Sable : " + fmt(e.smix.sf * 100, 0) + " % sable fin + " + fmt(e.smix.ssan * 100, 0) + " % sable de la Sanaga"); }
     if (r !== "enduit") { e.det.unshift("Type : " + TYPES[r][$("typ-" + r).selectedIndex].nom); }
     out(r, e);
   }
@@ -752,8 +760,8 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     var L = [], sc = e.kg / SAC;
     Object.keys(e.parp).forEach(function (k) { L.push([Cap(plab(k)), fmt(e.parp[k], 0) + " u", n0("p-" + k), e.parp[k] * n0("p-" + k)]); });
     if (e.kg > 0) { var kc = e.tc || "c325"; L.push([matn(kc) + " (sac de 50 kg)", fmt(sc, 1) + " sacs", n0("p-" + kc), sc * n0("p-" + kc)]); }
-    if (e.sable > 0) { var ks = e.ts || "sg"; L.push([matn(ks), fmt(e.sable, 2) + " m³", n0("p-" + ks), e.sable * n0("p-" + ks)]); }
-    if (e.gravier > 0) { var kq = e.tg || "g515"; L.push([matn(kq), fmt(e.gravier, 2) + " m³", n0("p-" + kq), e.gravier * n0("p-" + kq)]); }
+    sandParts(e).forEach(function (s2) { L.push([matn(s2[0]), fmt(s2[1], 2) + " m³", n0("p-" + s2[0]), s2[1] * n0("p-" + s2[0]), vx(s2[1])]); });
+    if (e.gravier > 0) { var kq = e.tg || "g515"; L.push([matn(kq), fmt(e.gravier, 2) + " m³", n0("p-" + kq), e.gravier * n0("p-" + kq), vx(e.gravier)]); }
     if (e.acier > 0) { L.push(["Acier profilé IPE", fmt(e.acier, 0) + " kg", n0("p-acier"), e.acier * n0("p-acier")]); }
     (e.lines || []).forEach(function (x) { L.push(x); });
     if (PRO.on && e.mo > 0) { L.push(["Main d'œuvre", "forfait", e.mo, e.mo]); }
@@ -790,7 +798,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
         rows += '<tr class="pt"><td colspan="3">' + k + ". " + esc(e.nom) + '</td><td class="n">' + fmt(Math.round(c), 0) + "</td></tr>" +
           '<tr><td colspan="4"><small>' + info.map(esc).join("<br>") + "</small></td></tr>";
         L.forEach(function (x) {
-          rows += "<tr><td>" + esc(x[0]) + '</td><td class="n">' + esc(x[1]) + '</td><td class="n">' + fmt(Math.round(x[2]), 0) + '</td><td class="n">' + fmt(Math.round(x[3]), 0) + "</td></tr>";
+          rows += "<tr><td>" + esc(x[0]) + '</td><td class="n">' + esc(x[1]) + (x[4] ? "<br><small>" + esc(x[4]) + "</small>" : "") + '</td><td class="n">' + fmt(Math.round(x[2]), 0) + '</td><td class="n">' + fmt(Math.round(x[3]), 0) + "</td></tr>";
         });
         if (PRO.on) {
           rows += '<tr class="noprint"><td colspan="4">Main d\'œuvre de ce poste (FCFA) : <input type="text" inputmode="decimal" data-mo="' + i + '" value="' + (e.mo || "") + '" style="width:150px;display:inline-block"></td></tr>';
@@ -824,7 +832,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     entries.forEach(function (e) {
       T.acier += e.acier || 0; T.eau += e.eau;
       if (e.kg > 0) { var a1 = e.tc || "c325"; T.c[a1] = (T.c[a1] || 0) + e.kg; }
-      if (e.sable > 0) { var a2 = e.ts || "sg"; T.s[a2] = (T.s[a2] || 0) + e.sable; }
+      sandParts(e).forEach(function (s2) { T.s[s2[0]] = (T.s[s2[0]] || 0) + s2[1]; });
       if (e.gravier > 0) { var a3 = e.tg || "g515"; T.g[a3] = (T.g[a3] || 0) + e.gravier; }
       Object.keys(e.parp).forEach(function (q) { T.parp[q] = (T.parp[q] || 0) + e.parp[q]; });
       (e.mat || []).forEach(function (m) { var z = T.x[m[0]] || (T.x[m[0]] = { q: 0, u: m[2] }); z.q += m[1]; });
@@ -833,13 +841,13 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     var brow = function (a, b) { BUY.push("- " + a + " : " + b); h += "<tr><td>" + esc(a) + '</td><td class="n">' + b + "</td></tr>"; };
     Object.keys(T.parp).forEach(function (q) { brow(Cap(plab(q)), fmt(T.parp[q], 0)); });
     Object.keys(T.c).forEach(function (q) { brow(matn(q) + " (sacs de 50 kg)", fmt(sacs(T.c[q]), 0) + " sacs"); });
-    Object.keys(T.s).forEach(function (q) { brow(matn(q), fmt(T.s[q], 2) + " m³"); });
-    Object.keys(T.g).forEach(function (q) { brow(matn(q), fmt(T.g[q], 2) + " m³"); });
+    Object.keys(T.s).forEach(function (q) { brow(matn(q), fmt(T.s[q], 2) + " m³ (" + vx(T.s[q]) + ")"); });
+    Object.keys(T.g).forEach(function (q) { brow(matn(q), fmt(T.g[q], 2) + " m³ (" + vx(T.g[q]) + ")"); });
     if (T.eau > 0) { brow("Eau (environ)", fmt(T.eau, 0) + " litres"); }
     if (T.acier > 0) { brow("Acier profilé IPE", fmt(T.acier, 0) + " kg"); }
     Object.keys(T.x).forEach(function (a) {
       var z = T.x[a];
-      brow(a, z.u === "kg" ? fmt(z.q, 0) + " kg" : z.u === "sacs" ? fmt(Math.ceil(z.q - 1e-9), 0) + " sacs" : fmt(z.q, 2) + " " + z.u);
+      brow(a, z.u === "kg" ? fmt(z.q, 0) + " kg" : z.u === "sacs" ? fmt(Math.ceil(z.q - 1e-9), 0) + " sacs" : fmt(z.q, 2) + " " + z.u + (z.u === "m³" ? " (" + vx(z.q) + ")" : ""));
     });
     $("dv-body").innerHTML = h + "</table></div>";
   }
@@ -945,16 +953,17 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   var MESH = [[5, 100], [5, 150], [5, 200], [6, 100], [6, 150], [6, 200], [8, 100], [8, 150], [8, 200], [10, 150], [10, 200]];
   var AR = {
     fond: [["Semelle isolée", "slab"], ["Semelle filante", "strip"], ["Longrine", "beam"], ["Chaînage bas", "beam"], ["Radier général", "slab"], ["Amorces de poteaux", "beam"],
-      ["Chevêtre (semelle de liaison)", "beam"], ["Nervures du radier", "beam"], ["Puits", "cage"], ["Pieux", "cage"], ["Treillis soudé (dallage, radier)", "mesh"]],
+      ["Chevêtre (semelle de liaison)", "beam"], ["Nervures du radier", "beam"], ["Puits", "cage"], ["Pieux", "cage"], ["Cadres seuls (longrine, chaînage)", "cadre"], ["Chapeaux et barres d'attente", "bars"], ["Treillis soudé (dallage, radier)", "mesh"]],
     elev: [["Poteau carré ou rectangulaire", "beam"], ["Poteau circulaire", "cage"], ["Poutre", "beam"], ["Linteau", "beam"], ["Chaînage haut", "beam"],
-      ["Chaînage vertical (raidisseur)", "beam"], ["Console", "beam"], ["Treillis soudé", "mesh"]]
+      ["Chaînage vertical (raidisseur)", "beam"], ["Console", "beam"], ["Cadres seuls (poteau, poutre, linteau)", "cadre"], ["Chapeaux et barres d'attente", "bars"], ["Dalle pleine (nappes)", "slab"], ["Treillis soudé", "mesh"]]
   };
   var DD = {
     "Poteau carré ou rectangulaire": { b: 20, h: 20, nb: 4, d1: "HA12", es: 15 }, "Poutre": { b: 15, h: 30, nb: 6, d1: "HA12", es: 15 },
     "Longrine": { b: 20, h: 30, nb: 6, d1: "HA12", es: 15 }, "Linteau": { b: 15, h: 20, nb: 4, d1: "HA10", es: 15 },
     "Chaînage haut": { b: 15, h: 20, nb: 4, d1: "HA10", es: 20 }, "Chaînage bas": { b: 15, h: 20, nb: 4, d1: "HA10", es: 20 },
     "Radier général": { nap: 2, d1: "HA12", e1: 20, d2: "HA12", e2: 20 }, "Puits": { D: 80, nb: 8, d1: "HA12", es: 20 }, "Pieux": { D: 40, nb: 6, d1: "HA14", es: 15 },
-    "Poteau circulaire": { D: 25, nb: 6, d1: "HA12", es: 15 }
+    "Poteau circulaire": { D: 25, nb: 6, d1: "HA12", es: 15 },
+    "Dalle pleine (nappes)": { nap: 2, d1: "HA10", e1: 15, d2: "HA10", e2: 15, h: 0.12, c: 2.5 }
   };
   function dd(nm, key, def) { var o = DD[nm]; return o && o[key] !== undefined ? o[key] : def; }
   function diaSel(r, id, label, cur) { return sel(r, id, label, DIA.map(function (x) { return [x[0], x[1] + " mm"]; }), cur); }
@@ -969,7 +978,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
         inp(r, "es", "Espacement des cadres (cm)", dd(nm, "es", 15));
     } else if (k === "slab") {
       h += inp(r, "n", "Nombre d'éléments de ce type", "") + inp(r, "L", "Longueur (m)", "") + inp(r, "l", "Largeur (m)", "") +
-        inp(r, "h", "Hauteur ou épaisseur (m)", 0.3) + inp(r, "c", "Enrobage (cm)", 5) +
+        inp(r, "h", "Hauteur ou épaisseur (m)", dd(nm, "h", 0.3)) + inp(r, "c", "Enrobage (cm)", dd(nm, "c", 5)) +
         diaSel(r, "d1", "Barres dans le sens de la longueur", dd(nm, "d1", "HA10")) + inp(r, "e1", "Espacement de ces barres (cm)", dd(nm, "e1", 15)) +
         diaSel(r, "d2", "Barres dans le sens de la largeur", dd(nm, "d2", "HA10")) + inp(r, "e2", "Espacement de ces barres (cm)", dd(nm, "e2", 15)) +
         sel(r, "nap", "Nombre de nappes", [["1", "1 nappe (en bas)"], ["2", "2 nappes (bas et haut)"]], String(dd(nm, "nap", 1)));
@@ -977,6 +986,11 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
       h += inp(r, "L", "Longueur totale (m)", "") + inp(r, "l", "Largeur de la semelle (m)", "") + inp(r, "h", "Hauteur de la semelle (m)", 0.3) +
         inp(r, "c", "Enrobage (cm)", 5) + inp(r, "nb", "Nombre de barres longitudinales", 4) + diaSel(r, "d1", "Diamètre des barres longitudinales", "HA10") +
         diaSel(r, "d2", "Diamètre des barres transversales", "HA10") + inp(r, "es", "Espacement des barres transversales (cm)", 20);
+    } else if (k === "cadre") {
+      h += inp(r, "n", "Nombre d'éléments (poteaux, poutres, linteaux...)", "") + inp(r, "L", "Longueur ou hauteur d'un élément (m)", "") + inp(r, "b", "Largeur b (cm)", 20) + inp(r, "h", "Hauteur h (cm)", 20) +
+        inp(r, "c", "Enrobage (cm)", 3) + diaSel(r, "d2", "Diamètre des cadres", "RL6") + inp(r, "es", "Espacement des cadres (cm)", 15);
+    } else if (k === "bars") {
+      h += inp(r, "n", "Nombre de barres", "") + inp(r, "L", "Longueur d'une barre (m)", "") + diaSel(r, "d1", "Diamètre des barres", "HA12");
     } else if (k === "cage") {
       h += inp(r, "n", "Nombre d'éléments de ce type", "") + inp(r, "L", "Profondeur ou hauteur (m)", "") + inp(r, "D", "Diamètre (cm)", dd(nm, "D", 40)) +
         inp(r, "c", "Enrobage (cm)", 4) + inp(r, "nb", "Nombre de barres verticales", dd(nm, "nb", 6)) + diaSel(r, "d1", "Diamètre des barres verticales", dd(nm, "d1", "HA12")) +
@@ -1026,6 +1040,18 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
       nom += " " + fmt(L, 2) + " m x " + fmt(l, 2) + " m";
       info.push("Barres longitudinales : " + fmt(nb, 0) + " " + dl(d1) + " sur " + fmt(L, 2) + " m");
       info.push("Barres transversales : " + nt + " " + dl(d2) + " de " + fmt(lt, 2) + " m, espacées de " + fmt(es, 0) + " cm");
+    } else if (k === "cadre") {
+      n = num("ar-n"); L = num("ar-L"); b = num("ar-b"); h = num("ar-h"); c = n0("ar-c"); es = num("ar-es"); d2 = $("ar-d2").value;
+      if (!(n > 0 && L > 0 && b > 2 * c && h > 2 * c && es > 0)) { return bad1(); }
+      var nc2 = Math.ceil(L * 100 / es) + 1, pc2 = 2 * ((b - 2 * c) + (h - 2 * c)) / 100 + 0.2;
+      add(d2, n * nc2 * pc2 * rec * mkg(d2));
+      nom += " " + fmt(b, 0) + " x " + fmt(h, 0) + " cm (" + fmt(n, 0) + " élément" + (n > 1 ? "s" : "") + " de " + fmt(L, 2) + " m)";
+      info.push("Cadres : " + nc2 + " cadres " + dl(d2) + " par élément, espacés de " + fmt(es, 0) + " cm (" + fmt(pc2, 2) + " m chacun, crochets compris)");
+    } else if (k === "bars") {
+      n = num("ar-n"); L = num("ar-L"); d1 = $("ar-d1").value;
+      if (!(n > 0 && L > 0)) { return bad1(); }
+      add(d1, n * L * rec * mkg(d1));
+      nom += " : " + fmt(n, 0) + " barres " + dl(d1) + " de " + fmt(L, 2) + " m";
     } else if (k === "cage") {
       n = num("ar-n"); L = num("ar-L"); var D = num("ar-D"); c = n0("ar-c"); nb = num("ar-nb"); es = num("ar-es"); d1 = $("ar-d1").value; d2 = $("ar-d2").value;
       if (!(n > 0 && L > 0 && D > 2 * c && nb > 0 && es > 0)) { return bad1(); }
@@ -1372,7 +1398,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   }
   $("tour-fab").addEventListener("click", tourStart);
   try {
-    if (!localStorage.getItem(TOUR_KEY)) { window.setTimeout(function () { try { tourStart(); } catch (er) { tourOn = false; } }, 1000); }
+    if (!localStorage.getItem(TOUR_KEY) && localStorage.getItem("baticalc_guide_v2")) { window.setTimeout(function () { try { tourStart(); } catch (er) { tourOn = false; } }, 1000); }
   } catch (er) {}
 
   $("of-mail").href = "mailto:" + CONTACT + "?subject=" + encodeURIComponent("BatiCalc : prévenez-moi du lancement") +
@@ -1393,6 +1419,25 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     $("pro-aide").style.display = "none";
   } else {
     $("pro-bientot").style.display = "none";
+  }
+  // ===== GUIDE À LIRE OBLIGATOIREMENT =====
+  var GK = "baticalc_guide_v2";
+  function guideLu() { try { return !!localStorage.getItem(GK); } catch (er) { return true; } }
+  if (!guideLu()) {
+    var ov = document.createElement("div"); ov.id = "guide-ov";
+    ov.innerHTML = '<div class="gbox"><h2>📘 Lisez d\'abord le guide</h2><p class="aide">Pour bien utiliser BatiCalc, lisez tout le guide jusqu\'en bas. Le bouton se débloque à la fin.</p><div id="g-txt"></div><button type="button" class="btn" id="g-ok" disabled>Faites défiler jusqu\'en bas pour continuer</button></div>';
+    document.body.appendChild(ov);
+    var gs = $("guide").cloneNode(true), gd = gs.querySelectorAll("details"), gi;
+    gs.removeAttribute("id"); gs.className = ""; gs.removeChild(gs.querySelector("h2"));
+    for (gi = 0; gi < gd.length; gi++) { gd[gi].setAttribute("open", ""); }
+    $("g-txt").appendChild(gs);
+    var gchk = function () { if (ov.scrollTop + ov.clientHeight >= ov.scrollHeight - 40) { $("g-ok").disabled = false; $("g-ok").textContent = "J'ai lu le guide : commencer"; } };
+    ov.addEventListener("scroll", gchk); window.setTimeout(gchk, 400);
+    $("g-ok").addEventListener("click", function () {
+      try { localStorage.setItem(GK, "1"); } catch (er) {}
+      document.body.removeChild(ov);
+      try { if (!localStorage.getItem(TOUR_KEY)) { tourStart(); } } catch (er) {}
+    });
   }
   // ================= PAIEMENT ET LICENCE =================
   function msg(id, t, ok) { var e = $(id); e.textContent = t; e.style.color = ok ? "#1a7f37" : "#b3261e"; }
