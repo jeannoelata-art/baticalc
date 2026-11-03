@@ -144,6 +144,8 @@ button[id^="add-"]::before{content:"\2795  "}
 footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18px;letter-spacing:6px;margin-bottom:4px}
 }
 #guide-ov{position:fixed;top:0;left:0;right:0;bottom:0;z-index:10000;background:#eaf1fa;overflow-y:auto;padding:10px}#guide-ov .gbox{max-width:640px;margin:0 auto;background:#fff;border-radius:14px;padding:14px;border-top:5px solid #f97316}#guide-ov p,#guide-ov li{font-size:15px;line-height:1.6}#guide-ov .btn:disabled{background:#8a94a0;box-shadow:none}
+#tour-ban{position:fixed;left:10px;right:80px;bottom:16px;z-index:60;background:#fff;border:2px solid #f97316;border-radius:12px;padding:8px 10px;font-size:13px;display:none;gap:8px;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.3)}#tour-ban button{padding:8px 10px;border:0;border-radius:8px;background:#f97316;color:#fff;font-weight:bold}#tour-tip .nx:disabled{background:#8a94a0}
+.px-avert{background:#fff8e6;border:1px solid #e6c36a;border-radius:10px;padding:10px;margin-top:8px;font-size:14px}.px-al{background:#fff3e0;border:2px solid #f97316;border-radius:10px;padding:10px;margin-top:10px;font-size:14px}#prix input.ex{border-color:#f97316;background:#fff7ed}
 </style>
 </head>
 <body>
@@ -170,7 +172,13 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   <label for="p-moi-tel">Votre contact (téléphone ou WhatsApp)</label><input id="p-moi-tel" type="text" inputmode="tel" placeholder="ex : 6 99 00 00 00">
   <label for="p-moi-mail">Votre adresse e-mail (facultatif)</label><input id="p-moi-mail" type="text" inputmode="email" placeholder="facultatif">
  </details>
- <details class="noprint"><summary>Mes prix en FCFA (appuyer pour modifier)</summary><div class="grid" id="prix"></div></details>
+ <div id="px-alerte" class="noprint"></div>
+ <details class="noprint" id="px-det"><summary>Mes prix en FCFA (appuyer pour modifier)</summary>
+  <div class="px-avert"><b>⚠ À faire obligatoirement.</b> Entrez le prix exact de chaque matériau, tel qu'il se vend dans votre ville aujourd'hui. Les prix affichés au départ sont seulement des exemples : un prix faux donne un devis faux.<br>Vos prix sont enregistrés automatiquement sur cet appareil. Quand un matériau augmente, ouvrez cette liste et corrigez le prix : la modification est enregistrée tout de suite.</div>
+  <div class="grid" id="prix"></div>
+  <button type="button" class="btn bleu" id="px-ok">Je confirme mes prix</button>
+  <p class="note" id="px-etat"></p>
+ </details>
  <div id="dv-head"></div>
  <div id="dv-body"></div>
  <button type="button" class="btn bleu noprint" id="dv-print">Imprimer ou enregistrer en PDF</button>
@@ -329,7 +337,8 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
  <details><summary>7. Enduit</summary>
   <p>Entrez la surface et l'épaisseur. <b>Exemple :</b> 100 m² sur 2 cm = 2 m³ de mortier, plus 10 % de perte.</p></details>
  <details><summary>8. Mon devis, prix, impression</summary>
-  <ul><li>Les prix de départ sont des exemples : remplacez-les par ceux de votre ville.</li>
+  <ul><li><b>Obligatoire :</b> les prix de départ sont des exemples. Entrez le prix exact de chaque matériau dans votre ville (« Mes prix en FCFA »). Les cases en orange sont les prix pas encore réglés.</li>
+  <li>Vos prix sont enregistrés automatiquement sur votre appareil. Si un matériau augmente, corrigez la case : c'est enregistré tout de suite, sans rien refaire d'autre.</li>
   <li>Le devis est classé par rubrique avec un total par rubrique puis un total général. La liste d'achat arrondit le ciment au sac entier.</li>
   <li>« Retirer ce poste » enlève un poste ; « Vider le devis » efface tout.</li></ul></details>
  <details><summary>9. Version Pro : acier d'armature</summary>
@@ -624,6 +633,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     var x = $("res-" + r);
     x.className = "res err show";
     x.textContent = msg;
+    if (!tourFait()) { x.insertAdjacentHTML("beforeend", '<p><b>Conseil de professionnel :</b> il manque une information. Cela arrive souvent quand on n\'a pas suivi la visite guidée de 2 minutes, qui explique chaque case pour exploiter BatiCalc à 100 %.</p><button type="button" class="btn bleu" data-tour-resume>Reprendre la visite guidée</button>'); }
     pend[r] = null;
     $("add-" + r).disabled = true;
   }
@@ -769,6 +779,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   }
   var BUY = [];
   function renderDevis() {
+    pxUI();
     var cl = $("p-client").value, d = new Date(), co = "";
     var mn = $("p-moi-nom").value.trim(), mt = $("p-moi-tel").value.trim(), me = $("p-moi-mail").value.trim();
     var by = [mn, mt ? "Tél : " + mt : "", me ? "E-mail : " + me : ""].filter(Boolean).map(esc).join("<br>");
@@ -935,6 +946,35 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   for (q = 0; q < gl.length; q++) {
     gl[q].addEventListener("click", function (ev) { ev.preventDefault(); go(ev.currentTarget.getAttribute("data-go")); });
   }
+  // ===== PRIX : alerte, enregistrement automatique, confirmation =====
+  var PXKEY = "baticalc_prix_v1", PXS = { ok: {}, maj: 0 };
+  try { var pr0 = JSON.parse(localStorage.getItem(PXKEY) || "null"); if (pr0 && pr0.ok) { PXS = pr0; } } catch (er) {}
+  function pxSave() { try { localStorage.setItem(PXKEY, JSON.stringify(PXS)); } catch (er) {} }
+  function pxNb() { return PRIX.filter(function (x) { return !PXS.ok[x[0]]; }).length; }
+  function pxUI() {
+    var n = pxNb();
+    PRIX.forEach(function (x) { $(x[0]).className = PXS.ok[x[0]] ? "" : "ex"; });
+    $("px-alerte").innerHTML = n ? '<div class="px-al"><b>⚠ Prix à régler.</b> ' + n + ' prix sont encore des prix d\'exemple. Entrez le prix exact de chaque matériau dans votre ville avant de présenter un devis.<button type="button" class="btn" id="px-go">Régler mes prix</button></div>' : "";
+    $("px-etat").textContent = n ? n + " prix en orange sont encore des exemples : modifiez-les, ou appuyez sur « Je confirme mes prix » s'ils sont déjà exacts."
+      : "✔ Vos prix sont réglés et enregistrés automatiquement" + (PXS.maj ? " (dernière modification : " + new Date(PXS.maj).toLocaleDateString("fr-FR") + ")" : "") + ". Si un prix augmente, corrigez simplement la case concernée.";
+    $("px-ok").style.display = n ? "" : "none";
+  }
+  function pxInit() {
+    var first = true;
+    try { first = localStorage.getItem(PXKEY) === null; } catch (er) {}
+    if (first) {
+      PRIX.forEach(function (x) { if (String($(x[0]).value) !== String(x[2])) { PXS.ok[x[0]] = true; } });
+      pxSave();
+    }
+  }
+  PRIX.forEach(function (x) {
+    $(x[0]).addEventListener("input", function () {
+      if (String($(x[0]).value).trim() !== "") { PXS.ok[x[0]] = true; PXS.maj = Date.now(); } else { delete PXS.ok[x[0]]; }
+      pxSave(); pxUI();
+    });
+  });
+  $("px-ok").addEventListener("click", function () { PRIX.forEach(function (x) { PXS.ok[x[0]] = true; }); PXS.maj = Date.now(); pxSave(); pxUI(); });
+  document.addEventListener("click", function (ev) { if (ev.target.id === "px-go") { $("px-det").open = true; try { $("px-det").scrollIntoView({ block: "start" }); } catch (er) {} } });
   // ================= MODE PRO (TEST GRATUIT) =================
   var PKEY = "baticalc_pro_v1";
   var PRO = { on: false, nom: "", adr: "", niu: "", logo: "", tva: "0", marge: "0", remise: "0", ch: {}, ps: {} };
@@ -1292,6 +1332,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     var a = ev.target.getAttribute("data-psa"), d = ev.target.getAttribute("data-psd");
     if (a && PRO.ps[a]) {
       Object.keys(PRO.ps[a]).forEach(function (id) { if ($(id)) { $(id).value = PRO.ps[a][id]; } });
+      PRIX.forEach(function (x) { PXS.ok[x[0]] = true; }); pxSave();
       save(); renderDevis(); go("devis");
     } else if (d && window.confirm("Supprimer cette liste de prix ?")) { delete PRO.ps[d]; psave(); listes(); }
   });
@@ -1321,26 +1362,48 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   });
   pload();
   // ===== VISITE GUIDÉE (flèches) =====
-  var TOUR_KEY = "baticalc_tour_v1", tourI = 0, tourOn = false, tourEl = null, tourSpot = null, tourTip = null;
+  var TOUR_KEY = "baticalc_tour_v2", TOUR_WAIT = 6, tourMax = -1, tourTimer = null, tourI = 0, tourOn = false, tourEl = null, tourSpot = null, tourTip = null;
   var STEPS = [
-    { tab: "fond", sel: "#tabs", t: "Les onglets", d: "Fondation, Élévation, Enduit : choisissez la partie de l'ouvrage à calculer. « Mon devis » rassemble tout. Faites glisser pour voir les autres onglets." },
-    { tab: "fond", sel: "#typ-fond", t: "1. Type de fondation", d: "Commencez par choisir le type de fondation de votre chantier : semelles, radier, puits, pieux..." },
-    { tab: "fond", sel: "#sel-fond", t: "2. Élément à calculer", d: "Choisissez ensuite l'élément : béton de propreté, semelles, longrines, soubassement..." },
-    { tab: "fond", sel: "#form-fond", t: "3. Les dimensions", d: "Remplissez les dimensions en mètres. Pour plusieurs tailles différentes, choisissez le nombre de types (A, B, C...)." },
-    { tab: "fond", sel: "#go-fond", t: "4. Calculer", d: "Appuyez sur Calculer : le site donne le ciment, le sable, le gravier et l'eau." },
-    { tab: "fond", sel: "#add-fond", t: "5. Ajouter au devis", d: "Ajoutez le résultat au devis. Faites de même pour chaque élément, puis passez à l'Élévation." },
-    { tab: "devis", sel: "#dv-head", t: "6. Votre devis", d: "Tous vos calculs se rassemblent ici, rubrique par rubrique, avec le total et la liste des matériaux à acheter." },
-    { tab: "devis", sel: "#devis summary", t: "7. Vos coordonnées et vos prix", d: "Ouvrez « Mes coordonnées » pour mettre votre nom et votre contact, et « Mes prix » pour saisir les prix de votre marché." },
-    { tab: "devis", sel: "#dv-print", t: "8. Imprimer ou PDF", d: "Imprimez le devis ou enregistrez-le en PDF pour l'envoyer à votre client." }
+    { tab: "fond", sel: "#tabs", t: "Bienvenue dans BatiCalc", d: "Ces quelques étapes (environ 2 minutes) vous montrent comment faire un devis sans erreur. En haut : Fondation, Élévation et Enduit pour calculer, Mon devis pour tout rassembler. Faites glisser pour voir les autres onglets." },
+    { tab: "fond", sel: "#typ-fond", t: "Étape 1 : le type de fondation", d: "Choisissez le type de fondation de votre chantier : semelles isolées, filantes, radier, puits ou pieux. La liste des éléments change selon ce choix, et le texte sous la liste explique chaque type." },
+    { tab: "fond", sel: "#sel-fond", t: "Étape 2 : l'élément à calculer", d: "Choisissez un élément à la fois : béton de propreté, semelles, longrines, soubassement... Vous calculez chaque élément séparément, puis vous l'ajoutez au devis." },
+    { tab: "fond", sel: "#form-fond", t: "Étape 3 : les dimensions", d: "Remplissez les mesures en mètres (nombre, longueur, largeur, hauteur). Chaque case doit contenir un nombre supérieur à 0. Vous pouvez écrire 0,3 ou 0.3." },
+    { tab: "fond", sel: "#fond-dos", t: "Le dosage du béton", d: "C'est la quantité de ciment par m³ de béton. 350 kg/m³ convient aux éléments porteurs. Sous la case, le site affiche le nombre de sacs pour 1 m³." },
+    { tab: "fond", sel: "#fond-tc", t: "Ciment, sable et gravier", d: "Choisissez le type de ciment, de sable et de gravier. Chaque matériau sera chiffré à son propre prix dans le devis." },
+    { tab: "fond", sel: "#fond-per", t: "La perte en pourcentage", d: "Elle ajoute une marge pour la casse et les chutes. Gardez 5 % si vous n'avez pas de raison de la changer." },
+    { tab: "fond", sel: "#go-fond", t: "Étape 4 : calculer", d: "Appuyez sur Calculer. Le site donne le ciment en sacs, le sable et le gravier en m³ avec le nombre de brouettes et de camions, et l'eau en litres. Si une case est vide, un message rouge vous dit laquelle." },
+    { tab: "fond", sel: "#add-fond", t: "Étape 5 : ajouter au devis", d: "Si le résultat vous convient, appuyez sur Ajouter au devis. Ce bouton ne s'active qu'après un calcul réussi. Recommencez les étapes 2 à 5 pour chaque élément." },
+    { tab: "elev", sel: "#typ-elev", t: "Élévation : même méthode", d: "Choisissez d'abord le type de structure (poteaux-poutres, murs porteurs...), puis l'élément à calculer, les dimensions, et enfin Calculer et Ajouter au devis." },
+    { tab: "elev", sel: "#elev-nt", t: "Plusieurs types différents", d: "Si vos poteaux (ou poutres, semelles...) n'ont pas tous la même taille, choisissez le nombre de types, puis remplissez le type A, le type B... Exemple : type A 1 x 1 m et type B 1,2 x 1,5 m." },
+    { tab: "elev", sel: "#elev-ts", t: "Le sable des élévations", d: "Choisissez un seul sable, ou le mélange sable fin + sable de la Sanaga. Dans ce cas, indiquez la part de sable fin en % : le reste est du sable de la Sanaga." },
+    { tab: "enduit", sel: "#form-enduit", t: "Enduit", d: "Entrez la surface à crépir en m² et l'épaisseur en cm. Calculez, puis ajoutez au devis comme pour les autres éléments." },
+    { tab: "devis", sel: "#p-client", t: "Mon devis : le client", d: "Écrivez le nom du client ou du chantier. Il apparaît en haut du devis imprimé. Vos coordonnées se règlent juste en dessous." },
+    { tab: "devis", sel: "#devis details:nth-of-type(2) summary", t: "Important : vos prix", d: "Ouvrez « Mes prix en FCFA » et remplacez les prix d'exemple par ceux de votre ville. Vous y réglez aussi la capacité de votre brouette et de votre camion. Sans vos prix, le total n'est pas juste. Ils sont enregistrés automatiquement : changez-les seulement quand un prix augmente." },
+    { tab: "devis", sel: "#dv-print", t: "Imprimer ou PDF", d: "Quand le devis est prêt, imprimez-le ou enregistrez-le en PDF pour l'envoyer au client. Vous pouvez relancer cette visite à tout moment avec le bouton ? en bas à droite." }
   ];
   function tourDone() { try { localStorage.setItem(TOUR_KEY, "1"); } catch (er) {} }
-  function tourEnd() {
+  function ban(show) {
+    var b = $("tour-ban");
+    if (!b) { b = document.createElement("div"); b.id = "tour-ban"; b.innerHTML = '<span>📘 Visite guidée non terminée : elle évite les erreurs de calcul.</span><button type="button" data-tour-resume>Reprendre</button>'; document.body.appendChild(b); }
+    b.style.display = show ? "flex" : "none";
+  }
+  function tourEnd(fini) {
     tourOn = false;
+    window.clearInterval(tourTimer);
     if (tourSpot) { tourSpot.style.display = "none"; }
     if (tourTip) { tourTip.style.display = "none"; }
-    tourDone();
+    if (fini) { tourDone(); ban(false); } else { ban(true); }
     go("fond");
   }
+  function tourSkipAsk() {
+    window.clearInterval(tourTimer);
+    tourTip.innerHTML = '<div class="ar"></div><b class="t">Une minute pour bien démarrer</b>Un bon technicien prend le temps de comprendre son outil. Ces étapes vous évitent des erreurs de calcul et vous font gagner du temps sur chaque devis. Voulez-vous vraiment les passer ?<div class="row"><button type="button" class="nx">Continuer la visite</button><button type="button" class="sk">Passer</button></div>';
+    tourTip.querySelector(".nx").addEventListener("click", function () { tourShow(tourI, 1); });
+    tourTip.querySelector(".sk").addEventListener("click", function () { tourEnd(false); });
+    window.setTimeout(tourPlace, 50);
+  }
+  function tourFait() { try { return !!localStorage.getItem(TOUR_KEY); } catch (er) { return true; } }
+  document.addEventListener("click", function (ev) { if (ev.target.hasAttribute && ev.target.hasAttribute("data-tour-resume")) { tourStart(); } });
   function tourPlace() {
     if (!tourOn || !tourEl) { return; }
     var r = tourEl.getBoundingClientRect(), pad = 6, vw = window.innerWidth, vh = window.innerHeight;
@@ -1363,7 +1426,8 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   }
   function tourShow(i, dir) {
     if (i < 0) { i = 0; }
-    if (i >= STEPS.length) { tourEnd(); return; }
+    if (i >= STEPS.length) { tourEnd(true); return; }
+    window.clearInterval(tourTimer);
     tourI = i;
     var st = STEPS[i];
     go(st.tab);
@@ -1378,7 +1442,16 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     tourTip.querySelector(".pv").style.display = i === 0 ? "none" : "block";
     tourTip.querySelector(".pv").addEventListener("click", function () { tourShow(tourI - 1, -1); });
     tourTip.querySelector(".nx").addEventListener("click", function () { tourShow(tourI + 1, 1); });
-    tourTip.querySelector(".sk").addEventListener("click", tourEnd);
+    tourTip.querySelector(".sk").addEventListener("click", tourSkipAsk);
+    var nxb = tourTip.querySelector(".nx"), lbl = nxb.textContent, left = TOUR_WAIT;
+    if (i > tourMax) {
+      nxb.disabled = true; nxb.textContent = lbl + " (" + left + ")";
+      tourTimer = window.setInterval(function () {
+        left--;
+        if (left <= 0) { window.clearInterval(tourTimer); nxb.disabled = false; nxb.textContent = lbl; } else { nxb.textContent = lbl + " (" + left + ")"; }
+      }, 1000);
+    }
+    tourMax = Math.max(tourMax, i);
     var tall = el.getBoundingClientRect().height > window.innerHeight * 0.6;
     el.scrollIntoView({ block: tall ? "start" : "center" });
     if (tall) { window.scrollBy(0, -80); }
@@ -1394,11 +1467,12 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
       window.addEventListener("scroll", tourPlace);
     }
     tourOn = true;
+    ban(false);
     tourShow(0, 1);
   }
   $("tour-fab").addEventListener("click", tourStart);
   try {
-    if (!localStorage.getItem(TOUR_KEY) && localStorage.getItem("baticalc_guide_v2")) { window.setTimeout(function () { try { tourStart(); } catch (er) { tourOn = false; } }, 1000); }
+    if (!localStorage.getItem(TOUR_KEY)) { window.setTimeout(function () { try { tourStart(); } catch (er) { tourOn = false; } }, 1000); }
   } catch (er) {}
 
   $("of-mail").href = "mailto:" + CONTACT + "?subject=" + encodeURIComponent("BatiCalc : prévenez-moi du lancement") +
@@ -1409,6 +1483,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   proUI();
   listes();
   load();
+  pxInit();
   renderDevis();
   if (!PRO_DISPONIBLE) {
     ["acier", "rev"].forEach(function (id) { var el = $(id); if (el) { el.parentNode.removeChild(el); } });
@@ -1420,30 +1495,11 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   } else {
     $("pro-bientot").style.display = "none";
   }
-  // ===== GUIDE À LIRE OBLIGATOIREMENT =====
-  var GK = "baticalc_guide_v2";
-  function guideLu() { try { return !!localStorage.getItem(GK); } catch (er) { return true; } }
-  if (!guideLu()) {
-    var ov = document.createElement("div"); ov.id = "guide-ov";
-    ov.innerHTML = '<div class="gbox"><h2>📘 Lisez d\'abord le guide</h2><p class="aide">Pour bien utiliser BatiCalc, lisez tout le guide jusqu\'en bas. Le bouton se débloque à la fin.</p><div id="g-txt"></div><button type="button" class="btn" id="g-ok" disabled>Faites défiler jusqu\'en bas pour continuer</button></div>';
-    document.body.appendChild(ov);
-    var gs = $("guide").cloneNode(true), gd = gs.querySelectorAll("details"), gi;
-    gs.removeAttribute("id"); gs.className = ""; gs.removeChild(gs.querySelector("h2"));
-    for (gi = 0; gi < gd.length; gi++) { gd[gi].setAttribute("open", ""); }
-    $("g-txt").appendChild(gs);
-    var gchk = function () { if (ov.scrollTop + ov.clientHeight >= ov.scrollHeight - 40) { $("g-ok").disabled = false; $("g-ok").textContent = "J'ai lu le guide : commencer"; } };
-    ov.addEventListener("scroll", gchk); window.setTimeout(gchk, 400);
-    $("g-ok").addEventListener("click", function () {
-      try { localStorage.setItem(GK, "1"); } catch (er) {}
-      document.body.removeChild(ov);
-      try { if (!localStorage.getItem(TOUR_KEY)) { tourStart(); } } catch (er) {}
-    });
-  }
   // ================= PAIEMENT ET LICENCE =================
   function msg(id, t, ok) { var e = $(id); e.textContent = t; e.style.color = ok ? "#1a7f37" : "#b3261e"; }
   function appel(url, corps) {
     return fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corps) })
-      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j._ok = r.ok; return j; }); });
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j._ok = r.ok; j._s = r.status; return j; }); });
   }
   function licEtat() {
     var d = lireLic();
@@ -1462,7 +1518,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     b.disabled = true; msg("ac-msg", "Ouverture de la page de paiement...", true);
     appel("/api/acheter", corps).then(function (j) {
       if (j.url) { window.location.href = j.url; return; }
-      msg("ac-msg", j.erreur || "Le paiement n'a pas pu démarrer.", false); b.disabled = false;
+      msg("ac-msg", j.erreur || ("Le paiement n'a pas pu démarrer (code " + (j._s || "?") + ")."), false); b.disabled = false;
     }).catch(function () { msg("ac-msg", "Pas de connexion. Réessayez.", false); b.disabled = false; });
   });
   $("lic-go").addEventListener("click", function () {
