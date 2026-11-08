@@ -162,6 +162,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
 <header><h1>Bati<span>Calc</span></h1><p>Votre devis de chantier en 2 minutes</p><div class="badges"><span>✔ Gratuit</span><span>📱 Sur téléphone</span><span>🧱 Fondation · Élévation · Dalle · Escalier · Charpente · Enduit</span></div></header>
 <nav id="tabs">
  <button type="button" data-tab="guide" class="hl">🚀 Découvrir</button>
+ <button type="button" data-tab="mode" class="hl">📖 Mode d'emploi</button>
  <button type="button" data-tab="fond" class="on">🏗️ Fondation</button>
  <button type="button" data-tab="elev">🧱 Élévation</button>
  <button type="button" data-tab="dalle">🏠 Dalle</button>
@@ -344,6 +345,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
  <h2>🚀 Découvrir BatiCalc en 1 minute</h2>
  <p class="aide">Touchez une carte pour l'essayer tout de suite.</p>
  <div class="dcs">
+  <a href="#" class="dc" data-go="mode"><b>📖 Mode d'emploi détaillé</b><span>Pas à pas, avec des exemples et un dictionnaire des mots techniques, pour tout comprendre sans être technicien.</span></a>
   <a href="#" class="dc" data-go="fond"><b>🏗️ Fondation</b><span>Déblai, remblai, semelles, longrines, radier, puits. Ciment en sacs, sable et gravier en m³, avec brouettes et camions.</span></a>
   <a href="#" class="dc" data-go="elev"><b>🧱 Élévation</b><span>Poteaux, poutres, murs, linteaux. Plusieurs types A, B, C, et mélange sable fin + Sanaga.</span></a>
   <a href="#" class="dc" data-go="dalle"><b>🏠 Dalle</b><span>Dalle pleine, corps creux (poutrelles + hourdis), nervurée, collaborante, métallique (IPE, PTR), bois, dallage, prédalle. <em>(offres Pass Projet et Entreprise)</em></span></a>
@@ -375,7 +377,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   <p>Dans l'onglet Élévation, la case « Type de sable » propose « Mélange sable fin + sable de la Sanaga » (choisi au départ). Une case « Part de sable fin (%) » apparaît : le reste est du sable de la Sanaga.</p>
   <p><b>Exemple :</b> 1,00 m³ de sable avec 50 % de sable fin donne 0,50 m³ de sable fin et 0,50 m³ de sable de la Sanaga, chacun chiffré à son prix. Le devis écrit la composition du mélange. Pour un seul sable, choisissez-le dans la liste. Réglez les deux prix dans « Mes prix en FCFA ».</p></details>
  <details><summary>5. Murs en parpaings</summary>
-  <p>Entrez le nombre de murs identiques, la longueur, la hauteur, puis les portes et fenêtres à retirer (surface par mur).</p>
+  <p>Pour chaque type de mur (A, B...), entrez le nombre de murs identiques, la longueur, la hauteur, les portes et fenêtres à retirer (surface par mur), puis choisissez l'épaisseur du parpaing : 10, 12, 15 ou 20 cm. Chaque type peut avoir son propre parpaing.</p>
   <p><b>Exemple :</b> 1 mur de 10 m sur 3 m avec deux portes de 2 m² : 26 m², environ 342 parpaings de 15 cm avec 5 % de perte.</p></details>
  <details><summary>6. Dosage, perte, eau</summary>
   <ul><li><b>Dosage</b> : kg de ciment par m³ de béton (350 est courant pour les éléments porteurs). Le sable, le gravier et l'eau par m³ sont modifiables.</li>
@@ -407,6 +409,241 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   <p>BatiCalc s'ouvre alors comme une application, directement depuis votre écran d'accueil.</p></details>
  </details>
 </section>
+<section class="panel" id="mode">
+ <h2>📖 Mode d'emploi pour tous</h2>
+ <p class="aide">Ce guide est écrit pour quelqu'un qui n'est pas technicien. Il explique chaque onglet, chaque case et chaque mot, avec des exemples chiffrés. Touchez un titre pour l'ouvrir. Commencez par le chapitre 1.</p>
+ <div class="info"><b>En une phrase :</b> vous dites à BatiCalc ce que vous construisez (avec les mesures), il calcule les matériaux (ciment, sable, parpaings, fers, bois, tôles...), puis il les met dans un devis avec les prix que vous avez entrés.</div>
+
+ <details open><summary>1. Les 3 règles à retenir avant de commencer</summary>
+  <ol>
+   <li><b>Toutes les mesures sont en mètres.</b> 20 cm s'écrit 0,20. 5 cm s'écrit 0,05. 1 m 50 s'écrit 1,5. Vous pouvez écrire la virgule ou le point.</li>
+   <li><b>Les prix de départ sont des exemples.</b> Dans « Mon devis », ouvrez « Mes prix en FCFA » et mettez les vrais prix de votre ville. Sans cela, le total du devis est faux.</li>
+   <li><b>BatiCalc donne une estimation.</b> Il ne remplace ni un plan, ni un ingénieur, ni une étude de sol. Faites toujours valider les dimensions importantes (poutres, dalle, escalier, charpente) par un technicien avant de construire.</li>
+  </ol></details>
+
+ <details><summary>2. Comprendre l'écran</summary>
+  <ul>
+   <li><b>Le menu du haut</b> : une ligne de boutons. Faites-la glisser du doigt vers la gauche pour voir tous les onglets : Découvrir, Mode d'emploi, Fondation, Élévation, Dalle, Coffrage, Escalier, Charpente, Acier, Enduit, Revêtements, Mon devis, Version Pro, Légal. L'onglet ouvert est en orange.</li>
+   <li><b>La barre « Niveau en cours »</b> (sous le menu) : elle sert aux maisons à étage (voir chapitre 4).</li>
+   <li><b>Le bouton rond « ? »</b> en bas à droite : il relance la visite guidée.</li>
+   <li><b>Les cartes de « Découvrir »</b> : touchez une carte pour aller directement dans l'onglet.</li>
+  </ul></details>
+
+ <details><summary>3. Les 4 gestes de base : choisir, remplir, calculer, ajouter</summary>
+  <ol>
+   <li><b>Choisir.</b> Ouvrez un onglet, par exemple Fondation. Choisissez d'abord le type (la grande famille), puis l'élément (la pièce précise à calculer). Une petite phrase sous le type vous explique à quoi il sert.</li>
+   <li><b>Remplir.</b> Écrivez les mesures dans les cases. Chaque case dit ce qu'elle attend : « Longueur (m) », « Hauteur (m) », « Nombre »... Une case déjà remplie contient une valeur courante que vous pouvez changer.</li>
+   <li><b>Calculer.</b> Appuyez sur « Calculer ». Le résultat s'affiche : sacs de ciment, sable, gravier, parpaings, etc. Si une case est entourée de rouge, c'est qu'elle est vide ou fausse : corrigez-la et recommencez.</li>
+   <li><b>Ajouter au devis.</b> Si le résultat vous convient, appuyez sur « Ajouter au devis ». Le bouton reste grisé tant que vous n'avez pas calculé. Recommencez pour chaque élément de la maison.</li>
+  </ol>
+  <p><b>Important :</b> si vous changez une mesure après avoir calculé, rappuyez sur « Calculer » avant d'ajouter au devis.</p></details>
+
+ <details><summary>4. Plusieurs étages : RDC, R+1, R+2...</summary>
+  <p><b>RDC</b> veut dire rez-de-chaussée (le niveau du sol). <b>R+1</b> veut dire rez-de-chaussée plus 1 étage, <b>R+2</b> plus 2 étages, et ainsi de suite.</p>
+  <ol>
+   <li>Dans la barre « Niveau en cours », choisissez le niveau sur lequel vous travaillez, par exemple RDC.</li>
+   <li>Calculez et ajoutez au devis les éléments de ce niveau : poteaux, murs, dalle, escalier, enduit, finitions.</li>
+   <li>Passez à R+1 dans la barre, et recommencez.</li>
+   <li><b>Étages identiques ?</b> Au lieu de tout refaire, choisissez le niveau à copier, puis dans « Copier tous les postes de ce niveau vers » choisissez le niveau d'arrivée et appuyez sur « Copier ». Tout est recopié, vous corrigez ensuite ce qui change.</li>
+  </ol>
+  <p>Dans « Mon devis », chaque rubrique est rangée par niveau avec son total : par exemple « Élévation · RDC » puis « Élévation · R+1 ». La <b>fondation</b> et la <b>charpente</b> sont communes : elles n'ont pas de niveau, car on les fait une seule fois pour toute la maison. La dalle d'un niveau se range avec ce niveau.</p></details>
+
+ <details><summary>5. Fondation : le bas de la maison</summary>
+  <p>La fondation est la partie enterrée qui porte toute la maison. Le premier menu propose plusieurs types : semelles isolées avec longrines, semelles filantes, radier, puits, pieux.</p>
+  <ul>
+   <li><b>Déblai</b> : creuser et enlever la terre. Vous donnez le nombre de fouilles, la longueur, la largeur et la profondeur. BatiCalc donne le volume en place, puis le volume « foisonné » (la terre creusée gonfle, car elle n'est plus tassée). Case « Foisonnement » : 25 % est une valeur courante. <b>Exemple :</b> 10 m x 8 m x 0,6 m = 48 m³ en place, soit 60 m³ à évacuer, environ 6 camions de 10 m³.</li>
+   <li><b>Remblai</b> : remettre de la terre, de la latérite ou du tout-venant autour ou sous la maison. Deux façons : par volume (longueur x largeur x hauteur) ou par surface et épaisseur. Il ajoute une marge de tassement.</li>
+   <li><b>Béton de propreté</b> : une fine couche de béton maigre sous les semelles, pour travailler sur une base propre.</li>
+   <li><b>Hérissonnage</b> : une couche de grosses pierres ou de cailloux sous un sol en béton.</li>
+   <li><b>Semelles, longrines, radier, puits, pieux</b> : les éléments en béton de la fondation. Pour chacun : nombre, longueur, largeur, hauteur. BatiCalc donne le volume, puis les sacs de ciment, le sable, le gravier et l'eau.</li>
+  </ul>
+  <p><b>Plusieurs types (A, B...)</b> : si vos semelles n'ont pas toutes la même taille, choisissez « Nombre de types différents » et remplissez chaque type à part. <b>Exemple :</b> type A = 8 semelles de 1 x 1 x 0,3 ; type B = 4 semelles de 1,2 x 1,5 x 0,3.</p></details>
+
+ <details><summary>6. Élévation : ce qui monte du sol (poteaux, poutres, murs)</summary>
+  <ul>
+   <li><b>Poteaux</b> : les colonnes. Choisissez la forme (carré, rectangle ou circulaire) puis les mesures.</li>
+   <li><b>Poutres, chaînages, linteaux, consoles</b> : les barres horizontales en béton. Un <b>chaînage</b> ceinture les murs. Un <b>linteau</b> est au-dessus d'une porte ou d'une fenêtre. Une <b>console</b> est un petit balcon ou une avancée.</li>
+   <li><b>Sable</b> : vous pouvez choisir un mélange de sable fin et de sable de la Sanaga, avec le pourcentage de chaque.</li>
+  </ul>
+  <p><b>Les murs en parpaings (agglos).</b> « Nombre de types » veut dire : combien de sortes de murs différentes avez-vous. Chaque type de mur (A, B, C...) a ses propres cases : nombre de murs identiques, longueur, hauteur, portes et fenêtres à retirer (en m², pour un mur), puis <b>l'épaisseur du parpaing</b> (10, 12, 15 ou 20 cm) et son type (<b>creux</b> ou <b>plein</b>). Un mur de séparation peut donc être en 10 cm (type A) et un mur extérieur en 15 cm (type B). Les murs n'ont pas de « largeur » : l'épaisseur est celle du parpaing.</p>
+  <p><b>Exemple :</b> 1 mur de 10 m de long, 3 m de haut, avec deux portes de 2 m². Surface : 10 x 3 - 4 = 26 m². Il faut environ 12,5 parpaings par m², donc 325, et 342 avec 5 % de casse.</p></details>
+
+ <details><summary>7. Dalle : le plancher ou la terrasse en béton</summary>
+  <p>Choisissez d'abord le type de dalle. Voici à quoi chacun correspond, en mots simples :</p>
+  <ul>
+   <li><b>Dalle pleine en béton armé</b> : une grande plaque de béton avec du fer à l'intérieur. Solide, pour terrasses, balcons, auvents.</li>
+   <li><b>Dalle à corps creux (poutrelles + hourdis)</b> : la plus courante. On pose des petites poutres préfabriquées (<b>poutrelles</b>), on place entre elles des blocs creux (<b>hourdis</b>, appelés aussi <b>entrevous</b>), puis on coule une fine couche de béton par-dessus (<b>dalle de compression</b>) avec un grillage (<b>treillis soudé</b>). Légère et économique.</li>
+   <li><b>Dalle nervurée</b> : on coule des petites poutres (nervures) sur place avec des blocs perdus entre elles. Pour de plus grandes portées.</li>
+   <li><b>Dalle collaborante</b> : une tôle en acier (<b>bac acier</b>) sur des poutres métalliques, recouverte de béton. Rapide, sans coffrage.</li>
+   <li><b>Plancher métallique</b> : des poutres en acier (<b>IPE</b>) et des tubes (<b>PTR</b>) recouverts de tôle ou de contreplaqué.</li>
+   <li><b>Plancher en bois</b> : des poutres en bois (<b>solives</b>) recouvertes de planches. On appelle <b>solivage</b> l'ensemble des solives. Pour de petites portées.</li>
+   <li><b>Dallage sur terre-plein</b> : le sol en béton du rez-de-chaussée, posé directement sur la terre, avec un film plastique (polyane) dessous.</li>
+   <li><b>Dalle préfabriquée</b> : panneaux livrés tout prêts (prédalle ou dalle alvéolaire), avec une couche de béton coulée dessus. Il faut une grue pour les poser.</li>
+  </ul>
+  <p><b>Exemple : dalle à corps creux de 4 m x 6 m.</b> Portée des poutrelles 4 m, largeur à couvrir 6 m, poutrelles tous les 0,60 m, hourdis de 0,20 m, dalle de compression de 5 cm. Résultat : 10 poutrelles de 4,10 m (41 m en tout), 200 hourdis soit 210 avec la casse, environ 1,89 m³ de béton, 26,4 m² de treillis.</p>
+  <p><b>Bon à savoir :</b> les poutrelles se posent dans le sens de la plus petite portée. Mettez une poutrelle en plus sous chaque cloison parallèle. Les poutres d'appui (en béton ou en acier) se calculent dans Élévation ou Acier. Le coffrage et les étais se calculent dans l'onglet Coffrage.</p>
+  <p><b>Plancher en bois :</b> BatiCalc compare la hauteur de vos solives à la hauteur indicative (portée divisée par 20) et vous prévient si elles sont trop basses.</p>
+  <p><b>Acrotère</b> : le petit rebord en béton autour d'une terrasse.</p></details>
+
+ <details><summary>8. Coffrage : le moule du béton</summary>
+  <p>Le béton est liquide quand on le coule : il faut un moule pour le tenir jusqu'à ce qu'il durcisse. Ce moule s'appelle le <b>coffrage</b> (planches, contreplaqué ou panneaux métalliques). Choisissez ce que vous coffrez : fondations, élévations (poteaux, poutres, voiles) ou dalle.</p>
+  <ul>
+   <li><b>Réutilisations</b> : les planches servent plusieurs fois. Si vous les réutilisez 3 fois, vous achetez 3 fois moins de planches.</li>
+   <li><b>Poteaux, poutres, semelles, voiles</b> : donnez le nombre et les mesures. BatiCalc calcule la surface à coffrer, puis les planches, les chevrons (petites pièces de bois de soutien), les pointes et l'huile de décoffrage (elle empêche le béton de coller).</li>
+   <li><b>Coffrage et étaiement de dalle</b> : c'est le plus délicat. Les <b>étais</b> sont des poteaux provisoires (en métal ou en bois) qui portent la dalle pendant qu'elle durcit. Au-dessus des étais on pose des <b>madriers</b> (grosses poutres de bois), puis des <b>chevrons</b>, puis le coffrage. Donnez la longueur, la largeur et l'épaisseur de la dalle, la hauteur sous dalle et l'espacement des étais (1 m est courant). Pour une dalle à corps creux, BatiCalc ne compte que les rives et les files d'étais. Au-dessus de 3,5 m de hauteur, il vous conseille des croisillons de contreventement. Les <b>cales d'enrobage</b> sont de petits blocs qui gardent les fers à bonne distance du coffrage.</li>
+  </ul>
+  <p><b>Exemple : 8 poteaux de 20 x 20 cm, 3 m de haut.</b> Surface à coffrer : 8 x 4 faces x 0,20 m x 3 m... soit 19,2 m². Avec 3 réutilisations : 6,72 m² de planches à acheter, plus les chevrons, les pointes et l'huile.</p></details>
+
+ <details><summary>9. Escalier : toutes les formes</summary>
+  <p>Choisissez le matériau (béton armé, bois ou acier), puis la forme :</p>
+  <ul>
+   <li><b>Droit</b> : une seule volée, tout droit.</li>
+   <li><b>Quart tournant</b> : l'escalier tourne à angle droit, avec un palier.</li>
+   <li><b>Demi-tournant</b> : deux volées avec un palier, on fait demi-tour.</li>
+   <li><b>À marches balancées</b> : les marches tournent sans palier.</li>
+   <li><b>Hélicoïdal (colimaçon)</b> : en spirale autour d'une colonne.</li>
+  </ul>
+  <p>Vous entrez la hauteur à franchir (du sol fini du bas au sol fini du haut), la hauteur d'une contremarche visée (0,17 m est confortable), le giron (la profondeur d'une marche, 0,28 m) et la largeur. BatiCalc trouve tout seul le nombre de marches et la hauteur exacte, la longueur de l'escalier, l'emprise au sol (la place qu'il prend), puis il vérifie le confort avec la formule de Blondel (2 x hauteur + giron doit valoir entre 0,60 et 0,64 m).</p>
+  <p><b>Exemple : escalier droit en béton, 2,80 m de hauteur, giron 0,28, largeur 1 m.</b> 16 marches de 17,5 cm, longueur 5,05 m, emprise 4,20 m x 1 m, environ 1,21 m³ de béton (avec perte) et 11 m² de coffrage.</p>
+  <p>Pour le bois : marches, contremarches, limons (les grandes pièces latérales qui portent les marches), poteaux d'angle (newels). Pour l'acier : limons en profilés, marches en tôle larmée ou en bois, soudure et peinture antirouille. Vous pouvez aussi ajouter un <b>garde-corps</b> (la rampe) en bois, acier ou inox, sur un ou deux côtés. Le <b>perron</b> et la <b>rampe d'accès</b> (pour les poussettes et fauteuils roulants) sont dans « Perron et rampe d'accès ».</p></details>
+
+ <details><summary>10. Charpente et couverture : le toit</summary>
+  <p>La <b>charpente</b> est l'ossature du toit (en bois ou en métal). La <b>couverture</b> est ce qui ferme le toit (tôles, tuiles...). Choisissez d'abord le type de toiture, puis calculez chaque élément dans l'ordre : charpente, puis couverture.</p>
+  <p><b>Les cases communes :</b> longueur du bâtiment, largeur du bâtiment (la portée), pente et débord.</p>
+  <ul>
+   <li><b>Pente (%)</b> : de combien le toit monte pour 1 m horizontal. 30 % veut dire 30 cm de montée par mètre, environ 17 degrés. Plus la pente est forte, plus la surface de toit est grande.</li>
+   <li><b>Débord</b> : la partie du toit qui dépasse des murs pour protéger de la pluie (0,50 m est courant).</li>
+   <li><b>Forme</b> : deux pentes (le toit classique), une pente (monopente) ou quatre pentes (croupe).</li>
+  </ul>
+  <p><b>Les charpentes :</b></p>
+  <ul>
+   <li><b>En bois</b> : <b>fermes</b> (les grands triangles porteurs), <b>pannes</b> (poutres horizontales posées sur les fermes), et pour les tuiles des <b>chevrons</b> et des <b>liteaux</b> (petites lattes sur lesquelles s'accrochent les tuiles). Les tôles se posent directement sur les pannes.</li>
+   <li><b>Métallique en tubes PTR</b> : fermes en tubes rectangulaires (PTR) et pannes métalliques. Entrez la taille des tubes : BatiCalc calcule leur poids.</li>
+   <li><b>Portiques IPE (hangar)</b> : poteaux et arbalétriers en profilés IPE pour de grands volumes.</li>
+   <li><b>Charpente légère en PTR</b> : pannes et chevrons en tubes, pour petites toitures.</li>
+  </ul>
+  <p><b>Les couvertures :</b> tôle bac aluzinc, tôle ondulée, tuiles béton ou terre cuite, bardeau bitumé (shingle), panneaux sandwich, plaques de fibrociment, chaume ou raphia. BatiCalc compte aussi les vis ou clous, le faîtage (la ligne du haut), les rives (les bords), les gouttières, les descentes d'eau et, au choix, un film ou un isolant sous le toit.</p>
+  <p><b>Exemple : bâtiment de 10 m x 6 m, pente 30 %, débord 0,5 m.</b> Surface de toit : environ 80,4 m². Tôle bac : environ 93 m² (avec recouvrement et casse). Charpente bois : 5 fermes (une tous les 2,5 m), environ 94 m de bois pour les fermes et 84 m pour les pannes.</p>
+  <p><b>Toiture terrasse</b> : un toit plat en béton. BatiCalc calcule le béton de pente (qui fait couler l'eau), l'isolant, l'étanchéité (bitume, membrane PVC ou résine), la protection (gravillons ou dalles) et les descentes d'eau. La dalle qui porte la terrasse se calcule dans l'onglet Dalle.</p></details>
+
+ <details><summary>11. Acier : les fers à béton</summary>
+  <p>L'<b>acier d'armature</b> (les fers) renforce le béton. L'onglet Acier est une partie Pro. Choisissez la partie de l'ouvrage (Fondation, Élévation ou Dalle), l'élément, puis les barres (diamètre et nombre). BatiCalc donne le poids de chaque diamètre et le nombre de barres à commander.</p>
+  <ul>
+   <li><b>Les cadres</b> sont les anneaux qui entourent les barres d'un poteau ou d'une poutre. Leur espacement est une case à remplir (par exemple tous les 15 cm).</li>
+   <li><b>Les chapeaux</b> sont des barres placées au-dessus des appuis d'une poutre. Les <b>barres d'attente</b> dépassent du béton pour accrocher l'élément suivant.</li>
+   <li><b>L'enrobage</b> est l'épaisseur de béton qui protège le fer (3 cm est courant).</li>
+   <li>Les fers de l'acier sont de type « HA » (haute adhérence), avec un diamètre en millimètres (HA 10, HA 12, HA 14...).</li>
+  </ul>
+  <p><b>Attention :</b> si vous choisissez l'option « ferraillage estimé » dans un élément, ne refaites pas ce même acier dans l'onglet Acier, sinon il sera compté deux fois.</p></details>
+
+ <details><summary>12. Enduit et revêtements : les finitions</summary>
+  <ul>
+   <li><b>Enduit</b> (crépissage) : la couche de mortier sur les murs. Entrez la surface et l'épaisseur. <b>Exemple :</b> 100 m² sur 2 cm font 2 m³ de mortier, plus 10 % de perte.</li>
+   <li><b>Revêtements</b> : carrelage, faïence, marbre, parquet, faux plafond, peinture, enduits de finition, chape (la couche qui rend le sol plat). Entrez la surface de la pièce et le format du carreau.</li>
+  </ul></details>
+
+ <details><summary>13. Mon devis : prix, modification, impression</summary>
+  <ol>
+   <li><b>Le nom du client</b> : écrivez-le en haut, il apparaît sur le devis.</li>
+   <li><b>Mes prix en FCFA</b> (à faire en premier) : ouvrez cette liste, remplacez chaque prix d'exemple par le vrai prix de votre ville, puis appuyez sur « Je confirme mes prix ». Les cases orange sont les prix pas encore réglés. Vos prix sont gardés dans votre téléphone : vous les changez seulement quand un prix augmente. Vous réglez aussi la capacité de votre brouette et de votre camion.</li>
+   <li><b>Lire le devis</b> : chaque rubrique (Fondation, Élévation, Dalle...) a son total. Les rubriques à étages sont séparées par niveau. À la fin : le total général, puis la <b>liste d'achat</b> (tout ce qu'il faut commander, le ciment arrondi au sac entier).</li>
+   <li><b>Modifier un poste</b> : appuyez sur « Modifier » sous le poste, corrigez les mesures, appuyez sur « Calculer », puis « Mettre à jour le devis ». « Retirer ce poste » l'enlève. « Vider le devis » efface tout.</li>
+   <li><b>Ligne libre</b> : pour un frais que BatiCalc ne calcule pas : transport, main d'œuvre, plomberie, électricité, portes, fenêtres, peinture, clôture, gardiennage, imprévus... Tapez les premières lettres, une liste de propositions apparaît. Exemple : transport du sable, 2 voyages à 15 000 FCFA = 30 000 FCFA.</li>
+   <li><b>Imprimer ou enregistrer en PDF</b> : pour envoyer le devis au client. Gardez toujours une copie PDF.</li>
+  </ol></details>
+
+ <details><summary>14. Les offres : quel onglet pour quelle offre</summary>
+  <ul>
+   <li><b>Gratuit</b> : murs en parpaings, éléments en béton, enduit, devis.</li>
+   <li><b>Technicien</b> : élévation complète, acier d'armature des éléments d'élévation et des longrines, plusieurs types A, B, C.</li>
+   <li><b>Pass Projet et Entreprise</b> : fondations complètes, dalle, coffrage, escalier, charpente et couverture, revêtements.</li>
+   <li><b>Entreprise</b> : tout, plus le logo, la marge, la TVA, l'export Excel et la liste d'achat par WhatsApp.</li>
+  </ul>
+  <p>Pendant la période gratuite affichée en haut de l'écran, tout est ouvert. Pour les prix et les achats, voir l'onglet « Version Pro ».</p></details>
+
+ <details><summary>15. Exemple complet : une petite maison à un étage (R+1)</summary>
+  <ol>
+   <li>Dans « Mon devis », réglez vos prix et confirmez-les.</li>
+   <li><b>Fondation</b> : calculez le déblai, le béton de propreté, les semelles et les longrines, le remblai. Ajoutez chaque résultat au devis.</li>
+   <li>Barre « Niveau » : choisissez <b>RDC</b>. <b>Élévation</b> : poteaux, poutres, chaînages, murs de chaque type. <b>Dalle</b> : le plancher du R+1. <b>Coffrage</b> : poteaux, poutres, dalle. <b>Escalier</b> : celui qui monte au R+1. <b>Enduit</b> et <b>Revêtements</b> du RDC.</li>
+   <li>Barre « Niveau » : choisissez <b>R+1</b>. Si l'étage ressemble au RDC, copiez le niveau RDC vers R+1, puis corrigez ce qui change.</li>
+   <li><b>Charpente</b> : calculez la charpente, puis la couverture, avec les gouttières.</li>
+   <li><b>Acier</b> : ajoutez les fers de chaque élément.</li>
+   <li>Ajoutez des <b>lignes libres</b> : transport, main d'œuvre, plomberie, électricité, portes, fenêtres, peinture, imprévus.</li>
+   <li>Ouvrez « Mon devis », vérifiez, entrez le nom du client, puis imprimez ou enregistrez en PDF.</li>
+  </ol></details>
+
+ <details><summary>16. Dictionnaire des mots techniques</summary>
+  <ul>
+   <li><b>Acrotère</b> : petit rebord en béton autour d'une terrasse.</li>
+   <li><b>Agglo, parpaing</b> : bloc de ciment pour monter les murs. <b>Creux</b> : avec des trous, plus léger. <b>Plein</b> : sans trou, plus lourd et plus résistant.</li>
+   <li><b>Arbalétrier</b> : pièce inclinée d'une ferme.</li>
+   <li><b>Armature, acier, ferraillage</b> : les fers qui renforcent le béton.</li>
+   <li><b>Bac acier</b> : tôle profilée très rigide.</li>
+   <li><b>Béton de propreté</b> : fine couche de béton sous les fondations.</li>
+   <li><b>Brouette, camion</b> : unités pour estimer le sable, le gravier et la terre (0,065 m³ et 10 m³ au départ, modifiables).</li>
+   <li><b>Cadre</b> : anneau en fer autour des barres d'un poteau ou d'une poutre.</li>
+   <li><b>Chaînage</b> : poutre en béton qui ceinture les murs.</li>
+   <li><b>Chape</b> : couche de mortier qui rend le sol plat avant le carrelage.</li>
+   <li><b>Chevron</b> : petite pièce de bois qui porte la couverture ou le coffrage.</li>
+   <li><b>Coffrage</b> : moule qui tient le béton frais.</li>
+   <li><b>Console</b> : avancée en béton (petit balcon).</li>
+   <li><b>Contremarche</b> : la partie verticale d'une marche. <b>Giron</b> : la partie sur laquelle on pose le pied.</li>
+   <li><b>Corps creux</b> : bloc creux (hourdis) qui allège une dalle.</li>
+   <li><b>Déblai</b> : terre que l'on enlève. <b>Remblai</b> : terre que l'on remet.</li>
+   <li><b>Débord</b> : partie du toit qui dépasse du mur.</li>
+   <li><b>Dosage</b> : kilos de ciment pour 1 m³ de béton (350 est courant).</li>
+   <li><b>Emprise</b> : place occupée au sol.</li>
+   <li><b>Enrobage</b> : épaisseur de béton qui protège le fer.</li>
+   <li><b>Entrevous, hourdis</b> : blocs qui remplissent l'espace entre les poutrelles.</li>
+   <li><b>Étai</b> : poteau provisoire qui soutient une dalle fraîche.</li>
+   <li><b>Étanchéité</b> : couche qui empêche l'eau de passer (toiture terrasse).</li>
+   <li><b>Faîtage</b> : ligne la plus haute du toit.</li>
+   <li><b>Ferme</b> : grand triangle en bois ou en métal qui porte le toit.</li>
+   <li><b>Foisonnement</b> : gonflement de la terre ou du sable quand on les remue.</li>
+   <li><b>Gravier 5/15, 15/25</b> : taille des cailloux en millimètres.</li>
+   <li><b>Hérissonnage</b> : lit de pierres sous un sol en béton.</li>
+   <li><b>HA</b> : fer à béton à haute adhérence, suivi de son diamètre en mm.</li>
+   <li><b>IPE</b> : profilé en acier en forme de I. <b>PTR</b> : tube en acier rectangulaire ou carré.</li>
+   <li><b>Limon</b> : pièce qui porte les marches d'un escalier.</li>
+   <li><b>Linteau</b> : poutre au-dessus d'une porte ou d'une fenêtre.</li>
+   <li><b>Liteau</b> : fine latte sur laquelle s'accrochent les tuiles.</li>
+   <li><b>Longrine</b> : poutre en béton posée sur les semelles ou sur le sol.</li>
+   <li><b>Madrier</b> : grosse pièce de bois.</li>
+   <li><b>Mortier</b> : mélange de ciment, sable et eau, pour coller les parpaings ou enduire.</li>
+   <li><b>Nervure</b> : petite poutre dans une dalle.</li>
+   <li><b>Newel</b> : poteau d'angle d'un escalier.</li>
+   <li><b>Palier</b> : plateforme plate dans un escalier.</li>
+   <li><b>Panne</b> : poutre horizontale qui porte la couverture.</li>
+   <li><b>Pente</b> : inclinaison du toit, en %.</li>
+   <li><b>Polyane</b> : film plastique posé sous un dallage.</li>
+   <li><b>Poutrelle</b> : petite poutre préfabriquée d'un plancher à corps creux.</li>
+   <li><b>Radier</b> : grande dalle en béton sous toute la maison.</li>
+   <li><b>Rampant</b> : longueur du toit mesurée dans la pente.</li>
+   <li><b>Réutilisations</b> : nombre de fois où le coffrage sert.</li>
+   <li><b>Semelle</b> : base élargie en béton sous un poteau (isolée) ou sous un mur (filante).</li>
+   <li><b>Solive</b> : poutre d'un plancher en bois ou en métal.</li>
+   <li><b>Treillis soudé</b> : grillage en fer posé dans une dalle.</li>
+   <li><b>Volée</b> : suite de marches entre deux paliers.</li>
+  </ul></details>
+
+ <details><summary>17. Si ça ne marche pas : problèmes courants</summary>
+  <ul>
+   <li><b>Une case est entourée de rouge.</b> Elle est vide ou contient une valeur impossible (zéro, lettre). Corrigez-la.</li>
+   <li><b>« Ajouter au devis » est grisé.</b> Appuyez d'abord sur « Calculer ».</li>
+   <li><b>Le total du devis affiche 0.</b> Vos prix ne sont pas réglés. Ouvrez « Mes prix en FCFA ».</li>
+   <li><b>Je ne veux pas d'acier ou de coffrage dans un élément.</b> Dans les options de l'élément, laissez « Non » pour le coffrage et 0 pour le ferraillage. C'est le réglage de départ.</li>
+   <li><b>Un onglet dit qu'il est réservé.</b> Il demande une offre Pass Projet ou Entreprise (voir chapitre 14).</li>
+   <li><b>Le message « les portes et fenêtres sont plus grandes que le mur ».</b> La surface des ouvertures dépasse celle du mur : vérifiez les mesures.</li>
+   <li><b>La page se comporte bizarrement.</b> Fermez l'onglet du navigateur, rouvrez le site. Si le problème continue, envoyez une capture d'écran à la personne qui vous a donné BatiCalc.</li>
+   <li><b>J'ai effacé les données de mon navigateur.</b> Vos prix et vos devis sont perdus : gardez toujours vos devis en PDF.</li>
+  </ul></details>
+
+ <details><summary>18. Installer BatiCalc sur l'écran d'accueil</summary>
+  <p><b>Android (Chrome)</b> : appuyez sur les trois points en haut à droite, puis « Ajouter à l'écran d'accueil » ou « Installer l'application ».</p>
+  <p><b>iPhone (Safari)</b> : appuyez sur le bouton Partager, puis « Sur l'écran d'accueil ».</p>
+  <p>BatiCalc s'ouvre alors comme une application.</p></details>
+</section>
 <section class="panel" id="legal">
  <h2>Informations légales</h2>
  <p class="aide">Dernière mise à jour : octobre 2026</p>
@@ -434,7 +671,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
  </ul>
 </section>
 </main>
-<footer>BatiCalc - Estimations indicatives.<br><a href="#" data-go="guide">Guide d'utilisation</a> · <a href="#" data-go="legal">Mentions légales</a> · <a href="#" data-go="legal">Confidentialité</a> · <a href="#" data-go="legal">Conditions d'utilisation</a></footer>
+<footer>BatiCalc - Estimations indicatives.<br><a href="#" data-go="mode">Mode d'emploi</a> · <a href="#" data-go="guide">Découvrir</a> · <a href="#" data-go="legal">Mentions légales</a> · <a href="#" data-go="legal">Confidentialité</a> · <a href="#" data-go="legal">Conditions d'utilisation</a></footer>
 <button type="button" id="tour-fab" aria-label="Visite guidée">?</button>
 <script>
 (function () {
@@ -462,7 +699,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     return part === "elev" || /longrine|Chapeaux|Cadres/i.test(nm);
   }
   var SAC = 50, KEY = "baticalc_v2";
-  var MORT = { "10": 0.018, "15": 0.025, "20": 0.033 };
+  var MORT = { "10": 0.018, "12": 0.021, "15": 0.025, "20": 0.033 };
   var RUB = { fond: "Fondation", elev: "Élévation", dalle: "Dalle (plancher)", coff: "Coffrage et étaiement", escl: "Escaliers", charp: "Charpente et couverture", enduit: "Enduit (crépissage)", fin: "Finitions et revêtements", libre: "Autres frais" };
   var ORD = ["fond", "elev", "dalle", "coff", "escl", "charp", "enduit"], ORDD = ["fond", "elev", "dalle", "coff", "escl", "charp", "enduit", "fin", "libre"];
   var DOS = [150, 200, 250, 300, 350, 400, 450];
@@ -681,10 +918,10 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   ];
   // ===== COFFRAGE ET FERRAILLAGE DE CHAQUE ÉLÉMENT =====
   function cfBlock(r, p) {
-    return (p.cf ? sel(r, "cfi", "Ajouter le coffrage de cet élément", [["0", "Non"], ["p-cofb", "Oui : planches de coffrage"], ["p-cp", "Oui : contreplaqué"], ["p-cofm", "Oui : coffrage métallique (location)"]], "p-cofb") +
+    return (p.cf ? sel(r, "cfi", "Option : ajouter le coffrage de cet élément", [["0", "Non (par défaut)"], ["p-cofb", "Oui : planches de coffrage"], ["p-cp", "Oui : contreplaqué"], ["p-cofm", "Oui : coffrage métallique (location)"]], "0") +
       inp(r, "cfr", "Nombre de réutilisations du coffrage", 3) : "") +
-      inp(r, "fer", "Ferraillage : kg d'acier par m³ de béton (0 = sans)", p.fr) +
-      '<div class="info">Le coffrage et le ferraillage de cet élément sont estimés ici. Pour un calcul précis des barres et des étais, utilisez les onglets Acier et Coffrage, sans doubler le poste.</div>';
+      inp(r, "fer", "Option : ferraillage estimé, en kg d'acier par m³ de béton (0 = aucun ; valeur conseillée " + p.fr + ")", 0) +
+      '<div class="info">Par défaut, aucun coffrage et aucun acier ne sont comptés. Ils ne s\'ajoutent au devis que si vous les choisissez ici. Pour un calcul précis, utilisez plutôt les onglets Acier et Coffrage, sans doubler le poste.</div>';
   }
   function addCF(r, e, V, S, pf) {
     var mt = $(r + "-cfi") ? $(r + "-cfi").value : "0", fr = $(r + "-fer") ? n0(r + "-fer") : 0, re = n0(r + "-cfr") || 3, kg;
@@ -881,7 +1118,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   var PRIX = [
     ["p-mo", "Main d'œuvre (total)", 0],
     ["p-10c", "Parpaing 10 creux", 350], ["p-10p", "Parpaing 10 plein", 450],
-    ["p-15c", "Parpaing 15 creux", 400], ["p-15p", "Parpaing 15 plein", 500],
+    ["p-12c", "Parpaing 12 creux", 370], ["p-12p", "Parpaing 12 plein", 470], ["p-15c", "Parpaing 15 creux", 400], ["p-15p", "Parpaing 15 plein", 500],
     ["p-20c", "Parpaing 20 creux", 500], ["p-20p", "Parpaing 20 plein", 600],
     ["p-acier", "Acier profilé IPE et tubes PTR (kg)", 900],
     ["p-arm", "Acier d'armature (kg)", 800], ["p-fil", "Fil d'attache (kg)", 1200],
@@ -1018,7 +1255,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   }
   function buildTypes(r) {
     var p = cur(r), f = F(r, p), n = p.u ? 1 : (parseInt($(r + "-nt").value, 10) || 1), old = {}, h = "", t, i, id;
-    var els = $(r + "-types").querySelectorAll("input");
+    var els = $(r + "-types").querySelectorAll("input, select");
     for (i = 0; i < els.length; i++) { old[els[i].id] = els[i].value; }
     if (f.note) { h += '<div class="info">' + esc(f.note) + "</div>"; }
     for (t = 0; t < n; t++) {
@@ -1026,6 +1263,10 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
       for (i = 0; i < f.l.length; i++) {
         id = r + "-t" + t + "f" + i;
         h += inp(r, "t" + t + "f" + i, f.l[i], old[id] !== undefined ? old[id] : f.v[i]);
+      }
+      if (p.t === "m") {
+        h += sel(r, "t" + t + "ep", "Épaisseur du parpaing de ce type de mur", [["10", "10 cm"], ["12", "12 cm"], ["15", "15 cm"], ["20", "20 cm"]], old[r + "-t" + t + "ep"] !== undefined ? old[r + "-t" + t + "ep"] : "15") +
+          sel(r, "t" + t + "ty", "Type de parpaing", [["c", "Creux"], ["p", "Plein"]], old[r + "-t" + t + "ty"] !== undefined ? old[r + "-t" + t + "ty"] : "c");
       }
       h += "</div>";
     }
@@ -1048,8 +1289,6 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
       h += inp(r, "per", f.steel ? "Perte et chutes (%)" : "Perte (%)", 5);
     } else if (p.t === "m") {
       h += ntSel(r) +
-        sel(r, "ep", "Épaisseur du parpaing", [["10", "10 cm"], ["15", "15 cm"], ["20", "20 cm"]], "15") +
-        sel(r, "ty", "Type de parpaing", [["c", "Creux"], ["p", "Plein"]], "c") +
         dosSel(r, "Dosage du mortier de pose", p.dos) + '<div class="info" id="' + r + '-info"></div>' +
         matSel(r, "tc", "Type de ciment", "c", "c325") + matSel(r, "ts", "Type de sable", "s", "sm") + pfBox(r) +
         inp(r, "sa", "Sable par m³ de mortier (m³)", 1) + inp(r, "ea", "Eau par m³ de mortier (litres)", 200) +
@@ -1153,7 +1392,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
         if (p.fr !== undefined) { addCF(r, e, V, cfS, 1 + P / 100); }
       }
     } else if (p.t === "m") {
-      var ep = $(r + "-ep").value, ty = $(r + "-ty").value, q, L, H, O, s;
+      var q, L, H, O, s, ept, tyt, kk, mort = 0, pk = {}, lbl = [], lb1;
       S = 0;
       for (t = 0; t < n; t++) {
         lt = String.fromCharCode(65 + t);
@@ -1161,12 +1400,14 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
         if (!(q > 0) || !(L > 0) || !(H > 0)) { return bad(r, "Mur " + lt + " : entrez le nombre, la longueur et la hauteur (nombres supérieurs à 0)."); }
         s = q * (L * H - O);
         if (!(s > 0)) { return bad(r, "Mur " + lt + " : les portes et fenêtres sont plus grandes que le mur."); }
-        S += s;
-        det.push("Mur " + lt + " : " + fmt(q, 0) + " x " + fmt(L, 2) + " m x " + fmt(H, 2) + " m, ouvertures " + fmt(O, 2) + " m² = " + fmt(s, 2) + " m²");
+        ept = $(r + "-t" + t + "ep").value; tyt = $(r + "-t" + t + "ty").value; kk = ept + tyt;
+        lb1 = ept + " cm " + (tyt === "c" ? "creux" : "plein");
+        if (lbl.indexOf(lb1) < 0) { lbl.push(lb1); }
+        S += s; mort += s * MORT[ept];
+        pk[kk] = (pk[kk] || 0) + Math.ceil(s * 12.5 * (1 + P / 100));
+        det.push("Mur " + lt + " : " + fmt(q, 0) + " x " + fmt(L, 2) + " m x " + fmt(H, 2) + " m, ouvertures " + fmt(O, 2) + " m² = " + fmt(s, 2) + " m², parpaing " + lb1);
       }
-      var mort = S * MORT[ep], pk = {};
-      pk[ep + ty] = Math.ceil(S * 12.5 * (1 + P / 100));
-      e = { nom: p.nom + " " + ep + " cm " + (ty === "c" ? "creux" : "plein") + " (" + fmt(S, 2) + " m², mortier " + dos + ")", det: det,
+      e = { nom: p.nom + " " + lbl.join(" + ") + " (" + fmt(S, 2) + " m², mortier " + dos + ")", det: det,
             kg: mort * dos, sable: mort * rd(r, "sa", 1), gravier: 0, eau: mort * rd(r, "ea", 200), parp: pk };
     } else if (p.t === "g") {
       var gv = [], gs = {}, gok = true, o2, pf2 = 1 + P / 100;
