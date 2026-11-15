@@ -2495,6 +2495,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     "<p class=\"aide\"><b>Carrelage au sol</b> : cochez les pièces</p>" + chk("pq-cs-sa", "Salon", true) + chk("pq-cs-cu", "Cuisine", true) + chk("pq-cs-ch", "Chambres", true) + chk("pq-cs-dc", "Douches", true) + chk("pq-cs-co", "Couloir", true) +
     "<p class=\"aide\"><b>Carrelage sur les murs</b> : cochez les pièces</p>" + chk("pq-cm-dc", "Murs des douches (jusqu'à 2 m)", true) + chk("pq-cm-cu", "Murs de la cuisine (jusqu'à 1,2 m)", false) + chk("pq-cm-sa", "Murs du salon", false) +
     '<button type="button" class="btn bleu" id="pq-go">Voir l\'esquisse du plan</button><div id="pq-esq"></div>' +
+    '<h3>Vue 3D de la maison</h3>' + selh("pq-style", "Style architectural", [["us", "Américain"], ["fr", "Français"], ["it", "Italien"]]) + '<p class="note" id="pq-sd"></p><button type="button" class="btn bleu" id="pq-3d">Voir la maison en 3D</button><canvas id="pq-cv" style="width:100%;height:340px;border-radius:10px;touch-action:none;margin-top:8px"></canvas><div class="grid" style="grid-template-columns:1fr 1fr 1fr"><button type="button" class="btn bleu" id="pq-zp">＋ Zoom</button><button type="button" class="btn bleu" id="pq-zm">－ Zoom</button><button type="button" class="btn bleu" id="pq-ar">⟳ Tourner</button></div><p class="note">Faites glisser le doigt sur l\'image pour tourner autour de la maison. C\'est une vue d\'ambiance, pas un plan d\'architecte.</p>' +
     '<button type="button" class="btn" id="pq-send" disabled>Faire le devis (fondation à toiture)</button><p class="note" id="pq-msg"></p>' +
     '<p class="note">Ceci est une estimation. Le recul et le coefficient d\'emprise exacts dépendent de votre commune : vérifiez-les à la mairie avant de construire. L\'esquisse n\'est pas un plan d\'architecte. Un ingénieur doit valider la structure et la fondation avant les travaux.</p>';
   var main = document.querySelector("main"), sec = document.createElement("section");
@@ -2640,6 +2641,114 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     $("tabs").querySelector('[data-tab="devis"]').click();
     $("pq-msg").textContent = bad.length ? "Non ajouté (à faire à la main dans l'onglet concerné) : " + bad.join(", ") + "." : "Devis rempli. Entrez maintenant vos prix (onglet Mon devis).";
   });
+  // ===== Vue 3D (sans bibliothèque, marche hors ligne) =====
+  var STY = {
+    us: { nom: "Américain", d: "Façade blanche ou beige, volets bleu marine, toit gris à pentes douces, porche à colonnes blanches.", mur: "#f2ece0", mur2: "#d8cfbd", toit: "#4b5058", vol: "#2c4a6e", porte: "#8c2f2a", cadre: "#ffffff", sol: "#9fc47f", chemin: "#c9c3b6", pente: 28, arbre: "#4f8a3f", rail: "#ffffff", hortensia: 0 },
+    fr: { nom: "Français", d: "Façade en pierre crème, toit d'ardoise gris-bleu à quatre pentes raides, volets gris-bleu, balcons en fer forgé.", mur: "#eadfc6", mur2: "#cdbf9d", toit: "#5d6975", vol: "#8fa3b8", porte: "#4a5f78", cadre: "#f7f1e3", sol: "#b9c78c", chemin: "#ddd3b8", pente: 42, arbre: "#6a8f4a", rail: "#2b2b2b" },
+    it: { nom: "Italien", d: "Façade ocre chaud, toit de tuiles terre cuite à faible pente, volets verts, encadrements clairs.", mur: "#dca868", mur2: "#b98445", toit: "#b4553a", vol: "#52704a", porte: "#5a3a22", cadre: "#f1dcb5", sol: "#d2c08c", chemin: "#e9dbb5", pente: 20, arbre: "#2f5a34", rail: "#6b4a2b" }
+  };
+  function hx(c) { return [parseInt(c.substr(1, 2), 16), parseInt(c.substr(3, 2), 16), parseInt(c.substr(5, 2), 16)]; }
+  function shade(c, k) { var a = hx(c); return "rgb(" + Math.min(255, Math.round(a[0] * k)) + "," + Math.min(255, Math.round(a[1] * k)) + "," + Math.min(255, Math.round(a[2] * k)) + ")"; }
+  function sub(a, b) { return [a[0] - b[0], a[1] - b[1], a[2] - b[2]]; }
+  function dot(a, b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
+  function crs(a, b) { return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]; }
+  function nrm(a) { var l = Math.sqrt(dot(a, a)) || 1; return [a[0] / l, a[1] / l, a[2] / l]; }
+  var CAM = { yaw: 0.6, pit: 0.38, k: 1 }, SC = null, AUTO = false, cv = null, cx2 = null;
+  function scene() {
+    var S = STY[$("pq-style").value], W = ST.W, D = ST.D, H = ST.H, N = ST.N, fl = H + 0.25, Ht = N * fl, terr = $("pq-toit").value === "t", pen = parseInt($("pq-pen").value, 10);
+    var Hw = Ht + (terr ? 0.45 : 0), it = [], gr = [], ctr = [0, Ht / 2, 0], o = 0.5;
+    function face(pts, col, ctrR, deco) { var n = nrm(crs(sub(pts[1], pts[0]), sub(pts[2], pts[0]))), c = [0, 0, 0]; pts.forEach(function (p) { c[0] += p[0] / pts.length; c[1] += p[1] / pts.length; c[2] += p[2] / pts.length; }); if (dot(n, sub(c, ctrR || ctr)) < 0) { n = [-n[0], -n[1], -n[2]]; } it.push({ p: pts, c: col, n: n, deco: deco || [] }); return it[it.length - 1]; }
+    function box(x0, x1, y0, y1, z0, z1, col) { var m = [(x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2]; [[[x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1]], [[x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]], [[x0, y0, z0], [x1, y0, z0], [x1, y1, z0], [x0, y1, z0]], [[x0, y0, z0], [x0, y0, z1], [x0, y1, z1], [x0, y1, z0]], [[x1, y0, z0], [x1, y0, z1], [x1, y1, z1], [x1, y1, z0]]].forEach(function (q) { face(q, col, m); }); }
+    function wall(O, u, nn, len) {
+      var d = [], k, l, n = Math.max(1, Math.round(len / 2.8)), sw = len / n, off = [nn[0] * 0.03, 0, nn[2] * 0.03];
+      function R(a, b, y0, y1, col, st) { var p0 = [O[0] + u[0] * a + off[0], y0, O[2] + u[2] * a + off[2]], p1 = [O[0] + u[0] * b + off[0], y0, O[2] + u[2] * b + off[2]]; d.push({ p: [p0, p1, [p1[0], y1, p1[2]], [p0[0], y1, p0[2]]], f: col, s: st }); }
+      R(0, len, 0, 0.4, S.mur2);
+      for (l = 0; l < N; l++) {
+        var y0 = l * fl, wy = Math.min(1.3, H * 0.45), sy = y0 + 0.9;
+        if (l > 0) { R(0, len, y0 - 0.06, y0 + 0.06, S.mur2); }
+        for (k = 0; k < n; k++) {
+          var c = (k + 0.5) * sw;
+          if (l === 0 && nn[2] > 0 && k === Math.floor(n / 2)) { R(c - 0.5, c + 0.5, 0, Math.min(2.1, H - 0.3), S.porte, S.cadre); continue; }
+          if (sw > 1.9) { R(c - 0.9, c - 0.5, sy, sy + wy, S.vol); R(c + 0.5, c + 0.9, sy, sy + wy, S.vol); }
+          R(c - 0.5, c + 0.5, sy, sy + wy, "#a9cbe6", S.cadre);
+        }
+      }
+      return d;
+    }
+    face([[-W / 2, 0, D / 2], [W / 2, 0, D / 2], [W / 2, Hw, D / 2], [-W / 2, Hw, D / 2]], S.mur, ctr, wall([-W / 2, 0, D / 2], [1, 0, 0], [0, 0, 1], W));
+    face([[W / 2, 0, -D / 2], [-W / 2, 0, -D / 2], [-W / 2, Hw, -D / 2], [W / 2, Hw, -D / 2]], S.mur, ctr, wall([W / 2, 0, -D / 2], [-1, 0, 0], [0, 0, -1], W));
+    face([[W / 2, 0, D / 2], [W / 2, 0, -D / 2], [W / 2, Hw, -D / 2], [W / 2, Hw, D / 2]], S.mur, ctr, wall([W / 2, 0, D / 2], [0, 0, -1], [1, 0, 0], D));
+    face([[-W / 2, 0, -D / 2], [-W / 2, 0, D / 2], [-W / 2, Hw, D / 2], [-W / 2, Hw, -D / 2]], S.mur, ctr, wall([-W / 2, 0, -D / 2], [0, 0, 1], [-1, 0, 0], D));
+    // toiture
+    var tn = Math.tan(S.pente * Math.PI / 180), lx = W >= D, Lh = (lx ? W : D) / 2 + o, sh = (lx ? D : W) / 2 + o;
+    function P(u, v, y) { return lx ? [u, y, v] : [v, y, u]; }
+    var rc = [0, Ht - 1.5, 0];
+    if (terr) { face([[-W / 2, Hw - 0.05, D / 2], [W / 2, Hw - 0.05, D / 2], [W / 2, Hw - 0.05, -D / 2], [-W / 2, Hw - 0.05, -D / 2]], "#8a8d91", [0, 0, 0]); }
+    else if (pen === 4) {
+      var rz = Ht + tn * sh, rl = Math.max(0, Lh - sh);
+      face([P(-Lh, -sh, Ht), P(Lh, -sh, Ht), P(rl, 0, rz), P(-rl, 0, rz)], S.toit, rc); face([P(-Lh, sh, Ht), P(Lh, sh, Ht), P(rl, 0, rz), P(-rl, 0, rz)], S.toit, rc);
+      face([P(-Lh, -sh, Ht), P(-Lh, sh, Ht), P(-rl, 0, rz)], S.toit, rc); face([P(Lh, -sh, Ht), P(Lh, sh, Ht), P(rl, 0, rz)], S.toit, rc);
+    } else if (pen === 2) {
+      var rz2 = Ht + tn * sh, Sw = (lx ? D : W) / 2, Lw = (lx ? W : D) / 2;
+      face([P(-Lh, -sh, Ht), P(Lh, -sh, Ht), P(Lh, 0, rz2), P(-Lh, 0, rz2)], S.toit, rc); face([P(-Lh, sh, Ht), P(Lh, sh, Ht), P(Lh, 0, rz2), P(-Lh, 0, rz2)], S.toit, rc);
+      [-Lw, Lw].forEach(function (u) { face([P(u, -Sw, Ht), P(u, Sw, Ht), P(u, Sw, Ht + tn * o), P(u, 0, rz2), P(u, -Sw, Ht + tn * o)], S.mur, rc); });
+    } else {
+      var t1 = Math.tan(12 * Math.PI / 180), z1 = D / 2 + o, z2 = -D / 2 - o;
+      face([[-W / 2 - o, Ht + t1 * o, z1], [W / 2 + o, Ht + t1 * o, z1], [W / 2 + o, Ht + t1 * (D + o), -D / 2], [-W / 2 - o, Ht + t1 * (D + o), -D / 2]], S.toit, rc);
+      [-W / 2, W / 2].forEach(function (x) { face([[x, Ht, D / 2], [x, Ht, -D / 2], [x, Ht + t1 * (D + o), -D / 2], [x, Ht + t1 * o, D / 2]], S.mur, rc); });
+      face([[-W / 2, Ht, -D / 2], [W / 2, Ht, -D / 2], [W / 2, Ht + t1 * (D + o), -D / 2], [-W / 2, Ht + t1 * (D + o), -D / 2]], S.mur, ctr);
+    }
+    // balcons et véranda
+    if ($("pq-ba").checked && N >= 2) { var bl = nb("pq-bl"), bp = nb("pq-bp"); [1, 2].forEach(function (q) { if (q < N) { var y = q * fl; box(-bl / 2, bl / 2, y - 0.15, y, D / 2, D / 2 + bp, "#bfb8aa"); face([[-bl / 2, y, D / 2 + bp], [bl / 2, y, D / 2 + bp], [bl / 2, y + 1, D / 2 + bp], [-bl / 2, y + 1, D / 2 + bp]], S.rail, [0, 0, 0], [{ p: [[-bl / 2, y, D / 2 + bp + 0.02], [bl / 2, y, D / 2 + bp + 0.02], [bl / 2, y + 1, D / 2 + bp + 0.02], [-bl / 2, y + 1, D / 2 + bp + 0.02]], f: null, s: S.rail }]).al = 1; } }); }
+    if ($("pq-ve").checked) { var vl = nb("pq-vl"), vp = nb("pq-vp"), vh = Math.min(2.7, H); [[-vl / 2, D / 2 + vp - 0.2], [vl / 2 - 0.2, D / 2 + vp - 0.2], [-vl / 2, D / 2], [vl / 2 - 0.2, D / 2]].forEach(function (c) { box(c[0], c[0] + 0.2, 0, vh, c[1], c[1] + 0.2, S.cadre); }); box(-vl / 2 - 0.1, vl / 2 + 0.1, vh, vh + 0.18, D / 2, D / 2 + vp + 0.1, S.mur2); }
+    // sol
+    var Lt = Math.min(60, Math.max($("pq-nr").checked ? 0 : nb("pq-L"), W + 8)) / 2, Wt = Math.min(60, Math.max($("pq-nr").checked ? 0 : nb("pq-W"), D + 8)) / 2;
+    gr.push({ p: [[-150, 0, -150], [150, 0, -150], [150, 0, 150], [-150, 0, 150]], c: "#c9c9c0" });
+    gr.push({ p: [[-Lt, 0.01, -Wt], [Lt, 0.01, -Wt], [Lt, 0.01, Wt], [-Lt, 0.01, Wt]], c: S.sol });
+    var n0 = Math.max(1, Math.round(W / 2.8)), dx = -W / 2 + (Math.floor(n0 / 2) + 0.5) * (W / n0);
+    gr.push({ p: [[dx - 0.6, 0.02, D / 2], [dx + 0.6, 0.02, D / 2], [dx + 0.6, 0.02, Wt], [dx - 0.6, 0.02, Wt]], c: S.chemin });
+    var tr = [], sx = $("pq-style").value;
+    if (sx === "us") { tr.push({ x: -W / 2 - 3, z: D / 2 + 2.5, h: 3.4, r: 1.7, t: "r" }, { x: W / 2 + 3.5, z: -1, h: 4, r: 2, t: "r" }); }
+    if (sx === "fr") { tr.push({ x: dx - 2, z: D / 2 + 1.5, h: 1.1, r: 0.55, t: "r" }, { x: dx + 2, z: D / 2 + 1.5, h: 1.1, r: 0.55, t: "r" }, { x: W / 2 + 3, z: 0, h: 3.6, r: 1.6, t: "r" }); }
+    if (sx === "it") { tr.push({ x: -W / 2 - 1.5, z: D / 2 + 1.5, h: 4.2, r: 0.6, t: "c" }, { x: W / 2 + 1.5, z: D / 2 + 1.5, h: 4.2, r: 0.6, t: "c" }, { x: W / 2 + 3.5, z: -D / 2, h: 3.4, r: 1.5, t: "r" }); }
+    return { it: it, gr: gr, tr: tr, S: S, T: [0, Ht / 2, 0], R: Math.max(W, D, Ht) };
+  }
+  function draw() {
+    if (!SC || !cv) { return; }
+    var w = cv.width, h = cv.height, S = SC.S, F = w * 1.05, dist = (SC.R * 2.2 + 6) * CAM.k, cp = Math.cos(CAM.pit), cd = [Math.sin(CAM.yaw) * cp, Math.sin(CAM.pit), Math.cos(CAM.yaw) * cp];
+    var cam = [SC.T[0] + cd[0] * dist, SC.T[1] + cd[1] * dist, SC.T[2] + cd[2] * dist], f = [-cd[0], -cd[1], -cd[2]], r = nrm(crs(f, [0, 1, 0])), u = crs(r, f);
+    function pj(p) { var q = sub(p, cam), z = dot(q, f); return [w / 2 + F * dot(q, r) / z, h * 0.55 - F * dot(q, u) / z, z]; }
+    var g = cx2.createLinearGradient(0, 0, 0, h); g.addColorStop(0, "#bfe0f7"); g.addColorStop(1, "#f4faff"); cx2.fillStyle = g; cx2.fillRect(0, 0, w, h);
+    function poly(pts, fill, stroke, lw) { var a = pts.map(pj); if (a.some(function (q) { return q[2] < 0.5; })) { return; } cx2.beginPath(); a.forEach(function (q, i) { if (i) { cx2.lineTo(q[0], q[1]); } else { cx2.moveTo(q[0], q[1]); } }); cx2.closePath(); if (fill) { cx2.fillStyle = fill; cx2.fill(); } if (stroke) { cx2.strokeStyle = stroke; cx2.lineWidth = lw || 1; cx2.stroke(); } }
+    SC.gr.forEach(function (q) { poly(q.p, q.c); });
+    var L = nrm([-0.4, 0.8, 0.5]), items = [];
+    SC.it.forEach(function (q) { var c = [0, 0, 0]; q.p.forEach(function (p) { c[0] += p[0] / q.p.length; c[1] += p[1] / q.p.length; c[2] += p[2] / q.p.length; }); if (dot(q.n, sub(cam, c)) <= 0) { return; } items.push({ z: pj(c)[2], q: q, k: 0.55 + 0.45 * Math.max(0, dot(q.n, L)) }); });
+    SC.tr.forEach(function (t) { items.push({ z: pj([t.x, t.h / 2, t.z])[2], t: t }); });
+    items.sort(function (a, b) { return b.z - a.z; });
+    items.forEach(function (e) {
+      if (e.q) { if (e.q.al) { cx2.globalAlpha = 0.22; } poly(e.q.p, shade(e.q.c, e.k), "rgba(0,0,0,0.25)", 1); cx2.globalAlpha = 1; e.q.deco.forEach(function (d) { poly(d.p, d.f ? shade(d.f, e.k) : null, d.s ? shade(d.s, e.k) : "rgba(0,0,0,0.35)", 1.2); }); return; }
+      var t = e.t, b = pj([t.x, 0, t.z]), top = pj([t.x, t.h, t.z]), pr = F * t.r / top[2];
+      cx2.strokeStyle = "#6b4a2b"; cx2.lineWidth = Math.max(2, pr * 0.2); cx2.beginPath(); cx2.moveTo(b[0], b[1]); cx2.lineTo(top[0], top[1]); cx2.stroke();
+      cx2.fillStyle = shade(S.arbre, 0.9); cx2.beginPath(); cx2.ellipse(top[0], top[1] - pr * (t.t === "c" ? 0.2 : 0.1), t.t === "c" ? pr : pr, t.t === "c" ? pr * 2.4 : pr * 0.9, 0, 0, 7); cx2.fill();
+    });
+  }
+  function vue3d() {
+    if (!ST) { esquisse(); }
+    if (!ST) { return; }
+    cv = $("pq-cv"); var wc = cv.parentNode.clientWidth || 340, dp = window.devicePixelRatio || 1;
+    cv.style.width = "100%"; cv.style.height = "340px"; cv.width = Math.round(wc * dp); cv.height = Math.round(340 * dp); cx2 = cv.getContext("2d");
+    SC = scene(); $("pq-sd").textContent = STY[$("pq-style").value].d; draw();
+  }
+  function boucle() { if (AUTO) { CAM.yaw += 0.01; draw(); window.requestAnimationFrame(boucle); } }
+  var dr = null;
+  $("pq-3d").addEventListener("click", vue3d);
+  $("pq-style").addEventListener("change", function () { if (SC) { vue3d(); } else { $("pq-sd").textContent = STY[$("pq-style").value].d; } });
+  $("pq-cv").addEventListener("pointerdown", function (e) { dr = [e.clientX, e.clientY]; });
+  window.addEventListener("pointerup", function () { dr = null; });
+  window.addEventListener("pointermove", function (e) { if (!dr || !SC) { return; } CAM.yaw -= (e.clientX - dr[0]) * 0.01; CAM.pit = Math.max(0.05, Math.min(1.25, CAM.pit + (e.clientY - dr[1]) * 0.006)); dr = [e.clientX, e.clientY]; draw(); });
+  $("pq-zp").addEventListener("click", function () { CAM.k = Math.max(0.4, CAM.k * 0.85); draw(); });
+  $("pq-zm").addEventListener("click", function () { CAM.k = Math.min(2.5, CAM.k * 1.18); draw(); });
+  $("pq-ar").addEventListener("click", function () { AUTO = !AUTO; $("pq-ar").textContent = AUTO ? "⏸ Arrêter" : "⟳ Tourner"; if (AUTO) { boucle(); } });
   function maj() {
     var n1 = parseInt($("pq-niv").value, 10) === 0, terr = $("pq-toit").value === "t";
     function d(id, off) { var e = $(id), w = e.type === "checkbox" ? e.closest("label") : e; e.disabled = off; w.style.opacity = off ? "0.4" : "1"; if (e.tagName === "SELECT" && e.previousElementSibling) { e.previousElementSibling.style.opacity = off ? "0.4" : "1"; } if (e.type !== "checkbox" && e.tagName === "INPUT" && e.previousElementSibling) { e.previousElementSibling.style.opacity = off ? "0.4" : "1"; } }
