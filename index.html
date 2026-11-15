@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧱</text></svg>">
 <meta name="theme-color" content="#0f4c9c">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="BatiCalc - Devis estimatif du bâtiment">
 <meta property="og:description" content="Calculez en quelques secondes les matériaux de vos travaux : parpaings, ciment, sable, gravier. Gratuit, sur téléphone.">
@@ -216,6 +218,10 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
  <button type="button" class="btn bleu noprint" id="dv-print">Imprimer ou enregistrer en PDF</button>
  <button type="button" class="btn bleu noprint problk" id="dv-csv">Exporter vers Excel (fichier CSV)</button>
  <button type="button" class="btn bleu noprint problk" id="dv-wa">Envoyer la liste d'achat par WhatsApp</button>
+ <button type="button" class="btn bleu noprint" id="sv-save">💾 Sauvegarder mes devis</button>
+ <button type="button" class="btn bleu noprint" id="sv-load">📂 Restaurer une sauvegarde</button>
+ <input type="file" id="sv-file" accept=".json,application/json" style="display:none">
+ <p class="note noprint" id="sv-msg">La sauvegarde est un petit fichier à garder dans votre téléphone (ou à vous envoyer sur WhatsApp).</p>
  <button type="button" class="btn rouge noprint" id="dv-clear">Vider le devis</button>
  <p class="note">Les montants sont calculés avec les quantités exactes ; la liste d'achat les arrondit au sac. Estimation indicative. Les quantités réelles varient selon les matériaux et les méthodes de travail.</p>
 </section>
@@ -924,7 +930,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
       '<div class="info">Par défaut, aucun coffrage et aucun acier ne sont comptés. Ils ne s\'ajoutent au devis que si vous les choisissez ici. Pour un calcul précis, utilisez plutôt les onglets Acier et Coffrage, sans doubler le poste.</div>';
   }
   function addCF(r, e, V, S, pf) {
-    var mt = $(r + "-cfi") ? $(r + "-cfi").value : "0", fr = $(r + "-fer") ? n0(r + "-fer") : 0, re = n0(r + "-cfr") || 3, kg;
+    var mt = $(r + "-cfi") ? $(r + "-cfi").value : "0", fr = $(r + "-fer") ? n0(r + "-fer") : 0, re = ($(r + "-cfr") ? n0(r + "-cfr") : 0) || 3, kg;
     e.lines = e.lines || []; e.mat = e.mat || [];
     var add = function (a) { var ln = LN(a[0], a[1], a[2], a[3]); e.lines.push(ln); e.mat.push([a[0], ln[6], a[1]]); };
     if (mt !== "0" && S > 0) { cfl(S, re, pf, mt, 1).forEach(add); e.det.push("Coffrage de cet élément : " + fmt(S, 2) + " m² (réutilisé " + fmt(re, 0) + " fois)"); }
@@ -1281,16 +1287,16 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
       h += p.u ? '<div class="info">Élément unique : une seule section pour tout l\'ouvrage.</div><div id="' + r + '-types"></div>' : ntSel(r);
       if (!f.steel) {
         h += dosSel(r, "Dosage du béton", p.dos) + '<div class="info" id="' + r + '-info"></div>' +
-          matSel(r, "tc", "Type de ciment", "c", "c325") + matSel(r, "ts", "Type de sable", "s", "sg") + pfBox(r) +
+          matSel(r, "tc", "Type de ciment", "c", "c425") + matSel(r, "ts", "Type de sable", "s", "sg") + pfBox(r) +
           matSel(r, "tg", "Type de gravier", "g", r === "fond" ? "g1525" : "g515") +
           inp(r, "sa", "Sable par m³ de béton (m³)", 0.4) + inp(r, "gr", "Gravier par m³ de béton (m³)", 0.8) +
-          inp(r, "ea", "Eau par m³ de béton (litres)", 175) + (p.cyc ? inp(r, "mo", "Part de moellons dans le volume (%)", 40) : "") + (p.fr !== undefined ? cfBlock(r, p) : "");
+          inp(r, "ea", "Eau par m³ de béton (litres)", 175) + (p.cyc ? inp(r, "mo", "Part de moellons dans le volume (%)", 40) : "") + (p.fr !== undefined ? cfBlock(r, p.pot ? { cf: f.cf, fr: p.fr } : p) : "");
       }
       h += inp(r, "per", f.steel ? "Perte et chutes (%)" : "Perte (%)", 5);
     } else if (p.t === "m") {
       h += ntSel(r) +
         dosSel(r, "Dosage du mortier de pose", p.dos) + '<div class="info" id="' + r + '-info"></div>' +
-        matSel(r, "tc", "Type de ciment", "c", "c325") + matSel(r, "ts", "Type de sable", "s", "sm") + pfBox(r) +
+        matSel(r, "tc", "Type de ciment", "c", "c425") + matSel(r, "ts", "Type de sable", "s", "sm") + pfBox(r) +
         inp(r, "sa", "Sable par m³ de mortier (m³)", 1) + inp(r, "ea", "Eau par m³ de mortier (litres)", 200) +
         inp(r, "per", "Casse et perte (%)", 5);
     } else if (p.t === "g") {
@@ -1299,7 +1305,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
       p.f.forEach(function (x, i) { h += inp(r, "g" + i, x[0], x[1]); });
       if (p.beton) {
         h += dosSel(r, "Dosage du béton", p.beton) + '<div class="info" id="' + r + '-info"></div>' +
-          matSel(r, "tc", "Type de ciment", "c", "c325") + matSel(r, "ts", "Type de sable", "s", "sg") + matSel(r, "tg", "Type de gravier", "g", "g515") +
+          matSel(r, "tc", "Type de ciment", "c", "c425") + matSel(r, "ts", "Type de sable", "s", "sg") + matSel(r, "tg", "Type de gravier", "g", "g515") +
           inp(r, "sa", "Sable par m³ de béton (m³)", 0.4) + inp(r, "gr", "Gravier par m³ de béton (m³)", 0.8) + inp(r, "ea", "Eau par m³ de béton (litres)", 175) + (p.fr !== undefined ? cfBlock(r, p) : "");
       }
       h += inp(r, "per", p.pl || "Perte (%)", p.per);
@@ -1674,8 +1680,12 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     if (d !== null && d !== undefined) { entries.splice(parseInt(d, 10), 1); save(); renderDevis(); }
   });
   $("dv-print").addEventListener("click", function () { renderDevis(); window.print(); });
+  var vcT = null;
   $("dv-clear").addEventListener("click", function () {
-    if (window.confirm("Vider tout le devis ?")) { entries = []; save(); renderDevis(); }
+    var bt = $("dv-clear");
+    if (vcT) { window.clearTimeout(vcT); vcT = null; bt.textContent = "Vider le devis"; entries = []; save(); renderDevis(); return; }
+    bt.textContent = "Appuyez encore pour vider tout le devis";
+    vcT = window.setTimeout(function () { vcT = null; bt.textContent = "Vider le devis"; }, 4000);
   });
   var nn = document.querySelectorAll(".lg-nom"), mm = document.querySelectorAll(".lg-mail"), q;
   for (q = 0; q < nn.length; q++) { nn[q].textContent = EDITEUR; }
@@ -2397,6 +2407,243 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     msg("lic-msg", "Paiement reçu. Votre clé arrive par e-mail : collez-la ci-dessus.", true);
     try { window.history.replaceState(null, "", window.location.pathname + "#pro"); } catch (er) {}
   }
+})();
+</script>
+<script>
+(function () {
+  var CLES = ["baticalc_v2", "baticalc_prix_v1", "baticalc_pro_v1"];
+  function m(t) { var e = document.getElementById("sv-msg"); if (e) { e.textContent = t; } }
+  document.getElementById("sv-save").addEventListener("click", function () {
+    var o = {};
+    try { CLES.forEach(function (k) { var v = localStorage.getItem(k); if (v) { o[k] = v; } }); } catch (er) { m("Impossible de lire les devis."); return; }
+    var a = document.createElement("a"), d = new Date();
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(o)], { type: "application/json" }));
+    a.download = "sauvegarde-baticalc-" + d.toISOString().slice(0, 10) + ".json";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    m("Sauvegarde créée. Gardez le fichier en lieu sûr.");
+  });
+  document.getElementById("sv-load").addEventListener("click", function () { document.getElementById("sv-file").click(); });
+  document.getElementById("sv-file").addEventListener("change", function (ev) {
+    var f = ev.target.files[0]; if (!f) { return; }
+    var r = new FileReader();
+    r.onload = function () {
+      try {
+        var o = JSON.parse(r.result), n = 0;
+        CLES.forEach(function (k) { if (typeof o[k] === "string") { localStorage.setItem(k, o[k]); n++; } });
+        if (!n) { m("Ce fichier n'est pas une sauvegarde BatiCalc."); return; }
+        m("Sauvegarde chargée, rechargement..."); window.setTimeout(function () { window.location.reload(); }, 600);
+      } catch (er) { m("Fichier illisible."); }
+    };
+    r.readAsText(f);
+  });
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+  }
+})();
+</script>
+<script>
+(function () {
+  var MK = "baticalc_mode_v1";
+  function $(i) { return document.getElementById(i); }
+  function nb(i) { var v = parseFloat(String($(i).value).replace(",", ".")); return isNaN(v) ? 0 : v; }
+  function r2(x) { return Math.round(x * 100) / 100; }
+  function fx(x) { return String(r2(x)).replace(".", ","); }
+  function fire(el) { el.dispatchEvent(new Event("change", { bubbles: true })); }
+  function inp(id, lab, v) { return '<div><label for="' + id + '">' + lab + '</label><input id="' + id + '" type="text" inputmode="decimal" value="' + v + '"></div>'; }
+  function chk(id, lab, on) { return '<label style="font-weight:normal"><input type="checkbox" id="' + id + '" style="width:auto"' + (on ? " checked" : "") + "> " + lab + "</label>"; }
+  function ligne(k, nom, n, L, l) { return "<h3>" + nom + '</h3><div class="grid">' + inp("pq-" + k + "n", "Nombre", n) + inp("pq-" + k + "s", "Surface (m²)", fx(L * l)) + inp("pq-" + k + "L", "Longueur (m)", L) + inp("pq-" + k + "l", "Largeur (m)", l) + "</div>"; }
+  function selh(id, lab, o) { var h = '<label for="' + id + '">' + lab + '</label><select id="' + id + '">'; o.forEach(function (x) { h += '<option value="' + x[0] + '">' + x[1] + "</option>"; }); return h + "</select>"; }
+
+  var niv = []; for (var q = 0; q <= 6; q++) { niv.push([q, q === 0 ? "Plain-pied (un seul niveau, sans étage)" : "Rez-de-chaussée + étages : R+" + q]); }
+  var html = '<h2>🏡 Mon projet (particulier)</h2><p class="aide">Répondez étape par étape. BatiCalc propose des dimensions simples, que vous pouvez changer.</p>' +
+    '<h3>1. Mon terrain</h3><div class="grid">' + inp("pq-L", "Longueur (m)", 25) + inp("pq-W", "Largeur (m)", 20) + "</div>" +
+    chk("pq-nr", "Mon terrain n'est pas rectangulaire", false) +
+    '<div id="pq-nrb" style="display:none" class="grid">' + inp("pq-S", "Superficie (m²)", 500) + inp("pq-P", "Périmètre (m)", 90) + "</div>" +
+    '<h3>Recul (distance libre autour de la maison)</h3><div class="grid">' + inp("pq-r1", "Côté rue (m)", 1) + inp("pq-r2", "Côté fond (m)", 1) + inp("pq-r3", "Côté gauche (m)", 1) + inp("pq-r4", "Côté droit (m)", 1) + "</div>" +
+    inp("pq-emp", "Emprise au sol maximale (0,6 = 60 % du terrain)", "0,6") + '<div class="res show" id="pq-terr"></div>' +
+    "<h3>2. Mes pièces</h3><p class=\"aide\">Changez la longueur et la largeur, la surface se calcule. Ou changez la surface, la largeur s'adapte.</p>" +
+    ligne("ch", "Chambres", 2, 3.5, 3.5) + ligne("sa", "Salon", 1, 4, 5) + ligne("cu", "Cuisine", 1, 3, 3.5) + ligne("dc", "Douches : nombre TOTAL (celles des chambres comprises)", 1, 1.5, 2.2) +
+    selh("pq-di", "Douche dans les chambres ?", [[0, "Non, une douche commune seulement"], [1, "Oui, une douche dans chaque chambre (comptée dans le total, 3 m² en plus)"]]) +
+    "<h3>3. Construction</h3>" + selh("pq-niv", "Type de construction (même plan à chaque niveau)", niv) +
+    selh("pq-fd", "Fondation", [[1, "Semelles filantes sous les murs (parpaing de 20)"], [0, "Je la choisirai moi-même dans l'onglet Fondation"]]) +
+    inp("pq-ht", "Hauteur sous plafond (m)", 3) +
+    "<h3>4. Toiture</h3>" + selh("pq-toit", "Type de toiture", [["c", "Charpente avec toiture (tôle ou tuile)"], ["t", "Toiture-terrasse (toujours avec acrotère)"]]) +
+    selh("pq-cov", "Matériau de couverture (si charpente)", [["tole", "Tôle"], ["tuile", "Tuile"]]) +
+    selh("pq-pen", "Nombre de pentes (si charpente)", [[1, "1 pente"], [2, "2 pentes"], [4, "4 pentes"]]) +
+    "<h3>5. Dalle, balcons, véranda</h3>" + selh("pq-dal", "Type de dalle des étages", [["p", "Dalle pleine"], ["c", "Dalle à corps creux (poutrelles + hourdis)"]]) + chk("pq-dh", "Dalle aussi sur le dernier niveau (si plusieurs niveaux)", true) + chk("pq-ba", "Balcons aux niveaux 1 et 2 (avec consoles)", false) + '<div class="grid">' + inp("pq-bl", "Balcon : longueur (m)", 3) + inp("pq-bp", "Balcon : profondeur (m)", 1.2) + "</div>" + chk("pq-ve", "Véranda au rez-de-chaussée", false) + '<div class="grid">' + inp("pq-vl", "Véranda : longueur (m)", 4) + inp("pq-vp", "Véranda : largeur (m)", 2.5) + "</div>" +
+    "<h3>6. Portes et fenêtres (par niveau)</h3><p class=\"aide\">Ces nombres servent seulement à calculer les linteaux et à retirer les ouvertures des murs. Les portes et fenêtres elles-mêmes ne sont pas dans le devis.</p><div class=\"grid\">" + inp("pq-po", "Portes", 5) + inp("pq-fe", "Fenêtres", 6) + "</div>" +
+    "<h3>7. Finitions</h3>" + chk("pq-pe", "Peinture", true) + chk("pq-fp", "Faux plafond", false) +
+    "<p class=\"aide\"><b>Carrelage au sol</b> : cochez les pièces</p>" + chk("pq-cs-sa", "Salon", true) + chk("pq-cs-cu", "Cuisine", true) + chk("pq-cs-ch", "Chambres", true) + chk("pq-cs-dc", "Douches", true) + chk("pq-cs-co", "Couloir", true) +
+    "<p class=\"aide\"><b>Carrelage sur les murs</b> : cochez les pièces</p>" + chk("pq-cm-dc", "Murs des douches (jusqu'à 2 m)", true) + chk("pq-cm-cu", "Murs de la cuisine (jusqu'à 1,2 m)", false) + chk("pq-cm-sa", "Murs du salon", false) +
+    '<button type="button" class="btn bleu" id="pq-go">Voir l\'esquisse du plan</button><div id="pq-esq"></div>' +
+    '<button type="button" class="btn" id="pq-send" disabled>Faire le devis (fondation à toiture)</button><p class="note" id="pq-msg"></p>' +
+    '<p class="note">Ceci est une estimation. Le recul et le coefficient d\'emprise exacts dépendent de votre commune : vérifiez-les à la mairie avant de construire. L\'esquisse n\'est pas un plan d\'architecte. Un ingénieur doit valider la structure et la fondation avant les travaux.</p>';
+  var main = document.querySelector("main"), sec = document.createElement("section");
+  sec.className = "panel"; sec.id = "esq"; sec.innerHTML = html; main.insertBefore(sec, main.firstChild);
+  var nav = $("tabs"), tb = document.createElement("button");
+  tb.type = "button"; tb.className = "hl"; tb.setAttribute("data-tab", "esq"); tb.textContent = "🏡 Mon projet"; nav.insertBefore(tb, nav.firstChild);
+  function ouvrir() {
+    var ps = document.querySelectorAll(".panel"), bs = nav.querySelectorAll("button"), i;
+    for (i = 0; i < ps.length; i++) { ps[i].classList.remove("on"); }
+    for (i = 0; i < bs.length; i++) { bs[i].classList.toggle("on", bs[i] === tb); }
+    sec.classList.add("on"); window.scrollTo(0, 0);
+  }
+  tb.addEventListener("click", ouvrir);
+  ["ch", "sa", "cu", "dc"].forEach(function (k) {
+    function surf() { $("pq-" + k + "s").value = fx(nb("pq-" + k + "L") * nb("pq-" + k + "l")); }
+    $("pq-" + k + "L").addEventListener("input", surf); $("pq-" + k + "l").addEventListener("input", surf);
+    $("pq-" + k + "s").addEventListener("input", function () { var L = nb("pq-" + k + "L"); if (L > 0) { $("pq-" + k + "l").value = fx(nb("pq-" + k + "s") / L); } });
+  });
+
+  var ST = null;
+  function terrain() {
+    var nr = $("pq-nr").checked, rs = [nb("pq-r1"), nb("pq-r2"), nb("pq-r3"), nb("pq-r4")], S, P, Wb, Lb, Sb, rm = (rs[0] + rs[1] + rs[2] + rs[3]) / 4;
+    $("pq-nrb").style.display = nr ? "grid" : "none";
+    if (nr) { S = nb("pq-S"); P = nb("pq-P"); Sb = Math.max(0, S - P * rm); Lb = Math.sqrt(Sb * 1.25); Wb = Lb ? Sb / Lb : 0; }
+    else { var L = nb("pq-L"), W = nb("pq-W"); S = L * W; P = 2 * (L + W); Lb = Math.max(0, L - rs[2] - rs[3]); Wb = Math.max(0, W - rs[0] - rs[1]); Sb = Lb * Wb; }
+    var em = S * nb("pq-emp"), Sc = Math.min(Sb, em);
+    $("pq-terr").innerHTML = "<table><tr><td>Superficie du terrain</td><td>" + fx(S) + " m²</td></tr><tr><td>Périmètre</td><td>" + fx(P) + " m</td></tr><tr><td>Après les reculs</td><td>" + fx(Sb) + " m²" + (nr ? " (estimé)" : " (" + fx(Lb) + " × " + fx(Wb) + " m)") + "</td></tr><tr><td>Emprise au sol maximale</td><td>" + fx(em) + " m²</td></tr><tr><td>Surface constructible</td><td>" + fx(Sc) + " m²</td></tr></table><p class='note'>Par défaut, le recul est de 1 m partout : vérifiez le recul exact à la mairie.</p>";
+    return { Sb: Sb, Sc: Sc, Lb: Math.max(Lb, Wb), Wb: Math.min(Lb, Wb) };
+  }
+  function pcs(k, nom) { var n = Math.round(nb("pq-" + k + "n")), a = nb("pq-" + k + "s"), o = [], i; for (i = 1; i <= n; i++) { o.push({ k: k, nom: nom + (n > 1 ? " " + i : ""), a: a }); } return o; }
+  function esquisse() {
+    var T = terrain(), jour = pcs("sa", "Salon").concat(pcs("cu", "Cuisine")), nuit = pcs("ch", "Chambre"), di = $("pq-di").value === "1", msg = "", At = 0, Aj = 0, An = 0, i, nCh = nuit.length, tot = Math.round(nb("pq-dcn")), ext;
+    if (di && tot < nCh) { tot = nCh; $("pq-dcn").value = String(tot); }
+    ext = di ? tot - nCh : tot;
+    if (di) { nuit.forEach(function (p) { p.a += 3; p.di = true; }); }
+    for (i = 1; i <= ext; i++) { nuit.push({ k: "dc", nom: "Douche" + (ext > 1 ? " " + i : ""), a: nb("pq-dcs") }); }
+    jour.forEach(function (p) { Aj += p.a; }); nuit.forEach(function (p) { An += p.a; }); At = Aj + An;
+    if (!(At > 0) || !(T.Sc > 0) || !nuit.length) { $("pq-esq").innerHTML = '<div class="res err show">Entrez un terrain et des pièces (au moins une chambre ou une douche).</div>'; return; }
+    var c = 1.1, F0 = At * 1.12, W = Math.min(T.Lb, Math.max(Math.sqrt(F0 * 1.3), Math.min(T.Lb, 2.7 * nuit.length))), D = F0 / W;
+    if (T.Wb > 0 && D > T.Wb) { D = T.Wb; W = Math.min(T.Lb, F0 / D); }
+    if (W * D > T.Sc) { var f = Math.sqrt(T.Sc / (W * D)); W *= f; D *= f; msg = "⚠️ Vos pièces dépassent la surface constructible (" + fx(T.Sc) + " m²) : elles sont réduites sur l'esquisse. Réduisez les pièces."; }
+    var kk = (D - c) * W / At;
+    if (!(kk > 0.3)) { $("pq-esq").innerHTML = '<div class="res err show">Le terrain constructible est trop petit pour ces pièces.</div>'; return; }
+    var h1 = Aj ? kk * Aj / W : 0, h3 = kk * An / W, R = [], x = 0, P0 = 0;
+    jour.forEach(function (p) { var w = W * p.a / Aj; R.push({ n: p.nom, x: x, y: 0, w: w, h: h1, k: p.k }); x += w; });
+    R.push({ n: "Couloir", x: 0, y: h1, w: W, h: c, k: "co", g: 1 });
+    var nu = nuit.filter(function (p) { return p.k === "ch"; }).concat(nuit.filter(function (p) { return p.k === "dc"; }));
+    x = 0; nu.forEach(function (p) {
+      var w = W * p.a / An, r = { n: p.nom, x: x, y: h1 + c, w: w, h: h3, k: p.k }; R.push(r);
+      if (p.di) { var hd = h3 * 0.55, wd = Math.min(w * 0.45, 3 / hd); R.push({ n: "Douche", x: x + w - wd, y: h1 + c + h3 - hd, w: wd, h: hd, k: "dc", in: 1 }); }
+      x += w;
+    });
+    var Pe = 2 * (W + D), Pr = 0; R.forEach(function (r) { Pr += 2 * (r.w + r.h); });
+    var Pi = Math.max(0, (Pr - Pe) / 2), k2 = 300 / W, ca = {}, Ld = 0; R.forEach(function (r) { if (r.k === "dc") { Ld += r.w + r.h; } }); Ld = Math.min(Ld, Pi);
+    var svg = '<svg viewBox="0 0 310 ' + Math.ceil(D * k2 + 10) + '" style="width:100%;background:#fff;border:1px solid #c9d3dd;border-radius:8px"><g transform="translate(5,5)">';
+    R.forEach(function (r) {
+      var sm = r.w * k2 < 55 || r.h * k2 < 28, a = r.w * r.h;
+      svg += '<rect x="' + r.x * k2 + '" y="' + r.y * k2 + '" width="' + r.w * k2 + '" height="' + r.h * k2 + '" fill="' + (r.g ? "#eee" : r.in ? "#cfe3ff" : "#eaf2ff") + '" stroke="#0f4c9c" stroke-width="' + (r.in ? 1 : 2) + '"/><text x="' + (r.x + r.w / 2) * k2 + '" y="' + (r.y + r.h / 2) * k2 + '" text-anchor="middle" font-size="' + (sm ? 8 : 11) + '" fill="#0a2f6b">' + r.n + '<tspan x="' + (r.x + r.w / 2) * k2 + '" dy="12">' + fx(a) + " m²</tspan></text>";
+      if (!r.in) { ca[r.k] = (ca[r.k] || 0) + a; }
+    });
+    svg += "</g></svg>";
+    var N = parseInt($("pq-niv").value, 10) + 1, H = nb("pq-ht") || 3;
+    ST = { Pe: Pe, Pi: Pi, Ld: Ld, nd: tot, di: di ? nCh : 0, W: W, D: D, H: H, N: N, np: Math.max(4, Math.ceil(Pe / 3.5) + Math.ceil(Pi / 6)) };
+    var rec = "", sol = 0, mur = 0;
+    ["sa", "cu", "ch", "dc", "co"].forEach(function (k) { if ($("pq-cs-" + k).checked && ca[k]) { sol += ca[k]; } });
+    R.forEach(function (r) { var p = 2 * (r.w + r.h); if (r.k === "dc" && $("pq-cm-dc").checked) { mur += p * 2; } if (r.k === "cu" && $("pq-cm-cu").checked) { mur += p * 1.2; } if (r.k === "sa" && $("pq-cm-sa").checked) { mur += p * H; } });
+    rec = "<p class='note'>Surface à carreler au sol : environ " + fx(sol) + " m² par niveau. Carrelage mural : environ " + fx(mur) + " m² par niveau (portes non déduites).</p>";
+    $("pq-esq").innerHTML = "<h3>Esquisse (vue du dessus, 1 niveau)</h3>" + svg + "<p class='note'>Douches : " + tot + " au total, dont " + (di ? nCh : 0) + " dans les chambres et " + ext + " hors chambre. Salon et cuisine côté rue, couloir au milieu, chambres et douches au fond. Maison d'environ " + fx(W) + " × " + fx(D) + " m = " + fx(W * D) + " m² par niveau. Murs extérieurs : " + fx(Pe) + " m ; intérieurs : environ " + fx(Pi) + " m ; poteaux estimés (un tous les 3,5 m sur les murs extérieurs, un tous les 6 m à l'intérieur) : " + ST.np + " par niveau, soit <b id='pq-npt'>" + ST.np * N + "</b> au total.</p>" + inp("pq-np", "Nombre de poteaux par niveau (estimation, modifiable)", ST.np) + rec + (msg ? '<div class="res err show">' + msg + "</div>" : "") + (nuit.length > 4 ? '<div class="res err show">Beaucoup de pièces : l\'esquisse est simplifiée. Faites-la valider par un professionnel.</div>' : "");
+    $("pq-np").addEventListener("input", function () { $("pq-npt").textContent = String(Math.round(nb("pq-np")) * N); });
+    $("pq-send").disabled = false;
+  }
+  function choisir(r, txt) { var s = $("sel-" + r), i; for (i = 0; i < s.options.length; i++) { if (s.options[i].text.toLowerCase().indexOf(txt) >= 0) { s.selectedIndex = i; fire(s); return true; } } return false; }
+  function typeDe(r, txt) { var s = $("typ-" + r), i; for (i = 0; i < s.options.length; i++) { s.selectedIndex = i; fire(s); if (choisir(r, txt)) { return true; } } return false; }
+  function setSel(r, re) { var ss = $("form-" + r).querySelectorAll("select"), i, j; for (i = 0; i < ss.length; i++) { for (j = 0; j < ss[i].options.length; j++) { if (re.test(ss[i].options[j].text)) { ss[i].selectedIndex = j; fire(ss[i]); return; } } } }
+  // ajoute un poste : r = onglet, txt = élément, lignes = [[v0,v1,v2,v3],...] (null = ne pas toucher), o = options
+  function poste(r, txt, lignes, o) {
+    o = o || {};
+    if (!choisir(r, txt) && !typeDe(r, txt)) { return false; }
+    if ($(r + "-nt")) { $(r + "-nt").value = String(lignes.length); fire($(r + "-nt")); }
+    lignes.forEach(function (v, t) {
+      v.forEach(function (x, i) {
+        var e = $(r + (o.g ? "-g" + i : "-t" + t + "f" + i)); if (e && x !== null) { e.value = fx(x); }
+      });
+      if (o.ep && $(r + "-t" + t + "ep")) { $(r + "-t" + t + "ep").value = o.ep[t]; }
+    });
+    if (o.cf && $(r + "-cfi")) { $(r + "-cfi").value = "p-cofb"; }
+    if (o.fer && $(r + "-fer")) { $(r + "-fer").value = String(o.fer); }
+    if (o.re) { setSel(r, o.re); }
+    $("go-" + r).click();
+    if ($("add-" + r).disabled) { return false; }
+    $("add-" + r).click(); return true;
+  }
+  $("pq-go").addEventListener("click", esquisse);
+  ["pq-L", "pq-W", "pq-S", "pq-P", "pq-r1", "pq-r2", "pq-r3", "pq-r4", "pq-emp", "pq-nr"].forEach(function (i) { $(i).addEventListener("input", terrain); $(i).addEventListener("change", terrain); });
+  $("pq-send").addEventListener("click", function () {
+    if (!ST) { return; }
+    if ($("pq-np")) { ST.np = Math.max(1, Math.round(nb("pq-np")) || ST.np); }
+    var bad = [], nv = $("niv-sel"), lv = ["RDC", "R+1", "R+2", "R+3", "R+4", "R+5", "R+6"], H = ST.H, i, terr = $("pq-toit").value === "t", po = nb("pq-po"), fe = nb("pq-fe"), N = ST.N, L2 = ST.Pe + ST.Pi;
+    var cc = $("pq-dal").value === "c", dp = Math.min(ST.W, ST.D), dg = Math.max(ST.W, ST.D), bl = nb("pq-bl"), bp = nb("pq-bp"), vl = nb("pq-vl"), vp = nb("pq-vp");
+    var oA = fe * 1.44 + Math.min(2, po) * 1.9, oC = ST.nd * 1.9, oB = Math.max(0, po - 2 - ST.nd) * 1.9, Pb = Math.max(0, ST.Pi - ST.Ld);
+    function t(nom, ok) { if (!ok) { bad.push(nom); } }
+    function dalle(l, ww, dd, tag) {
+      t(tag + "dalle", cc ? poste("dalle", "corps creux", [[Math.min(ww, dd), Math.max(ww, dd), null, null, null, null]], { g: 1 }) : poste("dalle", "dalle pleine", [[1, ww, dd, 0.12]], { fer: 60, cf: 1 }));
+    }
+    if ($("pq-fd").value === "1") {
+      t("béton de propreté", poste("fond", "béton de propreté", [[1, L2, 0.8, 0.05]]));
+      t("semelles filantes", poste("fond", "semelles filantes", [[1, L2, 0.6, 0.3]], { fer: 70 }));
+      t("amorces de poteaux", poste("fond", "amorces", [[ST.np, 0.2, 0.2, 0.6]], { fer: 120, cf: 1 }));
+      t("soubassement 20", poste("fond", "mur de soubassement", [[1, L2, 0.6, 0]], { ep: ["20"] }));
+      t("chaînage bas", poste("fond", "chaînage bas", [[1, L2, 0.2, 0.3]], { fer: 110, cf: 1 }));
+    }
+    for (i = 0; i < N; i++) {
+      nv.value = lv[i]; fire(nv);
+      var tag = lv[i] + " : ", nab = N - i, cote = nab <= 2 ? 0.2 : nab <= 4 ? 0.25 : 0.3, mm = [[1, ST.Pe, H, oA], [1, Pb, H, oB]], ep = ["15", "15"];
+      if (ST.Ld > 0) { mm.push([1, ST.Ld, H, oC]); ep.push("12"); }
+      typeDe("elev", "poteaux");
+      t(tag + "poteaux", poste("elev", "poteaux", [[ST.np, cote, H]], { fer: 120, cf: 1 }));
+      t(tag + "chaînage haut", poste("elev", "chaînage haut", [[1, L2, 0.2, 0.25]], { fer: 110, cf: 1 }));
+      t(tag + "linteaux", poste("elev", "linteaux", [[Math.round(po + fe), 1.2, 0.15, 0.2]], { fer: 110, cf: 1 }));
+      t(tag + "murs", poste("elev", "murs en parpaings", mm, { ep: ep }));
+      if (N > 1 ? (terr || i < N - 1 || $("pq-dh").checked) : terr) { dalle(0, ST.W, ST.D, tag); }
+      if ($("pq-ba").checked && (i === 1 || i === 2)) {
+        t(tag + "balcon", poste("dalle", "dalle pleine", [[1, bl, bp, 0.12]], { fer: 60, cf: 1 }));
+        t(tag + "consoles", poste("elev", "consoles", [[Math.ceil(bl / 1.5) + 1, bp, 0.2, 0.3]], { fer: 110, cf: 1 }));
+      }
+      if ($("pq-ve").checked && i === 0) {
+        t("véranda : poteaux", poste("elev", "poteaux", [[Math.ceil(vl / 3) + 1, 0.2, H]], { fer: 120, cf: 1 }));
+        t("véranda : chaînage haut", poste("elev", "chaînage haut", [[1, vl, 0.2, 0.25]], { fer: 110, cf: 1 }));
+        t("véranda : dalle", poste("dalle", "dalle pleine", [[1, vl, vp, 0.12]], { fer: 60, cf: 1 }));
+      }
+    }
+    nv.value = "RDC"; fire(nv);
+    if (terr) {
+      typeDe("charp", "toiture terrasse");
+      t("toiture terrasse", poste("charp", "toiture terrasse", [[ST.W * ST.D, ST.Pe, 6, 0.25]], { g: 1 }));
+      t("acrotère", poste("charp", "acrotère", [[1, ST.Pe, 0.1, 0.4]], { fer: 100, cf: 1 }));
+    } else {
+      typeDe("charp", "charpente en bois");
+      t("charpente", poste("charp", "charpente en bois", [[ST.D, ST.W, 30, 0.5]], { g: 1 }));
+      t("couverture", poste("charp", "couverture", [[ST.D, ST.W, 30, 0.5]], { g: 1, re: $("pq-cov").value === "tuile" ? /tuile/i : /t[ôo]le/i }));
+    }
+    $("tabs").querySelector('[data-tab="devis"]').click();
+    $("pq-msg").textContent = bad.length ? "Non ajouté (à faire à la main dans l'onglet concerné) : " + bad.join(", ") + "." : "Devis rempli. Entrez maintenant vos prix (onglet Mon devis).";
+  });
+  terrain();
+
+  var ov = document.createElement("div");
+  ov.style.cssText = "position:fixed;inset:0;z-index:10001;background:linear-gradient(135deg,#0a2f6b,#0f4c9c);display:none;flex-direction:column;justify-content:center;padding:24px;gap:14px";
+  ov.innerHTML = '<h1 style="color:#fff;text-align:center;margin:0">Bati<span style="color:#ffa94d">Calc</span></h1><p style="color:#fff;text-align:center;font-size:18px;margin:0 0 8px">Qui êtes-vous ?</p>' +
+    '<button type="button" class="btn" data-m="p" style="font-size:19px;padding:18px">🏠 Je suis particulier<br><small style="color:#fff;font-weight:normal">Je veux estimer le coût de ma maison</small></button>' +
+    '<button type="button" class="btn bleu" data-m="t" style="font-size:19px;padding:18px;background:#fff;color:#0f4c9c">🧰 Je suis technicien<br><small style="font-weight:normal">Je calcule un élément précis</small></button>';
+  document.body.appendChild(ov);
+  var cb = document.createElement("button");
+  cb.type = "button"; cb.id = "chg-mode"; cb.className = "sup"; cb.style.cssText = "margin-top:8px;background:#fff;color:#0f4c9c;border-color:#fff";
+  document.querySelector("header").appendChild(cb);
+  function appliquer(m) {
+    tb.style.display = m === "p" ? "" : "none";
+    cb.textContent = "🔄 Mode : " + (m === "p" ? "particulier" : "technicien") + " (changer)";
+    if (m === "p") { ouvrir(); } else { var f = nav.querySelector('[data-tab="fond"]'); if (f) { f.click(); } }
+  }
+  cb.addEventListener("click", function () { ov.style.display = "flex"; });
+  ov.addEventListener("click", function (ev) {
+    var m = ev.target.closest ? ev.target.closest("[data-m]") : null; if (!m) { return; }
+    var v = m.getAttribute("data-m"); try { localStorage.setItem(MK, v); } catch (er) {}
+    ov.style.display = "none"; appliquer(v);
+  });
+  var sv = null; try { sv = localStorage.getItem(MK); } catch (er) {}
+  if (sv === "p" || sv === "t") { appliquer(sv); } else { appliquer("t"); ov.style.display = "flex"; }
 })();
 </script>
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
