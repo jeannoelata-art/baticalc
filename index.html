@@ -1523,9 +1523,28 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
       return;
     }
     var h = "", recap = [], tot = 0, k = 0, TH = '<tr><th>Désignation</th><th class="n">Quantité</th><th class="n">P.U.</th><th class="n">Montant</th></tr>';
-    ORDD.forEach(function (r0) { (LEVELED.indexOf(r0) >= 0 ? LVL : [null]).forEach(function (nv) {
-      var r = r0, ttl = RUB[r] + (nv ? " · " + nv : ""), s = 0, rows = "";
-      ordre(r).filter(function (i) { return nv === null || (entries[i].niv || "RDC") === nv; }).forEach(function (i) {
+    function GROUPS() {
+      var out = [], STN = 0, q;
+      try { STN = parseInt(localStorage.getItem("baticalc_struct_v1"), 10) || 0; } catch (er) { STN = 0; }
+      if (!STN) {
+        ORDD.forEach(function (r0) { (LEVELED.indexOf(r0) >= 0 ? LVL : [null]).forEach(function (nv) {
+          out.push({ ttl: RUB[r0] + (nv ? " · " + nv : ""), idx: ordre(r0).filter(function (i) { return nv === null || (entries[i].niv || "RDC") === nv; }) });
+        }); });
+        return out;
+      }
+      var defs = [["Fondation", function (e) { return e.rub === "fond"; }]], used = {}, n = 0;
+      for (q = 0; q < STN; q++) { (function (q) { var lv = LVL[q + 1]; defs.push([STN === 1 ? "Élévation" : q === 0 ? "Rez-de-chaussée" : "Niveau " + q, function (e) { return LEVELED.indexOf(e.rub) >= 0 && (e.niv || "RDC") === lv; }]); })(q); }
+      defs.push(["Couverture (toiture)", function (e) { return e.rub === "charp"; }], ["Autres postes", function () { return true; }]);
+      defs.forEach(function (g) {
+        var idx = [];
+        ORDD.forEach(function (r0) { ordre(r0).forEach(function (i) { if (!used[i] && g[1](entries[i])) { idx.push(i); used[i] = 1; } }); });
+        if (idx.length) { n++; out.push({ ttl: n + ". " + g[0], idx: idx }); }
+      });
+      return out;
+    }
+    GROUPS().forEach(function (G) {
+      var ttl = G.ttl, s = 0, rows = "";
+      G.idx.forEach(function (i) {
         var e = entries[i];
         if (e.libre) {
           var mtl = e.qte * e.pu; s += mtl;
@@ -1553,7 +1572,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
         '<tr class="tot"><td colspan="3">TOTAL ' + ttl.toUpperCase() + '</td><td class="n">' + fmt(Math.round(s), 0) + "</td></tr></table></div>";
       recap.push([ttl, s]);
       tot += s;
-    }); });
+    });
     var mo = n0("p-mo"), base = tot + mo, net = base, lab = "TOTAL ESTIMATIF";
     h += '<h3>Récapitulatif</h3><div class="sc"><table class="dv">';
     recap.forEach(function (x) { h += "<tr><td>" + x[0] + '</td><td class="n">' + money(x[1]) + "</td></tr>"; });
@@ -1590,7 +1609,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     if (T.acier > 0) { brow("Acier profilé IPE", fmt(T.acier, 0) + " kg"); }
     Object.keys(T.x).forEach(function (a) {
       var z = T.x[a];
-      brow(a, z.u === "kg" ? fmt(z.q, 0) + " kg" + (z.m > 0 ? " (≈ " + Math.ceil(z.m / z.lc - 1e-9) + " barres de " + fmt(z.lc, 0) + " m)" : "") : z.u === "u" ? fmt(Math.ceil(z.q - 1e-9), 0) + " pièces" : z.u === "sacs" ? fmt(Math.ceil(z.q - 1e-9), 0) + " sacs" : fmt(z.q, 2) + " " + z.u + (z.u === "m³" ? " (" + vx(z.q) + ")" : ""));
+      brow(a, z.u === "kg" ? fmt(z.q, 0) + " kg" + (/^pointes/i.test(a) ? " (≈ " + Math.ceil(z.q * 1.1 / 25 - 1e-9) + " carton(s) de pointes de 70, cartons de 25 kg, 10 % de marge comprise)" : "") + (z.m > 0 ? " (≈ " + Math.ceil(z.m / z.lc - 1e-9) + " barres de " + fmt(z.lc, 0) + " m)" : "") : z.u === "u" ? fmt(Math.ceil(z.q - 1e-9), 0) + " pièces" : z.u === "sacs" ? fmt(Math.ceil(z.q - 1e-9), 0) + " sacs" : fmt(z.q, 2) + " " + z.u + (z.u === "m³" ? " (" + vx(z.q) + ")" : ""));
     });
     $("dv-body").innerHTML = h + "</table></div>";
   }
@@ -1683,7 +1702,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   var vcT = null;
   $("dv-clear").addEventListener("click", function () {
     var bt = $("dv-clear");
-    if (vcT) { window.clearTimeout(vcT); vcT = null; bt.textContent = "Vider le devis"; entries = []; save(); renderDevis(); return; }
+    if (vcT) { window.clearTimeout(vcT); vcT = null; bt.textContent = "Vider le devis"; try { localStorage.removeItem("baticalc_struct_v1"); } catch (er) {} entries = []; save(); renderDevis(); return; }
     bt.textContent = "Appuyez encore pour vider tout le devis";
     vcT = window.setTimeout(function () { vcT = null; bt.textContent = "Vider le devis"; }, 4000);
   });
@@ -2470,7 +2489,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     "<h3>4. Toiture</h3>" + selh("pq-toit", "Type de toiture", [["c", "Charpente avec toiture (tôle ou tuile)"], ["t", "Toiture-terrasse (toujours avec acrotère)"]]) +
     selh("pq-cov", "Matériau de couverture (si charpente)", [["tole", "Tôle"], ["tuile", "Tuile"]]) +
     selh("pq-pen", "Nombre de pentes (si charpente)", [[1, "1 pente"], [2, "2 pentes"], [4, "4 pentes"]]) +
-    "<h3>5. Dalle, balcons, véranda</h3>" + selh("pq-dal", "Type de dalle des étages", [["p", "Dalle pleine"], ["c", "Dalle à corps creux (poutrelles + hourdis)"]]) + chk("pq-dh", "Dalle aussi sur le dernier niveau (si plusieurs niveaux)", true) + chk("pq-ba", "Balcons aux niveaux 1 et 2 (avec consoles)", false) + '<div class="grid">' + inp("pq-bl", "Balcon : longueur (m)", 3) + inp("pq-bp", "Balcon : profondeur (m)", 1.2) + "</div>" + chk("pq-ve", "Véranda au rez-de-chaussée", false) + '<div class="grid">' + inp("pq-vl", "Véranda : longueur (m)", 4) + inp("pq-vp", "Véranda : largeur (m)", 2.5) + "</div>" +
+    "<h3>5. Dalle, balcons, véranda</h3><p class=\"note\" id=\"pq-dnote\"></p>" + selh("pq-dal", "Type de dalle des étages", [["p", "Dalle pleine"], ["c", "Dalle à corps creux (poutrelles + hourdis)"]]) + chk("pq-dh", "Dalle aussi sur le dernier niveau (si plusieurs niveaux)", true) + chk("pq-ba", "Balcons aux niveaux 1 et 2 (avec consoles)", false) + '<div class="grid">' + inp("pq-bl", "Balcon : longueur (m)", 3) + inp("pq-bp", "Balcon : profondeur (m)", 1.2) + "</div>" + chk("pq-ve", "Véranda au rez-de-chaussée", false) + '<div class="grid">' + inp("pq-vl", "Véranda : longueur (m)", 4) + inp("pq-vp", "Véranda : largeur (m)", 2.5) + "</div>" +
     "<h3>6. Portes et fenêtres (par niveau)</h3><p class=\"aide\">Ces nombres servent seulement à calculer les linteaux et à retirer les ouvertures des murs. Les portes et fenêtres elles-mêmes ne sont pas dans le devis.</p><div class=\"grid\">" + inp("pq-po", "Portes", 5) + inp("pq-fe", "Fenêtres", 6) + "</div>" +
     "<h3>7. Finitions</h3>" + chk("pq-pe", "Peinture", true) + chk("pq-fp", "Faux plafond", false) +
     "<p class=\"aide\"><b>Carrelage au sol</b> : cochez les pièces</p>" + chk("pq-cs-sa", "Salon", true) + chk("pq-cs-cu", "Cuisine", true) + chk("pq-cs-ch", "Chambres", true) + chk("pq-cs-dc", "Douches", true) + chk("pq-cs-co", "Couloir", true) +
@@ -2617,9 +2636,18 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
       t("charpente", poste("charp", "charpente en bois", [[ST.D, ST.W, 30, 0.5]], { g: 1 }));
       t("couverture", poste("charp", "couverture", [[ST.D, ST.W, 30, 0.5]], { g: 1, re: $("pq-cov").value === "tuile" ? /tuile/i : /t[ôo]le/i }));
     }
+    try { localStorage.setItem("baticalc_struct_v1", String(N)); } catch (er) {}
     $("tabs").querySelector('[data-tab="devis"]').click();
     $("pq-msg").textContent = bad.length ? "Non ajouté (à faire à la main dans l'onglet concerné) : " + bad.join(", ") + "." : "Devis rempli. Entrez maintenant vos prix (onglet Mon devis).";
   });
+  function maj() {
+    var n1 = parseInt($("pq-niv").value, 10) === 0, terr = $("pq-toit").value === "t";
+    function d(id, off) { var e = $(id), w = e.type === "checkbox" ? e.closest("label") : e; e.disabled = off; w.style.opacity = off ? "0.4" : "1"; if (e.tagName === "SELECT" && e.previousElementSibling) { e.previousElementSibling.style.opacity = off ? "0.4" : "1"; } if (e.type !== "checkbox" && e.tagName === "INPUT" && e.previousElementSibling) { e.previousElementSibling.style.opacity = off ? "0.4" : "1"; } }
+    if (n1) { $("pq-ba").checked = false; }
+    d("pq-dal", n1 && !terr); d("pq-dh", n1); d("pq-ba", n1); d("pq-bl", n1); d("pq-bp", n1);
+    $("pq-dnote").textContent = n1 ? "Plain-pied : pas de dalle d'étage ni de balcon" + (terr ? " (la dalle de la terrasse est conservée)." : ".") : "";
+  }
+  $("pq-niv").addEventListener("change", maj); $("pq-toit").addEventListener("change", maj); maj();
   terrain();
 
   var ov = document.createElement("div");
