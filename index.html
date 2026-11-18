@@ -355,8 +355,8 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   <a href="#" class="dc" data-go="fond"><b>🏗️ Fondation</b><span>Déblai, remblai, semelles, longrines, radier, puits. Ciment en sacs, sable et gravier en m³, avec brouettes et camions.</span></a>
   <a href="#" class="dc" data-go="elev"><b>🧱 Élévation</b><span>Poteaux, poutres, murs, linteaux. Plusieurs types A, B, C, et mélange sable fin + Sanaga.</span></a>
   <a href="#" class="dc" data-go="dalle"><b>🏠 Dalle</b><span>Dalle pleine, corps creux (poutrelles + hourdis), nervurée, collaborante, métallique (IPE, PTR), bois, dallage, prédalle. <em>(offres Pass Projet et Entreprise)</em></span></a>
-  <a href="#" class="dc" data-go="escl"><b>🪜 Escalier</b><span>Béton armé, bois, acier. Droit, quart tournant, demi-tournant, balancé, hélicoïdal. Perron, rampe, garde-corps. <em>(offres Pass Projet et Entreprise)</em></span></a>
-  <a href="#" class="dc" data-go="charp"><b>🏘️ Charpente</b><span>Charpente en bois, métallique (PTR, IPE), couvertures (tôle, tuiles, bardeau, sandwich), toiture terrasse et étanchéité. <em>(offres Pass Projet et Entreprise)</em></span></a>
+  <a href="#" class="dc" data-go="escl"><b>🪜 Escalier</b><span>Béton armé, béton revêtu de pierre ou marbre, bois, acier, verre. Droit, quart tournant, demi-tournant, double quart tournant, impérial, balancé, hélicoïdal. Perron, rampe, garde-corps. <em>(offres Pass Projet et Entreprise)</em></span></a>
+  <a href="#" class="dc" data-go="charp"><b>🏘️ Charpente</b><span>Charpente en bois, métallique (PTR, IPE), béton armé ; fermes simples, à poinçon, en W, en N, en M ; couvertures (tôle, tuiles, bardeau, sandwich), toiture terrasse et étanchéité. <em>(offres Pass Projet et Entreprise)</em></span></a>
   <a href="#" class="dc" data-go="coff"><b>📐 Coffrage</b><span>Coffrage des fondations, poteaux, poutres, voiles et dalle, avec étais, madriers et chevrons. <em>(offres Pass Projet et Entreprise)</em></span></a>
   <a href="#" class="dc" data-go="enduit"><b>🖌️ Enduit</b><span>Surface et épaisseur : mortier et sable en quelques secondes.</span></a>
   <a href="#" class="dc" data-go="acier"><b>🔩 Acier</b><span>Barres, cadres, chapeaux, dalle : poids en kg et nombre de barres. <em>(offres Technicien et plus)</em></span></a>
@@ -961,7 +961,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   FORMES.cir.cf = function (c) { return c[0] * Math.PI * c[1] * c[2]; };
 
   // ===== ESCALIERS =====
-  var SHP = [["d", "Droit (une volée)"], ["q", "Quart tournant (palier d'angle)"], ["h", "Demi-tournant (deux volées et palier)"], ["b", "À marches balancées"], ["c", "Hélicoïdal (colimaçon)"]];
+  var SHP = [["d", "Droit (une volée)"], ["q", "Quart tournant (palier d'angle)"], ["h", "Demi-tournant (deux volées et palier)"], ["b", "À marches balancées"], ["dq", "Double quart tournant (deux paliers, en U carré)"], ["y", "Impérial (une volée centrale puis deux volées en Y)"], ["c", "Hélicoïdal (colimaçon)"]];
   var SF4 = [["Hauteur à franchir, sol fini à sol fini (m)", 2.8], ["Hauteur d'une contremarche visée (m)", 0.17], ["Giron : profondeur d'une marche (m)", 0.28], ["Largeur de l'escalier (m)", 1]];
   var HEL = [["Diamètre extérieur (m), hélicoïdal seulement", 1.4, 1], ["Diamètre de la colonne centrale (m), hélicoïdal seulement", 0.2, 1], ["Marches par tour complet, hélicoïdal seulement", 14, 1]];
   var SGC = [["gc", "Garde-corps et main courante", [["0", "Sans garde-corps"], ["p-gcb", "Bois"], ["p-gca", "Acier (tubes, fer)"], ["p-gci", "Inox"]], "p-gca"], ["gs", "Côtés équipés", [["1", "Un côté"], ["2", "Deux côtés"]], "1"]];
@@ -977,12 +977,12 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
       return o;
     }
     run = nt * g; o.L = Math.sqrt(run * run + H * H);
-    o.pal = sh === "q" ? w * w : (sh === "h" ? w * (2 * w + 0.1) : 0);
-    o.pe = sh === "q" ? 4 * w : (sh === "h" ? 2 * (3 * w + 0.1) : 0);
+    o.pal = sh === "q" ? w * w : (sh === "h" ? w * (2 * w + 0.1) : (sh === "dq" ? 2 * w * w : (sh === "y" ? 1.5 * w * w : 0)));
+    o.pe = sh === "q" ? 4 * w : (sh === "h" ? 2 * (3 * w + 0.1) : (sh === "dq" ? 7 * w : (sh === "y" ? 5 * w : 0)));
     o.det.push(nm + " marches (" + nt + " girons) de " + fmt(h2 * 100, 1) + " cm de haut et " + fmt(g * 100, 0) + " cm de giron", "Longueur développée de la volée : " + fmt(o.L, 2) + " m",
       "Formule de Blondel : 2 x hauteur + giron = " + fmt(2 * h2 + g, 2) + " m (confort entre 0,60 et 0,64 m)",
       sh === "d" ? "Emprise au sol : " + fmt(run, 2) + " x " + fmt(w, 2) + " m" : sh === "q" ? "Emprise au sol : environ " + fmt(run / 2 + w, 2) + " x " + fmt(run / 2 + w, 2) + " m" :
-        sh === "h" ? "Emprise au sol : environ " + fmt(run / 2 + w, 2) + " x " + fmt(2 * w + 0.1, 2) + " m" : "Marches balancées : le giron se réduit dans le virage, vérifiez-le sur plan");
+        sh === "h" ? "Emprise au sol : environ " + fmt(run / 2 + w, 2) + " x " + fmt(2 * w + 0.1, 2) + " m" : sh === "dq" ? "Emprise au sol : environ " + fmt(run / 3 + w, 2) + " x " + fmt(2 * w + 0.1, 2) + " m (trois volées, deux paliers)" : sh === "y" ? "Emprise au sol : environ " + fmt(run / 2 + w, 2) + " x " + fmt(2 * w + 0.1, 2) + " m (une volée centrale, deux volées de départ)" : "Marches balancées : le giron se réduit dans le virage, vérifiez-le sur plan");
     return o;
   }
   function gcl(s, o) {
@@ -991,6 +991,8 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     ml = o.hel ? o.nm * o.th * (o.R + (sd === 2 ? o.r : 0)) : (o.L + o.pe / 2) * sd;
     return [["Garde-corps et main courante : " + GCN[s.gc], "ml", s.gc, ml]];
   }
+  function MAR(s, n) { return s.mc === "p-mverre" ? ["Marches en verre feuilleté", "u", "p-mverre", n] : ["Marches en bois", "u", "p-mbois", n]; }
+  var RVN = { "p-rpierre": "pierre naturelle", "p-rmarbre": "marbre ou granite", "p-carr": "carrelage" };
   var STS = ["sh", "Forme de l'escalier", SHP, "d"];
   CAT.eba = G("Escalier en béton armé (toutes formes)", SF4.concat([["Épaisseur de la paillasse ou de la marche (m)", 0.15]], HEL), function (v, s, pf) {
     var o = stg(v[0], v[1], v[2], v[3], v[5], v[6], v[7], s.sh), ep = v[4], vb, cf;
@@ -1023,16 +1025,26 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     if (o.err) { return o; }
     if (o.hel) {
       kg = (v[0] * v[8] + o.nm * o.th * o.R * v[7]) * pf;
-      l.push(["Colonne centrale et limon hélicoïdal", "kg", "p-acier", kg], tole ? ["Marches en tôle larmée", "m²", "p-tole", o.A * 1.05 * pf] : ["Marches en bois", "u", "p-mbois", o.nm * pf]);
+      l.push(["Colonne centrale et limon hélicoïdal", "kg", "p-acier", kg], tole ? ["Marches en tôle larmée", "m²", "p-tole", o.A * 1.05 * pf] : MAR(s, o.nm * pf));
     } else {
       kg = o.L * (s.st === "c" ? 1 : 2) * v[7] * pf;
       l.push(["Limons métalliques", "kg", "p-acier", kg]);
-      l.push(tole ? ["Marches en tôle larmée", "m²", "p-tole", (o.nt * v[2] * v[3] + o.pal) * 1.05 * pf] : ["Marches en bois", "u", "p-mbois", o.nt * pf]);
-      if (o.pal > 0 && !tole) { l.push(["Palier en bois", "m²", "p-plat", o.pal * pf]); }
+      l.push(tole ? ["Marches en tôle larmée", "m²", "p-tole", (o.nt * v[2] * v[3] + o.pal) * 1.05 * pf] : MAR(s, o.nt * pf));
+      if (o.pal > 0 && !tole) { l.push(s.mc === "p-mverre" ? ["Palier en verre feuilleté", "m²", "p-verre", o.pal * pf] : ["Palier en bois", "m²", "p-plat", o.pal * pf]); }
     }
     l.push(["Cornières, platines et soudure (10 %)", "kg", "p-acier", kg * 0.1], ["Peinture antirouille (2 couches)", "L", "p-peint", kg * 1.1 * 0.01]);
     return { det: o.det.concat(["Acier : " + fmt(kg, 0) + " kg"]), l: l.concat(gcl(s, o)) };
   }, { note: IPEN, s: [STS, ["st", "Limons", [["l", "Deux limons latéraux"], ["c", "Un limon central"]], "l"], ["mc", "Marches", [["p-tole", "Tôle larmée"], ["p-mbois", "Bois"]], "p-tole"]].concat(SGC) });
+  CAT.egl = G("Escalier en verre (limons en acier, marches en verre feuilleté)", CAT.eac.f, function (v, s, pf) {
+    return CAT.eac.fn(v, Object.assign({}, s, { mc: "p-mverre" }), pf);
+  }, { note: IPEN, s: [STS, ["st", "Limons", [["l", "Deux limons latéraux"], ["c", "Un limon central"]], "l"]].concat(SGC) });
+  CAT.epi = G("Escalier en béton revêtu (pierre, marbre, granite, carrelage)", CAT.eba.f, function (v, s, pf) {
+    var r = CAT.eba.fn(v, s, pf), o = stg(v[0], v[1], v[2], v[3], v[5], v[6], v[7], s.sh), sf;
+    if (r.err) { return r; }
+    sf = o.hel ? o.A * 1.1 + o.nm * (o.R - o.r) * o.h2 : (o.nt * v[3] * (v[2] + o.h2) + o.pal) * 1.1;
+    r.l = r.l.concat([["Revêtement des marches : " + RVN[s.rv], "m²", s.rv, sf * pf]]);
+    return r;
+  }, { b: 350, fr: 90, cf: 1, s: [STS, ["rv", "Revêtement des marches", [["p-rpierre", "Pierre naturelle"], ["p-rmarbre", "Marbre ou granite"], ["p-carr", "Carrelage"]], "p-rmarbre"]].concat(SGC) });
   CAT.epe = G("Perron et marches d'entrée (béton)", [["Nombre de marches", 3], ["Hauteur d'une marche (m)", 0.15], ["Giron (m)", 0.3], ["Largeur (m)", 1.5]], function (v, s, pf) {
     return { vb: v[1] * v[2] * v[3] * v[0] * (v[0] + 1) / 2 * pf, det: ["Marches pleines empilées : le remblai sous le perron peut réduire le béton"], l: [] };
   }, { b: 300 });
@@ -1047,6 +1059,17 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   // ===== CHARPENTE ET COUVERTURE =====
   var RF = [["Longueur du bâtiment (m)", ""], ["Largeur du bâtiment, portée (m)", ""], ["Pente de la toiture (%)", 30], ["Débord du toit (m)", 0.5]];
   var RS = ["tf", "Forme de la toiture", [["2", "Deux pentes"], ["1", "Une pente (monopente)"], ["4", "Quatre pentes (croupe)"]], "2"];
+  var FFN = { s: "Ferme simple", p: "Ferme à poinçon", pc: "Ferme à poinçon et contrefiches", w: "Ferme en W (Fink)", n: "Ferme en N (Pratt)", m: "Ferme en M (Fink double)" };
+  var FF = ["ff", "Forme de la ferme (portées indicatives)", [["s", "Simple : entrait et arbalétriers (jusqu'à 5 m)"], ["p", "À poinçon (jusqu'à 8 m)"], ["pc", "À poinçon et contrefiches (6 à 10 m)"], ["w", "En W : Fink ou fermette (6 à 14 m)"], ["n", "En N : Pratt (8 à 16 m)"], ["m", "En M : Fink double (12 à 20 m)"]], "pc"];
+  function webs(f, l, h, tf) {
+    var m = tf === "1", L = m ? 2 * l : l, d = function (a, b) { return Math.sqrt(a * a + b * b); }, x = 0;
+    if (f === "p") { x = h; }
+    else if (f === "pc") { x = h + 2 * d(L / 4, h / 2); }
+    else if (f === "w") { x = 2 * (d(L / 12, h / 2) + d(L / 6, h)); }
+    else if (f === "n") { x = 2 * h + 2 * d(L / 4, h / 2); }
+    else if (f === "m") { x = h + 2 * (d(L / 12, h / 3) + d(L / 12, 2 * h / 3) + d(L / 6, 2 * h / 3)); }
+    return m ? x / 2 : x;
+  }
   function rg(L, l, p, d, sh) {
     var t = p / 100, c = 1 / Math.sqrt(1 + t * t), Lt = L + 2 * d, lt = l + 2 * d, half = sh === "1" ? lt : lt / 2, o = { t: t, c: c, Lt: Lt, lt: lt, R: half / c, S: Lt * lt / c, h: t * (sh === "1" ? l : l / 2), hip: 0 };
     if (sh === "1") { o.ridge = Lt; o.eaves = Lt; o.rives = 2 * o.R; }
@@ -1059,19 +1082,19 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   var PTRF = function (a, b, t) { return 2 * t * (a + b - 2 * t) * 0.00785; };
   var STL = function (kg) { return [["Platines, boulons et soudure (8 %)", "kg", "p-acier", kg * 0.08], ["Peinture antirouille (2 couches)", "L", "p-peint", kg * 1.08 * 0.01]]; };
   CAT.cht = G("Charpente en bois", RF.concat([["Entraxe des fermes (m)", 2.5], ["Entraxe des pannes (m)", 1], ["Entraxe des chevrons (m), tuiles seulement", 0.5], ["Entraxe des liteaux (m), tuiles seulement", 0.33]]), function (v, s, pf) {
-    var g = rgv(v, s), nf = cl(v[0] / v[4]) + 1, mlf = (s.tf === "1" ? 1 : 3) * g.R + v[1] + g.h, l = [], d = [g.det, nf + " fermes de " + fmt(mlf, 2) + " m de bois chacune (arbalétriers, entrait, poinçon, contrefiches)"];
+    var g = rgv(v, s), nf = cl(v[0] / v[4]) + 1, wb = webs(s.ff, v[1], g.h, s.tf), mlf = (s.tf === "1" ? 1 : 2) * g.R + v[1] + wb, l = [], d = [g.det, FFN[s.ff] + " : " + nf + " fermes de " + fmt(mlf, 2) + " m de bois chacune (arbalétriers, entrait et " + fmt(wb, 2) + " m de poinçon, diagonales ou montants)"];
     l.push(["Bois de ferme", "ml", "p-bois", nf * mlf * pf], ["Pannes en bois", "ml", "p-bois", g.S / v[5] * pf]);
     if (s.cv === "u") { l.push(["Chevrons en bois", "ml", "p-chev", g.S / v[6] * pf], ["Liteaux en bois", "ml", "p-lit", g.S / v[7] * pf]); d.push("Tuiles : chevrons et liteaux ajoutés"); }
     l.push(["Pointes, équerres et boulons", "kg", "p-clou", g.S * 0.2]);
     return { det: d, l: l };
-  }, { s: [RS, ["cv", "Couverture prévue", [["t", "Tôles ou bacs (posés sur les pannes)"], ["u", "Tuiles (chevrons et liteaux)"]], "t"]] });
-  CAT.chp = G("Charpente métallique : fermes tubulaires PTR", RF.concat([["Entraxe des fermes (m)", 3], ["Côté a des tubes (mm)", 50], ["Côté b des tubes (mm)", 50], ["Épaisseur t (mm)", 2], ["Coefficient de treillis (longueur de tube par mètre de membrure)", 2], ["Entraxe des pannes (m)", 1], ["Masse d'une panne (kg/m)", 2.4]]), function (v, s, pf) {
-    var g = rgv(v, s), nf = cl(v[0] / v[4]) + 1, m = PTRF(v[5], v[6], v[7]), mlf = ((s.tf === "1" ? g.R + g.h : 2 * g.R) + v[1]) * v[8], k1, k2;
+  }, { s: [RS, FF, ["cv", "Couverture prévue", [["t", "Tôles ou bacs (posés sur les pannes)"], ["u", "Tuiles (chevrons et liteaux)"]], "t"]] });
+  CAT.chp = G("Charpente métallique : fermes tubulaires PTR", RF.concat([["Entraxe des fermes (m)", 3], ["Côté a des tubes (mm)", 50], ["Côté b des tubes (mm)", 50], ["Épaisseur t (mm)", 2], ["Majoration pour assemblages et chutes (coefficient)", 1.1], ["Entraxe des pannes (m)", 1], ["Masse d'une panne (kg/m)", 2.4]]), function (v, s, pf) {
+    var g = rgv(v, s), nf = cl(v[0] / v[4]) + 1, m = PTRF(v[5], v[6], v[7]), wb = webs(s.ff, v[1], g.h, s.tf), mlf = ((s.tf === "1" ? g.R : 2 * g.R) + v[1] + wb) * v[8], k1, k2;
     if (!(m > 0)) { return { err: "Vérifiez les dimensions du tube : l'épaisseur est trop grande." }; }
     k1 = nf * mlf * m * pf; k2 = g.S / v[9] * v[10] * pf;
-    return { det: [g.det, nf + " fermes de " + fmt(mlf, 1) + " m de tube (" + fmt(m, 2) + " kg/m)", "Acier : fermes " + fmt(k1, 0) + " kg + pannes " + fmt(k2, 0) + " kg"],
+    return { det: [g.det, FFN[s.ff] + " : " + nf + " fermes de " + fmt(mlf, 1) + " m de tube (" + fmt(m, 2) + " kg/m)", "Acier : fermes " + fmt(k1, 0) + " kg + pannes " + fmt(k2, 0) + " kg"],
       l: [["Fermes en tubes PTR", "kg", "p-acier", k1], ["Pannes métalliques", "kg", "p-acier", k2]].concat(STL(k1 + k2)) };
-  }, { s: [RS] });
+  }, { s: [RS, FF] });
   CAT.cpi = G("Charpente métallique : portiques IPE (hangar)", RF.concat([["Hauteur des poteaux (m)", 4], ["Entraxe des portiques (m)", 5], ["Masse du profilé des portiques (kg/m)", 42.2], ["Entraxe des pannes (m)", 1.5], ["Masse d'une panne (kg/m)", 6.5]]), function (v, s, pf) {
     var g = rgv(v, s), np = cl(v[0] / v[5]) + 1, k1 = np * (2 * v[4] + (s.tf === "1" ? g.R : 2 * g.R)) * v[6] * pf, k2 = g.S / v[7] * v[8] * pf;
     return { det: [g.det, np + " portiques, acier : portiques " + fmt(k1, 0) + " kg + pannes " + fmt(k2, 0) + " kg"],
@@ -1082,6 +1105,10 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     if (!(m > 0)) { return { err: "Vérifiez les dimensions du tube : l'épaisseur est trop grande." }; }
     return { det: [g.det, "Tubes : " + fmt(ml, 1) + " m soit ≈ " + cl(ml / 6) + " barres de 6 m (" + fmt(m, 2) + " kg/m)"], l: [["Tubes PTR (pannes et chevrons)", "kg", "p-acier", kg]].concat(STL(kg)) };
   }, { s: [RS] });
+  CAT.cba = G("Charpente en béton armé (fermes ou portiques)", RF.concat([["Entraxe des fermes (m)", 4], ["Largeur de la section des barres (m)", 0.2], ["Hauteur de la section des barres (m)", 0.3]]), function (v, s, pf) {
+    var g = rgv(v, s), nf = cl(v[0] / v[4]) + 1, wb = webs(s.ff, v[1], g.h, s.tf), mlf = (s.tf === "1" ? 1 : 2) * g.R + v[1] + wb, ml = nf * mlf;
+    return { vb: ml * v[5] * v[6] * pf, cfS: ml * 2 * (v[5] + v[6]), det: [g.det, FFN[s.ff] + " : " + nf + " fermes de " + fmt(mlf, 2) + " m de barres en béton (" + fmt(ml, 1) + " m en tout)", "Les pannes (en béton ou en acier) se comptent à part"], l: [] };
+  }, { b: 350, fr: 120, cf: 1, s: [RS, FF] });
   var COV = { "p-tbac": ["Tôle bac aluzinc", "m²", 1.1], "p-tond": ["Tôle ondulée galvanisée", "m²", 1.15], "p-tuib": ["Tuiles béton", "u", 10.5], "p-tuit": ["Tuiles en terre cuite", "u", 12],
     "p-bard": ["Bardeau bitumé (shingle)", "m²", 1.1], "p-sand": ["Panneaux sandwich", "m²", 1.05], "p-fibr": ["Plaques de fibrociment", "m²", 1.15], "p-chau": ["Chaume, paille ou raphia", "m²", 1.1] };
   CAT.cov = G("Couverture (tôles, tuiles, bardeau, sandwich...)", RF, function (v, s, pf) {
@@ -1107,16 +1134,20 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
 
   TYPES.dalle.forEach(function (t) { t.el = t.el.filter(function (k) { return k !== "esc"; }); });
   TYPES.escl = [
-    { nom: "Escalier en béton armé", d: "Droit, quart tournant, demi-tournant, à marches balancées ou hélicoïdal. Béton, coffrage, acier et garde-corps.", el: ["eba"] },
+    { nom: "Escalier en béton armé", d: "Droit, quart tournant, demi-tournant, double quart tournant, impérial, balancé ou hélicoïdal. Béton, coffrage, acier et garde-corps.", el: ["eba"] },
+    { nom: "Escalier en béton revêtu de pierre, marbre ou carrelage", d: "Escalier en béton armé dont les marches sont habillées de pierre naturelle, de marbre, de granite ou de carrelage. Toutes les formes.", el: ["epi"] },
     { nom: "Escalier en bois", d: "Marches, limons, contremarches, newels et garde-corps. Toutes les formes, y compris le colimaçon.", el: ["ebo"] },
-    { nom: "Escalier en acier", d: "Limons en acier, marches en tôle larmée ou en bois, toutes les formes, y compris l'hélicoïdal.", el: ["eac"] },
+    { nom: "Escalier en acier (métallique)", d: "Limons en acier, marches en tôle larmée ou en bois, toutes les formes, y compris l'hélicoïdal.", el: ["eac"] },
+    { nom: "Escalier en verre", d: "Limons en acier et marches en verre feuilleté de sécurité. Toutes les formes, y compris l'hélicoïdal.", el: ["egl"] },
     { nom: "Perron et rampe d'accès", d: "Marches d'entrée en béton et rampe pour poussettes ou fauteuils roulants.", el: ["epe", "epr"] },
     { nom: "Garde-corps et main courante", d: "Garde-corps seuls en bois, acier ou inox (balcon, terrasse, escalier existant).", el: ["egc"] }
   ];
   TYPES.charp = [
-    { nom: "Toiture en bois + couverture", d: "Fermes, pannes (et chevrons, liteaux pour les tuiles) en bois, puis la couverture.", el: ["cht", "cov"] },
-    { nom: "Toiture métallique tubulaire PTR + couverture", d: "Fermes en tubes PTR, pannes métalliques, ou charpente légère en PTR, puis la couverture.", el: ["chp", "cpl", "cov"] },
-    { nom: "Hangar en portiques IPE + couverture", d: "Portiques en profilés IPE avec pannes métalliques, pour grands volumes.", el: ["cpi", "cov"] },
+    { nom: "Charpente en bois + couverture", d: "Fermes en bois (simple, à poinçon, en W, en N, en M), pannes, et chevrons et liteaux pour les tuiles, puis la couverture.", el: ["cht", "cov"] },
+    { nom: "Charpente métallique : fermes tubulaires PTR + couverture", d: "Fermes en tubes PTR (simple, à poinçon, en W, en N, en M) et pannes métalliques, puis la couverture.", el: ["chp", "cov"] },
+    { nom: "Charpente légère en PTR (pannes et chevrons) + couverture", d: "Pannes et chevrons en tubes PTR, sans fermes, pour petites toitures.", el: ["cpl", "cov"] },
+    { nom: "Charpente métallique : hangar en portiques IPE + couverture", d: "Portiques en profilés IPE avec pannes métalliques, pour grands volumes.", el: ["cpi", "cov"] },
+    { nom: "Charpente en béton armé + couverture", d: "Fermes ou portiques en béton armé (simple, à poinçon, en W, en N, en M) avec coffrage et acier, puis la couverture.", el: ["cba", "cov"] },
     { nom: "Toiture terrasse (étanchéité)", d: "Béton de pente, isolation, étanchéité, protection et descentes d'eau, avec acrotère.", el: ["ttr", "acr"] },
     { nom: "Couverture seule (charpente existante)", d: "Tôles, tuiles, bardeau, sandwich, chaume, avec faîtage, gouttières et sous-toiture.", el: ["cov"] }
   ];
@@ -1149,6 +1180,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     ["p-iso", "Isolant (laine, polystyrène) : prix du m²", 4500], ["p-etb", "Étanchéité bitume bicouche : prix du m²", 6500], ["p-etm", "Membrane PVC ou EPDM : prix du m²", 9000],
     ["p-etr", "Résine d'étanchéité : prix du m²", 7500], ["p-carr", "Dalles ou carrelage de protection : prix du m²", 6000], ["p-peint", "Peinture antirouille : prix du litre", 3500],
     ["p-mbois", "Marche d'escalier en bois : prix de l'unité", 15000], ["p-limon", "Limon d'escalier en bois : prix du mètre", 6000], ["p-newel", "Poteau ou newel d'escalier : prix de l'unité", 12000],
+    ["p-mverre", "Marche en verre feuilleté : prix de l'unité", 45000], ["p-verre", "Verre feuilleté de sécurité (palier) : prix du m²", 40000], ["p-rpierre", "Pierre naturelle pour marches : prix du m²", 18000], ["p-rmarbre", "Marbre ou granite pour marches : prix du m²", 25000],
     ["p-gcb", "Garde-corps en bois : prix du mètre", 12000], ["p-gca", "Garde-corps en acier : prix du mètre", 15000], ["p-gci", "Garde-corps en inox : prix du mètre", 35000]
   ];
   var MATS = [
@@ -2495,7 +2527,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     "<p class=\"aide\"><b>Carrelage au sol</b> : cochez les pièces</p>" + chk("pq-cs-sa", "Salon", true) + chk("pq-cs-cu", "Cuisine", true) + chk("pq-cs-ch", "Chambres", true) + chk("pq-cs-dc", "Douches", true) + chk("pq-cs-co", "Couloir", true) +
     "<p class=\"aide\"><b>Carrelage sur les murs</b> : cochez les pièces</p>" + chk("pq-cm-dc", "Murs des douches (jusqu'à 2 m)", true) + chk("pq-cm-cu", "Murs de la cuisine (jusqu'à 1,2 m)", false) + chk("pq-cm-sa", "Murs du salon", false) +
     '<button type="button" class="btn bleu" id="pq-go">Voir l\'esquisse du plan</button><div id="pq-esq"></div>' +
-    '<h3>Vue 3D de la maison</h3>' + selh("pq-style", "Style architectural", [["us", "Américain"], ["fr", "Français"], ["it", "Italien"]]) + '<p class="note" id="pq-sd"></p><button type="button" class="btn bleu" id="pq-3d">Voir la maison en 3D</button><canvas id="pq-cv" style="width:100%;height:340px;border-radius:10px;touch-action:none;margin-top:8px"></canvas><div class="grid" style="grid-template-columns:1fr 1fr 1fr"><button type="button" class="btn bleu" id="pq-zp">＋ Zoom</button><button type="button" class="btn bleu" id="pq-zm">－ Zoom</button><button type="button" class="btn bleu" id="pq-ar">⟳ Tourner</button></div><p class="note">Faites glisser le doigt sur l\'image pour tourner autour de la maison. C\'est une vue d\'ambiance, pas un plan d\'architecte.</p>' +
+    '<h3>Vue 3D de la maison</h3>' + selh("pq-style", "Style architectural", [["us", "Américain"], ["fr", "Français"], ["it", "Italien"]]) + '<p class="note" id="pq-sd"></p><button type="button" class="btn bleu" id="pq-3d">Voir la maison en 3D</button><canvas id="pq-cv" style="width:100%;height:340px;border-radius:10px;touch-action:none;margin-top:8px"></canvas><div class="grid" style="grid-template-columns:1fr 1fr 1fr"><button type="button" class="btn bleu" id="pq-zp">＋ Zoom</button><button type="button" class="btn bleu" id="pq-zm">－ Zoom</button><button type="button" class="btn bleu" id="pq-ar">⟳ Tourner</button></div><p class="note">Faites glisser le doigt sur l\'image pour tourner autour de la maison. C\'est une vue d\'ambiance, pas un plan d\'architecte.</p>' + arch() +
     '<button type="button" class="btn" id="pq-send" disabled>Faire le devis (fondation à toiture)</button><p class="note" id="pq-msg"></p>' +
     '<p class="note">Ceci est une estimation. Le recul et le coefficient d\'emprise exacts dépendent de votre commune : vérifiez-les à la mairie avant de construire. L\'esquisse n\'est pas un plan d\'architecte. Un ingénieur doit valider la structure et la fondation avant les travaux.</p>';
   var main = document.querySelector("main"), sec = document.createElement("section");
@@ -2526,6 +2558,10 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     return { Sb: Sb, Sc: Sc, Lb: Math.max(Lb, Wb), Wb: Math.min(Lb, Wb) };
   }
   function pcs(k, nom) { var n = Math.round(nb("pq-" + k + "n")), a = nb("pq-" + k + "s"), o = [], i; for (i = 1; i <= n; i++) { o.push({ k: k, nom: nom + (n > 1 ? " " + i : ""), a: a }); } return o; }
+  function arch() {
+    var t = encodeURIComponent("Bonjour Archidesign studio, j'ai fait une esquisse avec BatiCalc et je voudrais une étude ou un dessin sur ordinateur (plans, 3D).");
+    return '<div class="noprint" style="margin-top:14px;padding:12px;border:2px solid #1f7a3d;border-radius:10px;background:#f1faf4;color:#14301f"><b>⚠️ Ceci est seulement une esquisse.</b><br>Pour une vraie étude ou un dessin assisté par ordinateur (plans, coupes, façades, 3D), contactez <b>Archidesign studio</b>, concepteurs architecturaux.<br><a href="https://wa.me/237697413980?text=' + t + '" target="_blank" rel="noopener" style="display:block;margin-top:10px;padding:12px;text-align:center;border-radius:10px;background:#1f7a3d;color:#fff;font-weight:bold;text-decoration:none">WhatsApp : 6 97 41 39 80</a><a href="mailto:arthurtchana@gmail.com?subject=' + encodeURIComponent("Étude architecturale") + '" style="display:block;margin-top:8px;padding:12px;text-align:center;border-radius:10px;background:#1f4e79;color:#fff;font-weight:bold;text-decoration:none">arthurtchana@gmail.com</a></div>';
+  }
   function esquisse() {
     var T = terrain(), jour = pcs("sa", "Salon").concat(pcs("cu", "Cuisine")), nuit = pcs("ch", "Chambre"), di = $("pq-di").value === "1", msg = "", At = 0, Aj = 0, An = 0, i, nCh = nuit.length, tot = Math.round(nb("pq-dcn")), ext;
     if (di && tot < nCh) { tot = nCh; $("pq-dcn").value = String(tot); }
@@ -2563,7 +2599,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     ["sa", "cu", "ch", "dc", "co"].forEach(function (k) { if ($("pq-cs-" + k).checked && ca[k]) { sol += ca[k]; } });
     R.forEach(function (r) { var p = 2 * (r.w + r.h); if (r.k === "dc" && $("pq-cm-dc").checked) { mur += p * 2; } if (r.k === "cu" && $("pq-cm-cu").checked) { mur += p * 1.2; } if (r.k === "sa" && $("pq-cm-sa").checked) { mur += p * H; } });
     rec = "<p class='note'>Surface à carreler au sol : environ " + fx(sol) + " m² par niveau. Carrelage mural : environ " + fx(mur) + " m² par niveau (portes non déduites).</p>";
-    $("pq-esq").innerHTML = "<h3>Esquisse (vue du dessus, 1 niveau)</h3>" + svg + "<p class='note'>Douches : " + tot + " au total, dont " + (di ? nCh : 0) + " dans les chambres et " + ext + " hors chambre. Salon et cuisine côté rue, couloir au milieu, chambres et douches au fond. Maison d'environ " + fx(W) + " × " + fx(D) + " m = " + fx(W * D) + " m² par niveau. Murs extérieurs : " + fx(Pe) + " m ; intérieurs : environ " + fx(Pi) + " m ; poteaux estimés (un tous les 3,5 m sur les murs extérieurs, un tous les 6 m à l'intérieur) : " + ST.np + " par niveau, soit <b id='pq-npt'>" + ST.np * N + "</b> au total.</p>" + inp("pq-np", "Nombre de poteaux par niveau (estimation, modifiable)", ST.np) + rec + (msg ? '<div class="res err show">' + msg + "</div>" : "") + (nuit.length > 4 ? '<div class="res err show">Beaucoup de pièces : l\'esquisse est simplifiée. Faites-la valider par un professionnel.</div>' : "");
+    $("pq-esq").innerHTML = "<h3>Esquisse (vue du dessus, 1 niveau)</h3>" + svg + "<p class='note'>Douches : " + tot + " au total, dont " + (di ? nCh : 0) + " dans les chambres et " + ext + " hors chambre. Salon et cuisine côté rue, couloir au milieu, chambres et douches au fond. Maison d'environ " + fx(W) + " × " + fx(D) + " m = " + fx(W * D) + " m² par niveau. Murs extérieurs : " + fx(Pe) + " m ; intérieurs : environ " + fx(Pi) + " m ; poteaux estimés (un tous les 3,5 m sur les murs extérieurs, un tous les 6 m à l'intérieur) : " + ST.np + " par niveau, soit <b id='pq-npt'>" + ST.np * N + "</b> au total.</p>" + inp("pq-np", "Nombre de poteaux par niveau (estimation, modifiable)", ST.np) + rec + (msg ? '<div class="res err show">' + msg + "</div>" : "") + (nuit.length > 4 ? '<div class="res err show">Beaucoup de pièces : l\'esquisse est simplifiée. Faites-la valider par un professionnel.</div>' : "") + arch();
     $("pq-np").addEventListener("input", function () { $("pq-npt").textContent = String(Math.round(nb("pq-np")) * N); });
     $("pq-send").disabled = false;
   }
