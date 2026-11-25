@@ -2570,20 +2570,33 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     for (i = 1; i <= ext; i++) { nuit.push({ k: "dc", nom: "Douche" + (ext > 1 ? " " + i : ""), a: nb("pq-dcs") }); }
     jour.forEach(function (p) { Aj += p.a; }); nuit.forEach(function (p) { An += p.a; }); At = Aj + An;
     if (!(At > 0) || !(T.Sc > 0) || !nuit.length) { $("pq-esq").innerHTML = '<div class="res err show">Entrez un terrain et des pièces (au moins une chambre ou une douche).</div>'; return; }
-    var c = 1.1, F0 = At * 1.12, W = Math.min(T.Lb, Math.max(Math.sqrt(F0 * 1.3), Math.min(T.Lb, 2.7 * nuit.length))), D = F0 / W;
+    var c = nuit.length >= 2 ? 1.1 : 0, F0 = At * 1.12 + c * 4, W = Math.min(T.Lb, Math.max(Math.sqrt(F0 * 1.35), c ? 8 : 0)), D = F0 / W;
     if (T.Wb > 0 && D > T.Wb) { D = T.Wb; W = Math.min(T.Lb, F0 / D); }
     if (W * D > T.Sc) { var f = Math.sqrt(T.Sc / (W * D)); W *= f; D *= f; msg = "⚠️ Vos pièces dépassent la surface constructible (" + fx(T.Sc) + " m²) : elles sont réduites sur l'esquisse. Réduisez les pièces."; }
-    var kk = (D - c) * W / At;
+    var kk = (W - c) * D / (An + (W - c) * Aj / W);
     if (!(kk > 0.3)) { $("pq-esq").innerHTML = '<div class="res err show">Le terrain constructible est trop petit pour ces pièces.</div>'; return; }
-    var h1 = Aj ? kk * Aj / W : 0, h3 = kk * An / W, R = [], x = 0, P0 = 0;
+    var h1 = Aj ? kk * Aj / W : 0, h3 = D - h1, R = [], x = 0;
     jour.forEach(function (p) { var w = W * p.a / Aj; R.push({ n: p.nom, x: x, y: 0, w: w, h: h1, k: p.k }); x += w; });
-    R.push({ n: "Couloir", x: 0, y: h1, w: W, h: c, k: "co", g: 1 });
-    var nu = nuit.filter(function (p) { return p.k === "ch"; }).concat(nuit.filter(function (p) { return p.k === "dc"; }));
-    x = 0; nu.forEach(function (p) {
-      var w = W * p.a / An, r = { n: p.nom, x: x, y: h1 + c, w: w, h: h3, k: p.k }; R.push(r);
-      if (p.di) { var hd = h3 * 0.55, wd = Math.min(w * 0.45, 3 / hd); R.push({ n: "Douche", x: x + w - wd, y: h1 + c + h3 - hd, w: wd, h: hd, k: "dc", in: 1 }); }
-      x += w;
+    var ch2 = nuit.filter(function (p) { return p.k === "ch"; }).sort(function (u, v) { return v.a - u.a; }), dcs = nuit.filter(function (p) { return p.k === "dc"; }), un = [], col = [[], []], sc = [0, 0], wl, wr;
+    ch2.forEach(function (p) { un.push({ m: [p], a: p.a }); });
+    if (!un.length) { dcs.forEach(function (p) { un.push({ m: [p], a: p.a }); }); }
+    else { dcs.forEach(function (p, i) { var u = un[i % un.length]; u.m.push(p); u.a += p.a; }); }
+    un.forEach(function (u) { var j = (!c || sc[0] <= sc[1]) ? 0 : 1; col[j].push(u); sc[j] += u.a; });
+    wl = c ? (W - c) * sc[0] / An : W; wr = c ? W - c - wl : 0;
+    col.forEach(function (g, j) {
+      var x0 = j === 0 ? 0 : wl + c, w = j === 0 ? wl : wr, y = h1;
+      g.forEach(function (u) {
+        var h = h3 * u.a / sc[j], xx = x0;
+        u.m.forEach(function (p) {
+          var ww = w * p.a / u.a;
+          R.push({ n: p.nom, x: xx, y: y, w: ww, h: h, k: p.k });
+          if (p.di) { var hd = h * 0.55, wd = Math.min(ww * 0.45, 3 / hd); R.push({ n: "Douche", x: j === 0 ? xx : xx + ww - wd, y: y + h - hd, w: wd, h: hd, k: "dc", in: 1 }); }
+          xx += ww;
+        });
+        y += h;
+      });
     });
+    if (c) { R.push({ n: "Couloir", x: wl, y: h1, w: c, h: h3, k: "co", g: 1 }); }
     var Pe = 2 * (W + D), Pr = 0; R.forEach(function (r) { Pr += 2 * (r.w + r.h); });
     var Pi = Math.max(0, (Pr - Pe) / 2), k2 = 300 / W, ca = {}, Ld = 0; R.forEach(function (r) { if (r.k === "dc") { Ld += r.w + r.h; } }); Ld = Math.min(Ld, Pi);
     var svg = '<svg viewBox="0 0 310 ' + Math.ceil(D * k2 + 10) + '" style="width:100%;background:#fff;border:1px solid #c9d3dd;border-radius:8px"><g transform="translate(5,5)">';
@@ -2599,7 +2612,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     ["sa", "cu", "ch", "dc", "co"].forEach(function (k) { if ($("pq-cs-" + k).checked && ca[k]) { sol += ca[k]; } });
     R.forEach(function (r) { var p = 2 * (r.w + r.h); if (r.k === "dc" && $("pq-cm-dc").checked) { mur += p * 2; } if (r.k === "cu" && $("pq-cm-cu").checked) { mur += p * 1.2; } if (r.k === "sa" && $("pq-cm-sa").checked) { mur += p * H; } });
     rec = "<p class='note'>Surface à carreler au sol : environ " + fx(sol) + " m² par niveau. Carrelage mural : environ " + fx(mur) + " m² par niveau (portes non déduites).</p>";
-    $("pq-esq").innerHTML = "<h3>Esquisse (vue du dessus, 1 niveau)</h3>" + svg + "<p class='note'>Douches : " + tot + " au total, dont " + (di ? nCh : 0) + " dans les chambres et " + ext + " hors chambre. Salon et cuisine côté rue, couloir au milieu, chambres et douches au fond. Maison d'environ " + fx(W) + " × " + fx(D) + " m = " + fx(W * D) + " m² par niveau. Murs extérieurs : " + fx(Pe) + " m ; intérieurs : environ " + fx(Pi) + " m ; poteaux estimés (un tous les 3,5 m sur les murs extérieurs, un tous les 6 m à l'intérieur) : " + ST.np + " par niveau, soit <b id='pq-npt'>" + ST.np * N + "</b> au total.</p>" + inp("pq-np", "Nombre de poteaux par niveau (estimation, modifiable)", ST.np) + rec + (msg ? '<div class="res err show">' + msg + "</div>" : "") + (nuit.length > 4 ? '<div class="res err show">Beaucoup de pièces : l\'esquisse est simplifiée. Faites-la valider par un professionnel.</div>' : "") + arch();
+    $("pq-esq").innerHTML = "<h3>Esquisse (vue du dessus, 1 niveau)</h3>" + svg + "<p class='note'>Douches : " + tot + " au total, dont " + (di ? nCh : 0) + " dans les chambres et " + ext + " hors chambre. Salon et cuisine côté rue, puis un court couloir qui dessert les chambres et les douches de chaque côté. Maison d'environ " + fx(W) + " × " + fx(D) + " m = " + fx(W * D) + " m² par niveau. Murs extérieurs : " + fx(Pe) + " m ; intérieurs : environ " + fx(Pi) + " m ; poteaux estimés (un tous les 3,5 m sur les murs extérieurs, un tous les 6 m à l'intérieur) : " + ST.np + " par niveau, soit <b id='pq-npt'>" + ST.np * N + "</b> au total.</p>" + inp("pq-np", "Nombre de poteaux par niveau (estimation, modifiable)", ST.np) + rec + (msg ? '<div class="res err show">' + msg + "</div>" : "") + (nuit.length > 4 ? '<div class="res err show">Beaucoup de pièces : l\'esquisse est simplifiée. Faites-la valider par un professionnel.</div>' : "") + arch();
     $("pq-np").addEventListener("input", function () { $("pq-npt").textContent = String(Math.round(nb("pq-np")) * N); });
     $("pq-send").disabled = false;
   }
@@ -2819,16 +2832,16 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
 
   var ov = document.createElement("div");
   ov.style.cssText = "position:fixed;inset:0;z-index:10001;background:linear-gradient(135deg,#0a2f6b,#0f4c9c);display:none;flex-direction:column;justify-content:center;padding:24px;gap:14px";
-  ov.innerHTML = '<h1 style="color:#fff;text-align:center;margin:0">Bati<span style="color:#ffa94d">Calc</span></h1><p style="color:#fff;text-align:center;font-size:18px;margin:0 0 8px">Qui êtes-vous ?</p>' +
-    '<button type="button" class="btn" data-m="p" style="font-size:19px;padding:18px">🏠 Je suis particulier<br><small style="color:#fff;font-weight:normal">Je veux estimer le coût de ma maison</small></button>' +
-    '<button type="button" class="btn bleu" data-m="t" style="font-size:19px;padding:18px;background:#fff;color:#0f4c9c">🧰 Je suis technicien<br><small style="font-weight:normal">Je calcule un élément précis</small></button>';
+  ov.innerHTML = '<h1 style="color:#fff;text-align:center;margin:0">Bati<span style="color:#ffa94d">Calc</span></h1><div style="color:#fff;font-size:15px;line-height:1.5;background:rgba(255,255,255,.12);border-radius:12px;padding:12px">🏗️ <b>BatiCalc</b> calcule les quantités de matériaux et le coût estimatif de votre construction, en FCFA.<br>👷 Pour les particuliers qui construisent leur maison, comme pour les maçons et les techniciens.<br>📱 Une estimation rapide, étape par étape, directement depuis votre téléphone.</div><p style="color:#fff;text-align:center;font-size:18px;margin:0 0 8px">Vous êtes ? Touchez votre profil pour commencer</p>' +
+    '<button type="button" class="btn" data-m="p" style="font-size:19px;padding:18px">🏠 Je suis un particulier<br><small style="color:#fff;font-weight:normal">Je veux estimer le coût de ma maison, étape par étape, sans être technicien</small></button>' +
+    '<button type="button" class="btn bleu" data-m="t" style="font-size:19px;padding:18px;background:#fff;color:#0f4c9c">🧰 Je suis un technicien ou un professionnel<br><small style="font-weight:normal">Je calcule un élément précis (fondation, dalle, escalier, charpente...)</small></button>';
   document.body.appendChild(ov);
   var cb = document.createElement("button");
   cb.type = "button"; cb.id = "chg-mode"; cb.className = "sup"; cb.style.cssText = "margin-top:8px;background:#fff;color:#0f4c9c;border-color:#fff";
   document.querySelector("header").appendChild(cb);
   function appliquer(m) {
     tb.style.display = m === "p" ? "" : "none";
-    cb.textContent = "🔄 Mode : " + (m === "p" ? "particulier" : "technicien") + " (changer)";
+    cb.textContent = "🔄 Profil : " + (m === "p" ? "particulier" : "technicien") + " (changer)";
     if (m === "p") { ouvrir(); } else { var f = nav.querySelector('[data-tab="fond"]'); if (f) { f.click(); } }
   }
   cb.addEventListener("click", function () { ov.style.display = "flex"; });
@@ -2839,6 +2852,29 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   });
   var sv = null; try { sv = localStorage.getItem(MK); } catch (er) {}
   if (sv === "p" || sv === "t") { appliquer(sv); } else { appliquer("t"); ov.style.display = "flex"; }
+})();
+</script>
+<script>
+(function () {
+  var WA_AIDE = "237681463954"; /* numéro WhatsApp d'aide, avec l'indicatif, sans + ni espaces (exemple : 237600000000) */
+  var hd = document.querySelector("header"), dp = null, ib = document.createElement("button"), ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  var dedans = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone;
+  if (WA_AIDE) {
+    var a = document.createElement("a");
+    a.href = "https://wa.me/" + WA_AIDE + "?text=" + encodeURIComponent("Bonjour, j'ai besoin d'aide avec BatiCalc.");
+    a.target = "_blank"; a.rel = "noopener"; a.className = "noprint"; a.setAttribute("aria-label", "Aide sur WhatsApp"); a.textContent = "💬";
+    a.style.cssText = "position:fixed;right:14px;bottom:82px;z-index:60;width:54px;height:54px;border-radius:50%;background:#25d366;color:#fff;font-size:28px;display:flex;align-items:center;justify-content:center;text-decoration:none;box-shadow:0 4px 14px rgba(0,0,0,.3)";
+    document.body.appendChild(a);
+  }
+  ib.type = "button"; ib.className = "sup"; ib.textContent = "📲 Installer l'application"; ib.style.cssText = "display:none;margin-top:8px;background:#fff;color:#0f4c9c;border-color:#fff";
+  if (hd) { hd.appendChild(ib); }
+  if (!dedans && ios) { ib.style.display = ""; }
+  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); dp = e; if (!dedans) { ib.style.display = ""; } });
+  window.addEventListener("appinstalled", function () { ib.style.display = "none"; });
+  ib.addEventListener("click", function () {
+    if (dp) { dp.prompt(); dp = null; ib.style.display = "none"; }
+    else { alert("Pour installer BatiCalc : touchez le bouton Partager de Safari, puis « Sur l'écran d'accueil »."); }
+  });
 })();
 </script>
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
