@@ -2830,7 +2830,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
   $("pq-niv").addEventListener("change", maj); $("pq-toit").addEventListener("change", maj); maj();
   terrain();
 
-  var ov = document.createElement("div");
+  var ov = document.createElement("div"); ov.id = "ov-mode";
   ov.style.cssText = "position:fixed;inset:0;z-index:10001;background:linear-gradient(135deg,#0a2f6b,#0f4c9c);display:none;flex-direction:column;justify-content:center;padding:24px;gap:14px";
   ov.innerHTML = '<h1 style="color:#fff;text-align:center;margin:0">Bati<span style="color:#ffa94d">Calc</span></h1><div style="color:#fff;font-size:15px;line-height:1.5;background:rgba(255,255,255,.12);border-radius:12px;padding:12px">🏗️ <b>BatiCalc</b> calcule les quantités de matériaux et le coût estimatif de votre construction, en FCFA.<br>👷 Pour les particuliers qui construisent leur maison, comme pour les maçons et les techniciens.<br>📱 Une estimation rapide, étape par étape, directement depuis votre téléphone.</div><p style="color:#fff;text-align:center;font-size:18px;margin:0 0 8px">Vous êtes ? Touchez votre profil pour commencer</p>' +
     '<button type="button" class="btn" data-m="p" style="font-size:19px;padding:18px">🏠 Je suis un particulier<br><small style="color:#fff;font-weight:normal">Je veux estimer le coût de ma maison, étape par étape, sans être technicien</small></button>' +
@@ -2857,7 +2857,7 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
 <script>
 (function () {
   var WA_AIDE = "237681463954"; /* numéro WhatsApp d'aide, avec l'indicatif, sans + ni espaces (exemple : 237600000000) */
-  var hd = document.querySelector("header"), dp = null, ib = document.createElement("button"), ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  var hd = document.querySelector("header"), dp = null, ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
   var dedans = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone;
   if (WA_AIDE) {
     var a = document.createElement("a");
@@ -2866,15 +2866,31 @@ footer::before{content:"\1F3D7\FE0F  \1F9F1  \1F4D0";display:block;font-size:18p
     a.style.cssText = "position:fixed;right:14px;bottom:82px;z-index:60;width:54px;height:54px;border-radius:50%;background:#25d366;color:#fff;font-size:28px;display:flex;align-items:center;justify-content:center;text-decoration:none;box-shadow:0 4px 14px rgba(0,0,0,.3)";
     document.body.appendChild(a);
   }
-  ib.type = "button"; ib.className = "sup"; ib.textContent = "📲 Installer l'application"; ib.style.cssText = "display:none;margin-top:8px;background:#fff;color:#0f4c9c;border-color:#fff";
-  if (hd) { hd.appendChild(ib); }
-  if (!dedans && ios) { ib.style.display = ""; }
-  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); dp = e; if (!dedans) { ib.style.display = ""; } });
-  window.addEventListener("appinstalled", function () { ib.style.display = "none"; });
-  ib.addEventListener("click", function () {
-    if (dp) { dp.prompt(); dp = null; ib.style.display = "none"; }
-    else { alert("Pour installer BatiCalc : touchez le bouton Partager de Safari, puis « Sur l'écran d'accueil »."); }
-  });
+  var BS = "border:0;border-radius:12px;background:#f97316;color:#fff;font-weight:bold;cursor:pointer;";
+  function montrer() {
+    var m = document.createElement("div"), android = /android/i.test(navigator.userAgent);
+    m.style.cssText = "position:fixed;inset:0;z-index:10002;background:rgba(8,20,45,.8);display:flex;align-items:center;justify-content:center;padding:18px";
+    m.innerHTML = '<div style="background:#fff;color:#1b2a3a;border-radius:16px;padding:18px;max-width:380px;width:100%;font-size:16px;line-height:1.5"><h3 style="margin:0 0 8px;color:#0f4c9c">📲 Installer BatiCalc</h3>' +
+      (ios ? '<p style="margin:0 0 6px"><b>Sur iPhone (Safari) :</b></p><ol style="margin:0 0 10px;padding-left:20px"><li>Touchez le bouton <b>Partager</b> (le carré avec une flèche).</li><li>Faites défiler et touchez <b>« Sur l\'écran d\'accueil »</b>.</li><li>Touchez <b>« Ajouter »</b>.</li></ol>' :
+      '<p style="margin:0 0 6px"><b>Sur Android (Chrome) :</b></p><ol style="margin:0 0 10px;padding-left:20px"><li>Touchez les <b>trois points ⋮</b> en haut à droite.</li><li>Touchez <b>« Installer l\'application »</b> (ou « Ajouter à l\'écran d\'accueil »).</li><li>Touchez <b>« Installer »</b>.</li></ol>' + (android ? '' : '<p style="margin:0 0 10px;font-size:14px">Sur iPhone : bouton Partager, puis « Sur l\'écran d\'accueil ».</p>')) +
+      '<p style="margin:0 0 12px;font-size:14px">L\'icône BatiCalc apparaît ensuite sur votre écran, comme une vraie application.</p><button type="button" style="' + BS + 'width:100%;padding:12px;font-size:17px">J\'ai compris</button></div>';
+    m.addEventListener("click", function (ev) { if (ev.target === m || ev.target.tagName === "BUTTON") { m.remove(); } });
+    document.body.appendChild(m);
+  }
+  function installer() { if (dp) { dp.prompt(); dp = null; } else { montrer(); } }
+  var btns = [];
+  function creer(parent, css) {
+    var b = document.createElement("button");
+    b.type = "button"; b.textContent = "📲 Installer l'application"; b.style.cssText = BS + css; b.addEventListener("click", installer);
+    parent.appendChild(b); btns.push(b);
+  }
+  if (!dedans) {
+    if (hd) { creer(hd, "display:block;margin-top:8px;padding:10px 14px;font-size:15px"); }
+    var ovm = document.getElementById("ov-mode");
+    if (ovm) { creer(ovm, "padding:14px;font-size:17px"); }
+    window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); dp = e; });
+    window.addEventListener("appinstalled", function () { btns.forEach(function (b) { b.style.display = "none"; }); });
+  }
 })();
 </script>
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
